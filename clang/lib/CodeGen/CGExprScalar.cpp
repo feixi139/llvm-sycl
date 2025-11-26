@@ -48,6 +48,8 @@
 #include "llvm/Support/TypeSize.h"
 #include <cstdarg>
 #include <optional>
+#include <iostream>
+// lzdebug
 
 using namespace clang;
 using namespace CodeGen;
@@ -628,8 +630,17 @@ public:
       return EmitLoadOfLValue(E);
 
     Value *V = CGF.EmitCallExpr(E).getScalarVal();
-
+    if (V) {
+      std::string str;
+      llvm::raw_string_ostream os(str);
+      V->print(os);
+      printf("LZDEBUG!!! in VisitCallExpr:\n");
+      printf("Value info: %s\n", str.c_str());
+    } else {
+      printf("LZDEBUG!!! in VisitCallExpr: Value info is nullptr\n");
+    }
     EmitLValueAlignmentAssumption(E, V);
+    
     return V;
   }
 

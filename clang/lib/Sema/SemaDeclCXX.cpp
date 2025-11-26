@@ -4035,7 +4035,6 @@ namespace {
         HandleValue(E->getArg(0), /*AddressOf=*/false);
         return;
       }
-
       Inherited::VisitCallExpr(E);
     }
 

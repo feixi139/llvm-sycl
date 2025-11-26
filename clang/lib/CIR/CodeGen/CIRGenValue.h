@@ -42,7 +42,7 @@ class RValue {
   mlir::Type elementType;
 
 public:
-  bool isScalar() const { return v1.getInt() == Scalar; }
+  bool isScalar() const { return v1.getInt() == Scalar;}
   bool isAggregate() const { return v1.getInt() == Aggregate; }
 
   /// Return the mlir::Value of this scalar value.

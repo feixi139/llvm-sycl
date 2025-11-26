@@ -9045,8 +9045,7 @@ bool LValueExprEvaluator::VisitVarDecl(const Expr *E, const VarDecl *VD) {
 }
 
 bool LValueExprEvaluator::VisitCallExpr(const CallExpr *E) {
-  if (!IsConstantEvaluatedBuiltinCall(E))
-    return ExprEvaluatorBaseTy::VisitCallExpr(E);
+  if (!IsConstantEvaluatedBuiltinCall(E)) {return ExprEvaluatorBaseTy::VisitCallExpr(E);}
 
   switch (E->getBuiltinCallee()) {
   default:
@@ -9060,7 +9059,6 @@ bool LValueExprEvaluator::VisitCallExpr(const CallExpr *E) {
       return Visit(E->getArg(0));
     break;
   }
-
   return ExprEvaluatorBaseTy::VisitCallExpr(E);
 }
 
@@ -11487,8 +11485,7 @@ static bool handleVectorElementCast(EvalInfo &Info, const FPOptions FPO,
 }
 
 bool VectorExprEvaluator::VisitCallExpr(const CallExpr *E) {
-  if (!IsConstantEvaluatedBuiltinCall(E))
-    return ExprEvaluatorBaseTy::VisitCallExpr(E);
+  if (!IsConstantEvaluatedBuiltinCall(E)) { return ExprEvaluatorBaseTy::VisitCallExpr(E);}
 
   switch (E->getBuiltinCallee()) {
   default:
@@ -12943,8 +12940,7 @@ static bool tryEvaluateBuiltinObjectSize(const Expr *E, unsigned Type,
 }
 
 bool IntExprEvaluator::VisitCallExpr(const CallExpr *E) {
-  if (!IsConstantEvaluatedBuiltinCall(E))
-    return ExprEvaluatorBaseTy::VisitCallExpr(E);
+  if (!IsConstantEvaluatedBuiltinCall(E)) {return ExprEvaluatorBaseTy::VisitCallExpr(E);}
   return VisitBuiltinCallExpr(E, E->getBuiltinCallee());
 }
 
@@ -15720,8 +15716,7 @@ static bool TryEvaluateBuiltinNaN(const ASTContext &Context,
 }
 
 bool FloatExprEvaluator::VisitCallExpr(const CallExpr *E) {
-  if (!IsConstantEvaluatedBuiltinCall(E))
-    return ExprEvaluatorBaseTy::VisitCallExpr(E);
+  if (!IsConstantEvaluatedBuiltinCall(E)) {return ExprEvaluatorBaseTy::VisitCallExpr(E);}
 
   switch (E->getBuiltinCallee()) {
   default:
@@ -16504,8 +16499,7 @@ bool ComplexExprEvaluator::VisitInitListExpr(const InitListExpr *E) {
 }
 
 bool ComplexExprEvaluator::VisitCallExpr(const CallExpr *E) {
-  if (!IsConstantEvaluatedBuiltinCall(E))
-    return ExprEvaluatorBaseTy::VisitCallExpr(E);
+  if (!IsConstantEvaluatedBuiltinCall(E)) {return ExprEvaluatorBaseTy::VisitCallExpr(E);}
 
   switch (E->getBuiltinCallee()) {
   case Builtin::BI__builtin_complex:
@@ -16597,8 +16591,7 @@ public:
   }
 
   bool VisitCallExpr(const CallExpr *E) {
-    if (!IsConstantEvaluatedBuiltinCall(E))
-      return ExprEvaluatorBaseTy::VisitCallExpr(E);
+    if (!IsConstantEvaluatedBuiltinCall(E)) { return ExprEvaluatorBaseTy::VisitCallExpr(E); }
 
     switch (E->getBuiltinCallee()) {
     case Builtin::BI__assume:

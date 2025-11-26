@@ -13027,7 +13027,6 @@ namespace {
         HandleValue(E->getArg(0));
         return;
       }
-
       Inherited::VisitCallExpr(E);
     }
 

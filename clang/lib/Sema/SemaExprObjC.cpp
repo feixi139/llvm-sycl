@@ -3651,7 +3651,6 @@ namespace {
       if (FunctionDecl *fn = e->getDirectCallee())
         if (ACCResult result = checkCallToFunction(fn))
           return result;
-
       return super::VisitCallExpr(e);
     }
 

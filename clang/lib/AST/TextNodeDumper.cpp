@@ -28,6 +28,8 @@
 
 #include <algorithm>
 #include <utility>
+#include <iostream>
+// lzdebug
 
 using namespace clang;
 
@@ -1494,7 +1496,6 @@ void TextNodeDumper::VisitCXXOperatorCallExpr(const CXXOperatorCallExpr *Node) {
   const char *OperatorSpelling = clang::getOperatorSpelling(Node->getOperator());
   if (OperatorSpelling)
     OS << " '" << OperatorSpelling << "'";
-
   VisitCallExpr(Node);
 }
 

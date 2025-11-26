@@ -53,6 +53,7 @@
 #include <numeric>
 #include <optional>
 #include <string>
+#include <iostream>
 
 using namespace clang;
 using namespace CodeGen;
@@ -1327,6 +1328,7 @@ void CodeGenModule::EmitExplicitCastExprType(const ExplicitCastExpr *E,
 //                         LValue Expression Emission
 //===----------------------------------------------------------------------===//
 
+// LZDEBUG!!! EmitPointerWithAlignment 
 static Address EmitPointerWithAlignment(const Expr *E, LValueBaseInfo *BaseInfo,
                                         TBAAAccessInfo *TBAAInfo,
                                         KnownNonNull_t IsKnownNonNull,
@@ -5878,6 +5880,7 @@ RValue CodeGenFunction::EmitCallExpr(const CallExpr *E,
   CGCallee callee = EmitCallee(E->getCallee());
 
   if (callee.isBuiltin()) {
+
     return EmitBuiltinExpr(callee.getBuiltinDecl(), callee.getBuiltinID(),
                            E, ReturnValue);
   }

@@ -22,6 +22,8 @@
 #include "clang/AST/OpenMPClause.h"
 #include "clang/AST/StmtVisitor.h"
 #include "llvm/ADT/FoldingSet.h"
+// lzdebug
+#include <iostream>
 using namespace clang;
 
 namespace {

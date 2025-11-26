@@ -38,6 +38,8 @@
 #include "llvm/Support/ScopedPrinter.h"
 #include <optional>
 #include <utility>
+// lzdebug
+#include <iostream>
 
 using namespace clang;
 using namespace CodeGen;
@@ -113,8 +115,7 @@ static Value *EmitTargetArchBuiltinExpr(CodeGenFunction *CGF,
   case llvm::Triple::systemz:
     return CGF->EmitSystemZBuiltinExpr(BuiltinID, E);
   case llvm::Triple::nvptx:
-  case llvm::Triple::nvptx64:
-    return CGF->EmitNVPTXBuiltinExpr(BuiltinID, E);
+  case llvm::Triple::nvptx64: { return CGF->EmitNVPTXBuiltinExpr(BuiltinID, E);}
   case llvm::Triple::wasm32:
   case llvm::Triple::wasm64:
     return CGF->EmitWebAssemblyBuiltinExpr(BuiltinID, E);
@@ -138,15 +139,26 @@ static Value *EmitTargetArchBuiltinExpr(CodeGenFunction *CGF,
 Value *CodeGenFunction::EmitTargetBuiltinExpr(unsigned BuiltinID,
                                               const CallExpr *E,
                                               ReturnValueSlot ReturnValue) {
+  printf("LZDEBUG!!! in this branch EmitTargetBuiltinExpr func, and BuiltnId is %d\n", BuiltinID);
   if (getContext().BuiltinInfo.isAuxBuiltinID(BuiltinID)) {
     assert(getContext().getAuxTargetInfo() && "Missing aux target info");
     return EmitTargetArchBuiltinExpr(
         this, getContext().BuiltinInfo.getAuxBuiltinID(BuiltinID), E,
         ReturnValue, getContext().getAuxTargetInfo()->getTriple().getArch());
   }
-
-  return EmitTargetArchBuiltinExpr(this, BuiltinID, E, ReturnValue,
+  // lzdebug
+  auto result = EmitTargetArchBuiltinExpr(this, BuiltinID, E, ReturnValue,
                                    getTarget().getTriple().getArch());
+  // lzdebug
+  std::string str;
+  llvm::raw_string_ostream os(str);
+  result->print(os);
+  printf("LZDEBUG!!! in EmitTargetBuiltinExpr func:\n");
+  printf("Value info: %s\n", str.c_str());
+  
+  return result;
+  // return EmitTargetArchBuiltinExpr(this, BuiltinID, E, ReturnValue,
+  //                                  getTarget().getTriple().getArch());
 }
 
 static void initializeAlloca(CodeGenFunction &CGF, AllocaInst *AI, Value *Size,
@@ -2654,7 +2666,7 @@ static RValue EmitSYCLFreeFunctionKernelBuiltin(CodeGenFunction &CGF,
   return RValue::get(
       llvm::ConstantInt::getFalse(CGF.ConvertType(E->getType())));
 }
-
+// lzdebug
 RValue CodeGenFunction::EmitBuiltinExpr(const GlobalDecl GD, unsigned BuiltinID,
                                         const CallExpr *E,
                                         ReturnValueSlot ReturnValue) {
@@ -6541,15 +6553,20 @@ RValue CodeGenFunction::EmitBuiltinExpr(const GlobalDecl GD, unsigned BuiltinID,
   }
 
   // Now see if we can emit a target-specific builtin.
+  // lzdebug
   if (Value *V = EmitTargetBuiltinExpr(BuiltinID, E, ReturnValue)) {
     switch (EvalKind) {
     case TEK_Scalar:
-      if (V->getType()->isVoidTy())
+      if (V->getType()->isVoidTy()) {
+        printf("LZDEBUG!!! in this branch TEK_Scalar return nullptr \n");
         return RValue::get(nullptr);
+      }
+      printf("LZDEBUG!!! in this branch TEK_Scalar return get(V) \n");
       return RValue::get(V);
-    case TEK_Aggregate:
+    case TEK_Aggregate: {
       return RValue::getAggregate(ReturnValue.getAddress(),
                                   ReturnValue.isVolatile());
+    }
     case TEK_Complex:
       llvm_unreachable("No current target builtin returns complex");
     }

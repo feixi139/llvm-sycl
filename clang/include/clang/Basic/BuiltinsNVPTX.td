@@ -2547,6 +2547,8 @@ def __dmma_m8n8k4_ld_c : NVPTXBuiltinSMAndPTX<"void(double *, double const *, un
 def __dmma_m8n8k4_st_c_f64 : NVPTXBuiltinSMAndPTX<"void(double *, double const *, unsigned int, _Constant int)", SM_80, PTX70>;
 def __dmma_m8n8k4_mma_f64 : NVPTXBuiltinSMAndPTX<"void(double *, double const *, double const *, double const *, _Constant int, _Constant int)", SM_80, PTX70>;
 
+def __asm_mma_m16n8k4_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double *, double, double , double , double)", SM_80, PTX70>;
+
 def __mma_bf16_m16n16k16_ld_a : NVPTXBuiltinSMAndPTX<"void(int *, int const *, unsigned int, _Constant int)", SM_80, PTX70>;
 def __mma_bf16_m16n16k16_ld_b : NVPTXBuiltinSMAndPTX<"void(int *, int const *, unsigned int, _Constant int)", SM_80, PTX70>;
 def __mma_bf16_m16n16k16_mma_f32 : NVPTXBuiltinSMAndPTX<"void(float *, int const *, int const *, float const *, _Constant int, _Constant int)", SM_80, PTX70>;

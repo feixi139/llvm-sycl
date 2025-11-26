@@ -14223,8 +14223,7 @@ public:
       break;
     }
 
-    if (SequencingKind == NoSequencing)
-      return VisitCallExpr(CXXOCE);
+    if (SequencingKind == NoSequencing) { return VisitCallExpr(CXXOCE); }
 
     // This is a call, so all subexpressions are sequenced before the result.
     SequencedSubexpression Sequenced(*this);
