@@ -179,25 +179,6 @@ class WMMA_REGS<string Geom, string Frag, string PtxEltType> {
   string gf = Geom#":"#Frag;
   string ft = frag#":"#ptx_elt_type;
   list<LLVMType> regs = !cond(
-    // wgmma: 
-    !eq(gft,"m64n16k16:a:bf16") : !listsplat(llvm_float_ty, 1),
-    !eq(gft,"m64n16k16:b:bf16") : !listsplat(llvm_float_ty, 1),  
-
-    !eq(gft,"m64n16k16:a:f16") : !listsplat(llvm_float_ty, 1),
-    !eq(gft,"m64n16k16:b:f16") : !listsplat(llvm_float_ty, 1),
-    // !eq(gft,"m64n256k16:a:f16") : !listsplat(llvm_float_ty, 1),
-    // !eq(gft,"m64n256k16:b:f16") : !listsplat(llvm_float_ty, 1),
-
-    !eq(gft,"m64n8k8:a:tf32") : !listsplat(llvm_i32_ty, 1),
-    !eq(gft,"m64n8k8:b:tf32") : !listsplat(llvm_i32_ty, 1),
-
-    !eq(gft,"m64n8k8:c:f32") : !listsplat(llvm_float_ty, 1),
-    !eq(gft,"m64n8k8:d:f32") : !listsplat(llvm_float_ty, 4),
-    !eq(gft,"m64n16k16:c:f32") : !listsplat(llvm_float_ty, 1),
-    !eq(gft,"m64n16k16:d:f32") : !listsplat(llvm_float_ty, 8),
-    // !eq(gft,"m64n256k16:c:f32") : !listsplat(llvm_float_ty, 1),
-    // !eq(gft,"m64n256k16:d:f32") : !listsplat(llvm_float_ty, 128),
-
     // mma fp ops use smaller fragments than wmma fp ops
     !eq(gft,"m8n8k4:a:f16") : !listsplat(llvm_v2f16_ty, 2),
     !eq(gft,"m8n8k4:b:f16") : !listsplat(llvm_v2f16_ty, 2),
@@ -240,11 +221,6 @@ class WMMA_REGS<string Geom, string Frag, string PtxEltType> {
     !eq(gft,"m8n8k4:b:f64") : [llvm_double_ty],
     !eq(gft,"m8n8k4:c:f64") : !listsplat(llvm_double_ty, 2),
     !eq(gft,"m8n8k4:d:f64") : !listsplat(llvm_double_ty, 2),
-
-    !eq(gft,"m16n8k4:a:f64") : !listsplat(llvm_double_ty, 2),
-    !eq(gft,"m16n8k4:b:f64") : !listsplat(llvm_double_ty, 1),
-    !eq(gft,"m16n8k4:c:f64") : !listsplat(llvm_double_ty, 4),
-    !eq(gft,"m16n8k4:d:f64") : !listsplat(llvm_double_ty, 4),
 
     !eq(gft,"m16n8k16:a:f64") : !listsplat(llvm_double_ty, 8),
     !eq(gft,"m16n8k16:b:f64") : !listsplat(llvm_double_ty, 4),
@@ -360,6 +336,23 @@ class WMMA_REGS<string Geom, string Frag, string PtxEltType> {
     !eq(gf,"m8n16:x1") : !listsplat(llvm_i32_ty, 1),
     !eq(gf,"m8n16:x2") : !listsplat(llvm_i32_ty, 2),
     !eq(gf,"m8n16:x4") : !listsplat(llvm_i32_ty, 4),
+
+    // wgmma32: 
+    !eq(gft,"m64n16k16:a:bf16") : !listsplat(llvm_float_ty, 1),
+    !eq(gft,"m64n16k16:b:bf16") : !listsplat(llvm_float_ty, 1),
+    
+
+    !eq(gft,"m64n16k16:a:f16") : !listsplat(llvm_float_ty, 1),
+    !eq(gft,"m64n16k16:b:f16") : !listsplat(llvm_float_ty, 1),
+
+    !eq(gft,"m64n8k8:a:tf32") : [llvm_i32_ty],
+    !eq(gft,"m64n8k8:b:tf32") : [llvm_i32_ty],
+
+    !eq(gft,"m64n8k8:c:f32") : !listsplat(llvm_float_ty, 1),
+    !eq(gft,"m64n8k8:d:f32") : !listsplat(llvm_float_ty, 4),
+    !eq(gft,"m64n16k16:c:f32") : !listsplat(llvm_float_ty, 1),
+    !eq(gft,"m64n16k16:d:f32") : !listsplat(llvm_float_ty, 8),
+
   );
 }
 
@@ -536,7 +529,7 @@ class NVVM_MMA_OPS {
 
   list<list<WMMA_REGS>> tf32_wgmma_ops = WGMMA_OPS<
             ["m64n8k8"],
-            ["tf32"], ["tf32"], ["f32"], ["f32"]>.ret;  
+            ["tf32"], ["tf32"], ["f32"], ["f32"]>.ret;         
 
   list<list<WMMA_REGS>> all_wgmma_ops = !listconcat(
             bf16_wgmma_ops, fp16_wgmma_ops, tf32_wgmma_ops);
@@ -573,7 +566,7 @@ class NVVM_MMA_OPS {
             ["m16n8k16", "m16n8k8"],
             ["bf16"], [], ["f32"], []>.ret;
   list<list<WMMA_REGS>> f64_mma_ops = MMA_OPS<
-             ["m8n8k4", "m16n8k16", "m16n8k4"],
+             ["m8n8k4", "m16n8k16"],
             ["f64"], [], ["f64"], []>.ret;
   list<list<WMMA_REGS>> fp_mma_ops = MMA_OPS<
             ["m8n8k4", "m16n8k8", "m16n8k16"],
@@ -760,7 +753,7 @@ class NVVM_MMA_SUPPORTED<list<WMMA_REGS> frags, string layout_a, string layout_b
 }
 
 // lzdebug 针对mma指令是否被硬件所支持
-class NVVM_WGMMA_SUPPORTED<list<WMMA_REGS> frags, int trans_a, int trans_b> {
+class NVVM_WGMMA_SUPPORTED<list<WMMA_REGS> frags> {
   // MMA ops check both layouts.
   string a_type = frags[0].ptx_elt_type;
   string b_type = frags[1].ptx_elt_type;
@@ -772,12 +765,6 @@ class NVVM_WGMMA_SUPPORTED<list<WMMA_REGS> frags, int trans_a, int trans_b> {
   // geom+frag_c+frag_d.
   string gcd = geom # ":" # c_type # d_type;
   bit ret = !cond(
-    !and(!eq(trans_a, 1),
-         !ne(a_type, "f16"),
-         !ne(a_type, "bf16")): false,
-    !and(!eq(trans_b, 1),
-         !ne(a_type, "f16"),
-         !ne(a_type, "bf16")): false,
     true: true
   );
 }
@@ -2188,17 +2175,23 @@ class NVVM_WGMMA<WMMA_REGS A, WMMA_REGS B, WMMA_REGS C, WMMA_REGS D>
               [IntrArgMemOnly, IntrNoCallback]>;
 
 foreach op = NVVM_MMA_OPS.all_wgmma_ops in {
-  foreach scale_d = [0, 1]  in {
-    foreach scale_a = [0, 1]  in {
-      foreach scale_b = [0, 1]  in {
-          foreach trans_a = [0, 1]  in {
-            foreach trans_b = [0, 1]  in {
-              if NVVM_WGMMA_SUPPORTED<op, trans_a, trans_b>.ret then {
-                def WGMMA_NAME<scale_d, scale_a, scale_b, trans_a, trans_b, op[0], op[1], op[2], op[3]>.record
-                    : NVVM_WGMMA<op[0], op[1], op[2], op[3]>;
-              }
+  foreach scale_d = [0, 1] in {
+    foreach scale_a = [0, 1] in {
+      foreach scale_b = [0, 1] in {
+        !if(!or(!eq(op[0].ptx_elt_type, "bf16"), !eq(op[0].ptx_elt_type, "f16")),
+          // 需要 trans_a/trans_b：遍历所有组合
+          foreach trans_a = [0, 1] in {
+            foreach trans_b = [0, 1] in {
+              def WGMMA_NAME<scale_d, scale_a, scale_b, trans_a, trans_b,
+                             op[0], op[1], op[2], op[3]>.record
+                : NVVM_WGMMA<op[0], op[1], op[2], op[3]>;
             }
-          }
+          },
+          // 不需要 trans：只生成 trans_a=0, trans_b=0（或忽略）
+          def WGMMA_NAME<scale_d, scale_a, scale_b, 0, 0,
+                         op[0], op[1], op[2], op[3]>.record
+            : NVVM_WGMMA<op[0], op[1], op[2], op[3]>;
+        )
       }
     }
   }

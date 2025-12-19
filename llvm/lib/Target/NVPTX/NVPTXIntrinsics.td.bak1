@@ -6820,12 +6820,6 @@ class WMMA_REGINFO<WMMA_REGS r, string op>
              !eq(geom, "m16n8k128"),
              !eq(geom, "m16n8k256"))) : [hasSM<80>, hasPTX<70>],
 
-    !and(!eq(op,"wgmma"),
-         !or(!eq(geom, "m64n16k16"),
-             !eq(geom, "m64n32k16"),
-             !eq(geom, "m64n8k8"),
-             !eq(geom, "m64n64k16"))) : [hasSM<80>, hasPTX<70>],
-
     !and(!eq(op,"ldmatrix"),
          !eq(ptx_elt_type,"b16"),
          !eq(geom, "m8n8")) : [hasSM<75>, hasPTX<65>],
@@ -6985,13 +6979,6 @@ class MMA_OP_PREDICATES<WMMA_REGINFO FragA, string b1op> {
     !if(!eq(b1op, ".and.popc"), [hasSM<80>,hasPTX<71>],[])
   );
 }
-
-class WGMMA_OP_PREDICATES<WMMA_REGINFO FragA> {
-  WMMA_REGINFO Frag = FragA;
-  list<Predicate> ret = 
-    FragA.Predicates
-  ;
-}
 // WMMA.MMA
 class WMMA_MMA<WMMA_REGINFO FragA, WMMA_REGINFO FragB,
                WMMA_REGINFO FragC, WMMA_REGINFO FragD,
@@ -7050,62 +7037,6 @@ defset list<WMMA_INSTR> WMMAs  = {
   } // layout_a
 } // defset
 }
-
-// WGMMA
-class WGMMA<WMMA_REGINFO FragA, WMMA_REGINFO FragB,
-               WMMA_REGINFO FragC, WMMA_REGINFO FragD, int scale_d, int scale_a, int scale_b, int trans_a, int trans_b>
-  : WMMA_INSTR<WGMMA_NAME<scale_d, scale_a, scale_b, trans_a, trans_b, FragA, FragB, FragC, FragD>.record,
-                        [
-                          (ins i64:$addr0),
-                          (ins i64:$addr1)
-                        ]>,
-    // Requires does not seem to have effect on Instruction w/o Patterns.
-    // We set it here anyways and propagate to the Pat<> we construct below.
-  Requires<WGMMA_OP_PREDICATES<FragA>.ret> {
-  let OutOperandList = FragD.Outs;
-  let InOperandList = !con(( 
-                      ins
-                      Int64Regs:$addr0,
-                      Int64Regs:$addr1
-                      ), (ins MmaCode:$ptx));
-  // let InOperandList  = !con(Args, (ins MmaCode:$ptx));
-  string TypeList = "." # FragD.ptx_elt_type
-                    # "." # FragA.ptx_elt_type
-                    # "." # FragB.ptx_elt_type;
-                    
-  bit needs_trans = !or(!eq(FragA.ptx_elt_type, "bf16"), !eq(FragA.ptx_elt_type, "f16"));
-  string trans = "," # trans_a # ", " # trans_b;
-  let AsmString = "wgmma.mma_async.sync.aligned."
-                  # FragA.geom
-                  # TypeList # "\n\t\t"
-                  # FragD.regstring # ",\n\t\t"
-                  # " $addr0,"
-                  # " $addr1,"
-                  # scale_d # ", "
-                  # scale_a # ", "
-                  # scale_b # !if(needs_trans, trans, "")
-                  # ";";
-}
-
-let isConvergent = true in {
-defset list<WMMA_INSTR> WGMMAs  = {
-  foreach scale_d = [0, 1]  in {
-    foreach scale_a = [0, 1]  in {
-      foreach scale_b = [0, 1]  in {
-        foreach trans_a = [0, 1]  in {
-          foreach trans_b = [0, 1]  in {
-            foreach op = NVVM_MMA_OPS.all_wgmma_ops in {
-              if NVVM_WGMMA_SUPPORTED<op, trans_a, trans_b>.ret then {
-                def : WGMMA<WMMA_REGINFO<op[0], "wgmma">, WMMA_REGINFO<op[1], "wgmma">, WMMA_REGINFO<op[2], "wgmma">, WMMA_REGINFO<op[3], "wgmma">, scale_d, scale_a, scale_b, trans_a, trans_b>;
-              }
-            }
-          }
-        }
-      }
-    }
-  }   
-} 
-} // op
 
 // MMA
 class MMA<WMMA_REGINFO FragA, WMMA_REGINFO FragB,
@@ -7202,7 +7133,7 @@ class MMA_PAT<WMMA_INSTR wi>
         Requires<wi.Predicates>;
 
 // Build intrinsic->instruction patterns for all MMA instructions.
-foreach mma = !listconcat(MMAs, WMMAs, MMA_LDSTs, LDMATRIXs, WGMMAs) in
+foreach mma = !listconcat(MMAs, WMMAs, MMA_LDSTs, LDMATRIXs) in
   def : MMA_PAT<mma>;
 
 multiclass MAPA<string suffix, Intrinsic Intr> {

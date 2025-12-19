@@ -214,6 +214,12 @@ struct NVPTXMmaInfo {
   // Layout and Satf, 0 otherwise.
 static NVPTXMmaInfo getNVPTXMmaInfo(unsigned BuiltinID) {
   // clang-format off
+#define WGMMA_TRANS_VARIANTS(geom, type)                                    \
+      Intrinsic::nvvm_wgmma_##geom##_##type##_1_1_1_0_0, 
+
+#define WGMMA_VARIANTS(geom, type)                                    \
+      Intrinsic::nvvm_wgmma_##geom##_##type##_1_1_1, 
+
 #define MMA_VARIANTS(geom, type)                                    \
       Intrinsic::nvvm_wmma_##geom##_mma_row_row_##type,             \
       Intrinsic::nvvm_wmma_##geom##_mma_row_col_##type,             \
@@ -363,9 +369,31 @@ static NVPTXMmaInfo getNVPTXMmaInfo(unsigned BuiltinID) {
     return {1, 1, 2, 2, {{MMA_VARIANTS(m8n8k4, f64)}}};
   }
 
-  case NVPTX::BI__asm_mma_m16n8k4_f64_f64_f64_f64: {
-    printf("in this branch NVPTX::BI__asm_mma_m16n8k4_f64_f64_f64_f64 at line 365\n");
+  case NVPTX::BI__asm_dmma_m8n8k4_f64_f64_f64_f64: {
+    printf("in this branch NVPTX::BI__asm_dmma_m8n8k4_f64_f64_f64_f64 at line 365\n");
     return {1, 1, 2, 2, {{MMA_VARIANTS_1(m8n8k4, f64)}}};
+  }
+
+  case NVPTX::BI__asm_dmma_m16n8k4_f64_f64_f64_f64: {
+    printf("in this branch NVPTX::BI__asm_dmma_m16n8k4_f64_f64_f64_f64 at line 365\n");
+    return {2, 1, 4, 4, {{MMA_VARIANTS_1(m16n8k4, f64)}}};
+  }
+
+  case NVPTX::BI__asm_dmma_m16n8k16_f64_f64_f64_f64: {
+    printf("in this branch NVPTX::BI__asm_mma_m16n8k16_f64_f64_f64_f64 at line 365\n");
+    return {8, 4, 4, 4, {{MMA_VARIANTS_1(m16n8k16, f64)}}};
+  }
+
+  case NVPTX::BI__asm_hmma_m16n8k16_mma_f16f16f32f32: {
+    // anchor
+    printf("in this branch NVPTX::BI__asm_hmma_m16n8k16_mma_f16f16f32f32 at line 365\n");
+    return {4, 2, 4, 4, {{MMA_VARIANTS_1(m16n8k16, f32_f32)}}};
+  }
+
+  case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32: {
+    // anchor
+    printf("in this branch NVPTX::__asm_mma_m16n8k8_f32_tf32_tf32_f32 at line 384\n");
+    return {4, 2, 4, 4, {{MMA_VARIANTS_1(m16n8k8, tf32)}}};
   }
 
   // Alternate FP MMA
@@ -385,6 +413,23 @@ static NVPTXMmaInfo getNVPTXMmaInfo(unsigned BuiltinID) {
     printf("in this branch NVPTX::BI__mma_tf32_m16n16k8_mma_f32\n");
     return {4, 4, 8, 8, {{MMA_VARIANTS(m16n16k8, tf32)}}};
   }
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_bf16_bf16: {
+    printf("in this branch NVPTX::BI__mma_tf32_m16n16k8_mma_f32\n");
+    return {4, 4, 8, 8, {{WGMMA_TRANS_VARIANTS(m64n16k16, f32_bf16_bf16)}}};
+  }
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16: {
+    printf("in this branch NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16\n");
+    return {4, 4, 8, 8, {{WGMMA_TRANS_VARIANTS(m64n16k16, f32_f16_f16)}}};
+  }
+  // case NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16: {
+  //   printf("in this branch NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16\n");
+  //   return {4, 4, 8, 128, {{WGMMA_TRANS_VARIANTS(m64n256k16, f32_f16_f16)}}};
+  // }
+  case NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32: {
+    printf("in this branch NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32\n");
+    return {4, 4, 4, 4, {{WGMMA_VARIANTS(m64n8k8, f32_tf32_tf32)}}};
+  }
+
   default:
     llvm_unreachable("Unexpected builtin ID.");
   }
@@ -529,14 +574,6 @@ static Value *MakeCpAsync(unsigned IntrinsicID, unsigned IntrinsicIDS,
   printf("LZDEBUG!!! MakeCpAsync Value IR:\n%s\n", str2.c_str());
 
   return result;
-  // return E->getNumArgs() == 3
-  //            ? CGF.Builder.CreateCall(CGF.CGM.getIntrinsic(IntrinsicIDS),
-  //                                     {CGF.EmitScalarExpr(E->getArg(0)),
-  //                                      CGF.EmitScalarExpr(E->getArg(1)),
-  //                                      CGF.EmitScalarExpr(E->getArg(2))})
-  //            : CGF.Builder.CreateCall(CGF.CGM.getIntrinsic(IntrinsicID),
-  //                                     {CGF.EmitScalarExpr(E->getArg(0)),
-  //                                      CGF.EmitScalarExpr(E->getArg(1))});
 }
 
 static Value *MakeHalfType(unsigned IntrinsicID, unsigned BuiltinID,
@@ -4866,7 +4903,6 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__mma_tf32_m16n16k8_ld_a:
   case NVPTX::BI__mma_tf32_m16n16k8_ld_b:
   case NVPTX::BI__mma_tf32_m16n16k8_ld_c: {
-    // Anchor 
     printf("===========================================================================\n");
     // E->dump();
     printf("===========================================================================\n");
@@ -4926,6 +4962,68 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__imma_m8n8k32_st_c_i32:
   case NVPTX::BI__bmma_m8n8k128_st_c_i32:
   case NVPTX::BI__dmma_m8n8k4_st_c_f64:
+  
+    case NVPTX::BI__mma_m16n16k8_st_c_f32: {
+    Value *Dst = EmitScalarExpr(E->getArg(0));
+    Address Src = EmitPointerWithAlignment(E->getArg(1));
+    Value *Ldm = EmitScalarExpr(E->getArg(2));
+    std::optional<llvm::APSInt> isColMajorArg =
+        E->getArg(3)->getIntegerConstantExpr(getContext());
+    if (!isColMajorArg)
+      return nullptr;
+    bool isColMajor = isColMajorArg->getSExtValue();
+    NVPTXMmaLdstInfo II = getNVPTXMmaLdstInfo(BuiltinID);
+    unsigned IID = isColMajor ? II.IID_col : II.IID_row;
+    if (IID == 0)
+      return nullptr;
+    Function *Intrinsic =
+        CGM.getIntrinsic(IID, Dst->getType());
+    llvm::Type *ParamType = Intrinsic->getFunctionType()->getParamType(1);
+    SmallVector<Value *, 10> Values = {Dst};
+    for (unsigned i = 0; i < II.NumResults; ++i) {
+      Value *V = Builder.CreateAlignedLoad(
+          Src.getElementType(),
+          Builder.CreateGEP(Src.getElementType(), Src.emitRawPointer(*this),
+                            llvm::ConstantInt::get(IntTy, i)),
+          CharUnits::fromQuantity(4));
+      Values.push_back(Builder.CreateBitCast(V, ParamType));
+    }
+    Values.push_back(Ldm);
+    Value *Result = Builder.CreateCall(Intrinsic, Values);
+    return Result;
+  }
+/*
+    case NVPTX::BI__mma_m16n16k8_st_c_f32: {
+    Value *Dst = EmitScalarExpr(E->getArg(0));
+    Address Src = EmitPointerWithAlignment(E->getArg(1));
+    Value *Ldm = EmitScalarExpr(E->getArg(2));
+    std::optional<llvm::APSInt> isColMajorArg =
+        E->getArg(3)->getIntegerConstantExpr(getContext());
+    if (!isColMajorArg)
+      return nullptr;
+    bool isColMajor = isColMajorArg->getSExtValue();
+    NVPTXMmaLdstInfo II = getNVPTXMmaLdstInfo(BuiltinID);
+    unsigned IID = isColMajor ? II.IID_col : II.IID_row;
+    if (IID == 0)
+      return nullptr;
+    Function *Intrinsic =
+        CGM.getIntrinsic(IID, Dst->getType());
+    llvm::Type *ParamType = Intrinsic->getFunctionType()->getParamType(1);
+    SmallVector<Value *, 10> Values = {Dst};
+    for (unsigned i = 0; i < II.NumResults; ++i) {
+      Value *V = Builder.CreateAlignedLoad(
+          Src.getElementType(),
+          Builder.CreateGEP(Src.getElementType(), Src.emitRawPointer(*this),
+                            llvm::ConstantInt::get(IntTy, i)),
+          CharUnits::fromQuantity(4));
+      Values.push_back(Builder.CreateBitCast(V, ParamType));
+    }
+    Values.push_back(Ldm);
+    Value *Result = Builder.CreateCall(Intrinsic, Values);
+    return Result;
+  }
+    */
+  /*
   case NVPTX::BI__mma_m16n16k8_st_c_f32: {
     printf("LZDEBUG!!! in this branch BI__mma_m16n16k8_st_c_f32 \n");
     printf("===========================================================================\n");
@@ -4978,6 +5076,8 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
     printf("Value info: %s\n", str.c_str());
     return Result;
   }
+    */
+
 
   // BI__hmma_m16n16k16_mma_<Dtype><CType>(d, a, b, c, layout, satf) -->
   // Intrinsic::nvvm_wmma_m16n16k16_mma_sync<layout A,B><DType><CType><Satf>
@@ -5009,7 +5109,6 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__mma_bf16_m32n8k16_mma_f32:
   case NVPTX::BI__mma_tf32_m16n16k8_mma_f32: {
     // lzdebug
-    // anchor
     printf("LZDEBUG!!! in this branch BI__mma_tf32_m16n16k8_mma_f32 \n");
     printf("LZDEBUG!!! use this line in NVPTX.cpp at line 3180\n");
     printf("===========================================================================\n");
@@ -5424,9 +5523,45 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
                        Intrinsic::nvvm_cp_async_ca_shared_global_16_s, *this, E,
                        16);
   }
+  // lz debug
+  case NVPTX::BI__nvvm_warpgroup_arrive:
+  {
+    return Builder.CreateCall(
+        CGM.getIntrinsic(Intrinsic::nvvm_wgmma_fence_sync_aligned));
+  }
+  case NVPTX::BI__nvvm_warpgroup_commit_batch:
+  {
+    return Builder.CreateCall(
+        CGM.getIntrinsic(Intrinsic::nvvm_wgmma_commit_group_sync_aligned));
+  }
+  // case NVPTX::BI__nvvm_warpgroup_wait:
+  // {
+  //   return Builder.CreateCall(
+  //       CGM.getIntrinsic(Intrinsic::nvvm_wgmma_wait_group_sync_aligned),
+  //       {EmitScalarExpr(E->getArg(0))});
+  // }
+  case NVPTX::BI__nvvm_warpgroup_wait: {
+    llvm::Value *Arg = EmitScalarExpr(E->getArg(0));
+    // 尝试折叠为常量
+    if (auto *CI = dyn_cast<llvm::ConstantInt>(Arg)) {
+      uint64_t Val = CI->getZExtValue();
+      if (Val > 7) {
+        CGM.ErrorUnsupported(E, "__nvvm_warpgroup_wait group ID must be 0-7");
+        Val = 0; // fallback
+      }
+      // 重新创建为 i32 常量（如果 intrinsic 用 i32）
+      Arg = llvm::ConstantInt::get(CGM.Int64Ty, Val);
+    } else {
+      CGM.ErrorUnsupported(E, "__nvvm_warpgroup_wait requires compile-time constant");
+    }
+    return Builder.CreateCall(
+        CGM.getIntrinsic(Intrinsic::nvvm_wgmma_wait_group_sync_aligned), {Arg});
+  }
   case NVPTX::BI__nvvm_cp_async_cg_shared_global_16:
   {
     printf("LZDEBUG!!! in this branch BI__nvvm_cp_async_cg_shared_global_16 \n");
+    E->dump();
+    printf("======================================================");
     return MakeCpAsync(Intrinsic::nvvm_cp_async_cg_shared_global_16,
                        Intrinsic::nvvm_cp_async_cg_shared_global_16_s, *this, E,
                        16);
@@ -5632,85 +5767,20 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
         CGM.getIntrinsic(Intrinsic::nvvm_barrier_cta_sync_count),
         {EmitScalarExpr(E->getArg(0)), EmitScalarExpr(E->getArg(1))});
   }
-  case NVPTX::BI__asm_mma_m16n8k4_f64_f64_f64_f64: {
-    // anchor
+  case NVPTX::BI__asm_dmma_m8n8k4_f64_f64_f64_f64: {
     Address Dst = EmitPointerWithAlignment(E->getArg(0));
-    // Value *Dst_d_0 = EmitScalarExpr(E->getArg(0));
-    // Value *Dst_d_1 = EmitScalarExpr(E->getArg(1));
     Value *Src_a_0 = EmitScalarExpr(E->getArg(1));
     Value *Src_b_0 = EmitScalarExpr(E->getArg(2));
     Value *Src_c_0 = EmitScalarExpr(E->getArg(3));
     Value *Src_c_1 = EmitScalarExpr(E->getArg(4));
 
-    auto printValue = [](Value *V, const char *name) {
-        std::string str;
-        llvm::raw_string_ostream os(str);
-        if (V) {
-            V->print(os);
-        } else {
-            os << "<null>";
-        }
-        printf("LZDEBUG!!! %s: %s\n", name, str.c_str());
-    };
-
-    printValue(Src_a_0, "Src_a_0");
-    printValue(Src_b_0,  "Src_b_0");
-    printValue(Src_c_0,  "Src_c_0");
-    printValue(Src_c_1, "Src_c_1");
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    // E->dump();
-    std::this_thread::sleep_for(std::chrono::seconds(2));
     NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
     unsigned IID = MI.getMMAIntrinsic(0, 0);
-    // unsigned IID = Intrinsic::nvvm_mma_m16n8k4_row_col_f64_f64_f64_f64;
 
     SmallVector<Value *, 24> Values;
     Function *Intrinsic = CGM.getIntrinsic(IID);
-    // llvm::Type *AType = Intrinsic->getFunctionType()->getParamType(0);
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    printf("==========================================================\n");
     Intrinsic->dump();
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    printf("at line 5578 in this branch NVPTX::BI__asm_mma_m16n8k4_f64_f64_f64_f64  \n");
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    // llvm::Type *ParamType = Intrinsic->getFunctionType()->getParamType(1);
-    // SmallVector<Value *, 24> Values;
-    // for (unsigned i = 0; i < MI.NumEltsA; ++i) {
-    //   Value *V = Builder.CreateAlignedLoad(
-    //       Src_a_0.getElementType(),
-    //       Builder.CreateGEP(Src_a_0.getElementType(), Src1,
-    //                         llvm::ConstantInt::get(IntTy, i)),
-    //       CharUnits::fromQuantity(4));
-    //   Values.push_back(V);
-    // }
-    // Value *V1 = Builder.CreateAlignedLoad(
-    //       Src_b_0.getElementType(),
-    //       Builder.CreateGEP(Src_b_0.getElementType(), Src1,
-    //                         llvm::ConstantInt::get(IntTy, i)),
-    //       CharUnits::fromQuantity(4));
-    // Values.push_back(V1);
-    // Value *V2 = Builder.CreateAlignedLoad(
-    //       Src_c_0.getElementType(),
-    //       Builder.CreateGEP(Src_c_0.getElementType(), Src1,
-    //                         llvm::ConstantInt::get(IntTy, i)),
-    //       CharUnits::fromQuantity(4));
-    // Values.push_back(V2);
-    // Value *V3 = Builder.CreateAlignedLoad(
-    //       Src_c_1.getElementType(),
-    //       Builder.CreateGEP(Src_c_1.getElementType(), Src1,
-    //                         llvm::ConstantInt::get(IntTy, i)),
-    //       CharUnits::fromQuantity(4));
-    // Values.push_back(V3);
     Value *Result = Builder.CreateCall(Intrinsic, {Src_a_0, Src_b_0, Src_c_0, Src_c_1});
-    printf("LZDEBUG AFTRE RESULT==========================================================\n");
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    printf("==========================================================\n");
     for(int i = 0; i < 2; i ++) {
       Builder.CreateAlignedStore(
               Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
@@ -5724,14 +5794,406 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
     Result->print(os);
     printf("Value info: %s\n", str.c_str());
     return Result;
+  }
 
-    /*
-    // version 1, A、B 为Value*, C 为 address 
-    */
+  case NVPTX::BI__asm_dmma_m16n8k4_f64_f64_f64_f64: {
+    Address Dst = EmitPointerWithAlignment(E->getArg(0));
+    Value *Src_a_0 = EmitScalarExpr(E->getArg(1));
+    Value *Src_a_1 = EmitScalarExpr(E->getArg(2));
+    Value *Src_b_0 = EmitScalarExpr(E->getArg(3));
+    Address Scr_c = EmitPointerWithAlignment(E->getArg(4));
+
+    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
+    unsigned IID = MI.getMMAIntrinsic(0, 0);
+
+    SmallVector<Value *, 24> Values = {Src_a_0, Src_a_1, Src_b_0};
+    Function *Intrinsic = CGM.getIntrinsic(IID);
+    Intrinsic->dump();
+
+    llvm::Type *CType =
+        Intrinsic->getFunctionType()->getParamType(MI.NumEltsA + MI.NumEltsB);
+    for (unsigned i = 0; i < MI.NumEltsC; ++i) {
+      Value *V = Builder.CreateAlignedLoad(
+          Scr_c.getElementType(),
+          Builder.CreateGEP(Scr_c.getElementType(), Scr_c.emitRawPointer(*this),
+                            llvm::ConstantInt::get(IntTy, i)),
+          CharUnits::fromQuantity(4));
+      Values.push_back(Builder.CreateBitCast(V, CType));
+    }
+
+    Value *Result = Builder.CreateCall(Intrinsic, Values);
+    for(int i = 0; i < MI.NumEltsD; i ++) {
+      Builder.CreateAlignedStore(
+              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
+                                    Dst.getElementType()),
+              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
+                                llvm::ConstantInt::get(IntTy, i)),
+              CharUnits::fromQuantity(4));
+    }       
+    std::string str;
+    llvm::raw_string_ostream os(str);
+    Result->print(os);
+    printf("Value info: %s\n", str.c_str());
+    return Result;
+  }
+  
+  case NVPTX::BI__asm_hmma_m16n8k16_mma_f16f16f32f32: {
+    // anchor
+    printf("BI__asm_hmma_m16n8k16_mma_f16f16f32f32, LZDEBUG!!! in this line 5760 \n");
+    Address Dst = EmitPointerWithAlignment(E->getArg(0));
+    // Value *Dst_d_0 = EmitScalarExpr(E->getArg(0));
+    // Value *Dst_d_1 = EmitScalarExpr(E->getArg(1));
+    Value *Src_a_0 = EmitScalarExpr(E->getArg(1));
+    Value *Src_a_1 = EmitScalarExpr(E->getArg(2));
+    Value *Src_a_2 = EmitScalarExpr(E->getArg(3));
+    Value *Src_a_3 = EmitScalarExpr(E->getArg(4));
+    Value *Src_b_0 = EmitScalarExpr(E->getArg(5));
+    Value *Src_b_1 = EmitScalarExpr(E->getArg(6));
+    Address Src_c = EmitPointerWithAlignment(E->getArg(7));
+    
+
+    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
+    unsigned IID = MI.getMMAIntrinsic(0, 0);
+    Function *Intrinsic = CGM.getIntrinsic(IID);
+    Intrinsic->dump();
+    printf("==========================================================\n");
+    printf("==========================================================\n");
+    printf("==========================================================\n");
+    
+    printf("==========================================================\n");
+    printf("==========================================================\n");
+    printf("==========================================================\n");
+    SmallVector<Value *, 24> Values;
+    llvm::Type *ParamType =
+        Intrinsic->getFunctionType()->getParamType(1);
+    Values.push_back(Builder.CreateBitCast(Src_a_0, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_a_1, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_a_2, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_a_3, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_b_0, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_b_1, ParamType));
+
+    // SmallVector<Value *, 24> Values = {Src_a_0, Src_a_1, Src_a_2, Src_a_3, Src_b_0, Src_b_1};
+    llvm::Type *CType =
+        Intrinsic->getFunctionType()->getParamType(7);
+    for (unsigned i = 0; i < MI.NumEltsC; ++i) {
+      Value *V = Builder.CreateAlignedLoad(
+          Src_c.getElementType(),
+          Builder.CreateGEP(Src_c.getElementType(), Src_c.emitRawPointer(*this),
+                            llvm::ConstantInt::get(IntTy, i)),
+          CharUnits::fromQuantity(4));
+      Values.push_back(Builder.CreateBitCast(V, CType));
+    }
+    Value *Result = Builder.CreateCall(Intrinsic, Values);
+
+    for(int i = 0; i < 4; i ++) {
+      Builder.CreateAlignedStore(
+              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
+                                    Dst.getElementType()),
+              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
+                                llvm::ConstantInt::get(IntTy, i)),
+              CharUnits::fromQuantity(4));
+    }  
+
+    std::string str;
+    llvm::raw_string_ostream os(str);
+    Result->print(os);
+    printf("Value info: %s\n", str.c_str());
+    printf("==========================================================\n");
+    printf("==========================================================\n");
+    printf("==========================================================\n");
+    // std::this_thread::sleep_for(std::chrono::seconds(50));
+    return Result;
+  }
+
+  case NVPTX::BI__asm_dmma_m16n8k16_f64_f64_f64_f64: {
+    printf("BI__asm_dmma_m16n8k16_f64_f64_f64_f64, LZDEBUG!!! in this line 5760 \n");
+
+    Address Dst = EmitPointerWithAlignment(E->getArg(0));
+    Address Src_a = EmitPointerWithAlignment(E->getArg(1));
+    Address Src_b = EmitPointerWithAlignment(E->getArg(2));
+    Address Src_c = EmitPointerWithAlignment(E->getArg(3));
+    
+    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
+    unsigned IID = MI.getMMAIntrinsic(0, 0);
+    Function *Intrinsic = CGM.getIntrinsic(IID);
+    Intrinsic->dump();
+
+    printf("==========================================================\n");
+    printf("==========================================================\n");
+    printf("==========================================================\n");
+    
+    printf("==========================================================\n");
+    printf("==========================================================\n");
+    printf("==========================================================\n");
+    // std::this_thread::sleep_for(std::chrono::seconds(50));
+
+    SmallVector<Value *, 24> Values;
+
+    llvm::Type *AType =
+        Intrinsic->getFunctionType()->getParamType(0);
+    for (unsigned i = 0; i < MI.NumEltsA; ++i) {
+      Value *V = Builder.CreateAlignedLoad(
+          Src_a.getElementType(),
+          Builder.CreateGEP(Src_a.getElementType(), Src_a.emitRawPointer(*this),
+                            llvm::ConstantInt::get(IntTy, i)),
+          CharUnits::fromQuantity(4));
+      Values.push_back(Builder.CreateBitCast(V, AType));
+    }
+
+    llvm::Type *BType =
+        Intrinsic->getFunctionType()->getParamType(1);
+    for (unsigned i = 0; i < MI.NumEltsB; ++i) {
+      Value *V = Builder.CreateAlignedLoad(
+          Src_b.getElementType(),
+          Builder.CreateGEP(Src_b.getElementType(), Src_b.emitRawPointer(*this),
+                            llvm::ConstantInt::get(IntTy, i)),
+          CharUnits::fromQuantity(4));
+      Values.push_back(Builder.CreateBitCast(V, BType));
+    }
+
+    llvm::Type *CType =
+        Intrinsic->getFunctionType()->getParamType(2);
+    for (unsigned i = 0; i < MI.NumEltsC; ++i) {
+      Value *V = Builder.CreateAlignedLoad(
+          Src_c.getElementType(),
+          Builder.CreateGEP(Src_c.getElementType(), Src_c.emitRawPointer(*this),
+                            llvm::ConstantInt::get(IntTy, i)),
+          CharUnits::fromQuantity(4));
+      Values.push_back(Builder.CreateBitCast(V, CType));
+    }
+
+    Value *Result = Builder.CreateCall(Intrinsic, Values);
+    for(int i = 0; i < 4; i ++) {
+      Builder.CreateAlignedStore(
+              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
+                                    Dst.getElementType()),
+              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
+                                llvm::ConstantInt::get(IntTy, i)),
+              CharUnits::fromQuantity(4));
+    }  
+
+    std::string str;
+    llvm::raw_string_ostream os(str);
+    Result->print(os);
+    printf("Value info: %s\n", str.c_str());
+    return Result;
+  }
+
+  // anchor
+  case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32: {
+    printf("BI__asm_mma_m16n8k8_f32_tf32_tf32_f32, LZDEBUG!!! in this line 5760 \n");
+
+    Address Dst = EmitPointerWithAlignment(E->getArg(0));
+    Value *Src_a0 = EmitScalarExpr(E->getArg(1));
+    Value *Src_a1 = EmitScalarExpr(E->getArg(2));
+    Value *Src_a2 = EmitScalarExpr(E->getArg(3));
+    Value *Src_a3 = EmitScalarExpr(E->getArg(4));
+    Value *Src_b0 = EmitScalarExpr(E->getArg(5));
+    Value *Src_b1 = EmitScalarExpr(E->getArg(6));
+    Address Src_c = EmitPointerWithAlignment(E->getArg(7));
+    
+    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
+    unsigned IID = MI.getMMAIntrinsic(0, 0);
+    Function *Intrinsic = CGM.getIntrinsic(IID);
+    Intrinsic->dump();
+
+    SmallVector<Value *, 24> Values;
+
+    llvm::Type *ParamType =
+        Intrinsic->getFunctionType()->getParamType(1);
+    Values.push_back(Builder.CreateBitCast(Src_a0, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_a1, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_a2, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_a3, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_b0, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_b1, ParamType));
+
+    llvm::Type *CType =
+        Intrinsic->getFunctionType()->getParamType(MI.NumEltsA + MI.NumEltsB);
+    for (unsigned i = 0; i < MI.NumEltsC; ++i) {
+      Value *V = Builder.CreateAlignedLoad(
+          Src_c.getElementType(),
+          Builder.CreateGEP(Src_c.getElementType(), Src_c.emitRawPointer(*this),
+                            llvm::ConstantInt::get(IntTy, i)),
+          CharUnits::fromQuantity(4));
+      Values.push_back(Builder.CreateBitCast(V, CType));
+    }
+    Value *Result = Builder.CreateCall(Intrinsic, Values);
+    for(int i = 0; i < MI.NumEltsD; i ++) {
+      Builder.CreateAlignedStore(
+              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
+                                    Dst.getElementType()),
+              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
+                                llvm::ConstantInt::get(IntTy, i)),
+              CharUnits::fromQuantity(4));
+    }  
+
+    std::string str;
+    llvm::raw_string_ostream os(str);
+    Result->print(os);
+    printf("Value info: %s\n", str.c_str());
+    return Result;
+  }
+  // case NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16
+  case NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32:
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_bf16_bf16:{
+    printf("BI__asm_wgmma_m64n16k16_f32_bf16_bf16, LZDEBUG!!! in this line 5760 \n");
+
+    Address Dst = EmitPointerWithAlignment(E->getArg(0));
+    Value *desc_a = EmitScalarExpr(E->getArg(1));
+    Value *desc_b = EmitScalarExpr(E->getArg(2));
+
+    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
+    unsigned IID = MI.getMMAIntrinsic(0, 0);
+    Function *Intrinsic = CGM.getIntrinsic(IID);
+    Intrinsic->dump();
+
+    // SmallVector<Value *, 24> Values = {desc_a, desc_b, scale_d, scale_a, scale_b, trans_a, trans_b};
+
+    Value *Result = Builder.CreateCall(Intrinsic, {desc_a, desc_b});
+    for(int i = 0; i < MI.NumEltsD; i ++) {
+      Builder.CreateAlignedStore(
+              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
+                                    Dst.getElementType()),
+              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
+                                llvm::ConstantInt::get(IntTy, i)),
+              CharUnits::fromQuantity(4));
+    }  
+
+    std::string str;
+    llvm::raw_string_ostream os(str);
+    Result->print(os);
+    printf("Value info: %s\n", str.c_str());
+    return Result;
   }
   default:
     return nullptr;
   }
-
-
 }
+/*
+  case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32: {
+    printf("BI__asm_mma_m16n8k8_f32_tf32_tf32_f32, LZDEBUG!!! in this line 5760 \n");
+
+    Address Dst = EmitPointerWithAlignment(E->getArg(0));
+    Address Src_a = EmitPointerWithAlignment(E->getArg(1));
+    Address Src_b = EmitPointerWithAlignment(E->getArg(2));
+    Address Src_c = EmitPointerWithAlignment(E->getArg(3));
+    
+    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
+    unsigned IID = MI.getMMAIntrinsic(0, 0);
+    Function *Intrinsic = CGM.getIntrinsic(IID);
+    Intrinsic->dump();
+
+    SmallVector<Value *, 24> Values;
+
+    llvm::Type *ParamType =
+        Intrinsic->getFunctionType()->getParamType(1);
+    
+    llvm::Type *AType =
+        Intrinsic->getFunctionType()->getParamType(0);
+    for (unsigned i = 0; i < MI.NumEltsA; ++i) {
+      Value *V = Builder.CreateAlignedLoad(
+          Src_a.getElementType(),
+          Builder.CreateGEP(Src_a.getElementType(), Src_a.emitRawPointer(*this),
+                            llvm::ConstantInt::get(IntTy, i)),
+          CharUnits::fromQuantity(4));
+      Values.push_back(Builder.CreateBitCast(V, AType));
+    }
+
+    llvm::Type *BType =
+        Intrinsic->getFunctionType()->getParamType(MI.NumEltsA);
+    for (unsigned i = 0; i < MI.NumEltsB; ++i) {
+      Value *V = Builder.CreateAlignedLoad(
+          Src_b.getElementType(),
+          Builder.CreateGEP(Src_b.getElementType(), Src_b.emitRawPointer(*this),
+                            llvm::ConstantInt::get(IntTy, i)),
+          CharUnits::fromQuantity(4));
+      Values.push_back(Builder.CreateBitCast(V, BType));
+    }
+
+    llvm::Type *CType =
+        Intrinsic->getFunctionType()->getParamType(MI.NumEltsA + MI.NumEltsB);
+    for (unsigned i = 0; i < MI.NumEltsC; ++i) {
+      Value *V = Builder.CreateAlignedLoad(
+          Src_c.getElementType(),
+          Builder.CreateGEP(Src_c.getElementType(), Src_c.emitRawPointer(*this),
+                            llvm::ConstantInt::get(IntTy, i)),
+          CharUnits::fromQuantity(4));
+      Values.push_back(Builder.CreateBitCast(V, CType));
+    }
+
+    Value *Result = Builder.CreateCall(Intrinsic, Values);
+    for(int i = 0; i < MI.NumEltsD; i ++) {
+      Builder.CreateAlignedStore(
+              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
+                                    Dst.getElementType()),
+              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
+                                llvm::ConstantInt::get(IntTy, i)),
+              CharUnits::fromQuantity(4));
+    }  
+
+    std::string str;
+    llvm::raw_string_ostream os(str);
+    Result->print(os);
+    printf("Value info: %s\n", str.c_str());
+    return Result;
+  }
+*/
+
+/*
+  case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32: {
+    printf("BI__asm_mma_m16n8k8_f32_tf32_tf32_f32, LZDEBUG!!! in this line 5760 \n");
+
+    Address Dst = EmitPointerWithAlignment(E->getArg(0));
+    Value *Src_a0 = EmitScalarExpr(E->getArg(1));
+    Value *Src_a1 = EmitScalarExpr(E->getArg(2));
+    Value *Src_a2 = EmitScalarExpr(E->getArg(3));
+    Value *Src_a3 = EmitScalarExpr(E->getArg(4));
+    Value *Src_b0 = EmitScalarExpr(E->getArg(5));
+    Value *Src_b1 = EmitScalarExpr(E->getArg(6));
+    Address Src_c = EmitPointerWithAlignment(E->getArg(7));
+    
+    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
+    unsigned IID = MI.getMMAIntrinsic(0, 0);
+    Function *Intrinsic = CGM.getIntrinsic(IID);
+    Intrinsic->dump();
+
+    SmallVector<Value *, 24> Values;
+
+    llvm::Type *ParamType =
+        Intrinsic->getFunctionType()->getParamType(1);
+    Values.push_back(Builder.CreateBitCast(Src_a0, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_a1, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_a2, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_a3, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_b0, ParamType));
+    Values.push_back(Builder.CreateBitCast(Src_b1, ParamType));
+
+    llvm::Type *CType =
+        Intrinsic->getFunctionType()->getParamType(MI.NumEltsA + MI.NumEltsB);
+    for (unsigned i = 0; i < MI.NumEltsC; ++i) {
+      Value *V = Builder.CreateAlignedLoad(
+          Src_c.getElementType(),
+          Builder.CreateGEP(Src_c.getElementType(), Src_c.emitRawPointer(*this),
+                            llvm::ConstantInt::get(IntTy, i)),
+          CharUnits::fromQuantity(4));
+      Values.push_back(Builder.CreateBitCast(V, CType));
+    }
+    Value *Result = Builder.CreateCall(Intrinsic, Values);
+    for(int i = 0; i < MI.NumEltsD; i ++) {
+      Builder.CreateAlignedStore(
+              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
+                                    Dst.getElementType()),
+              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
+                                llvm::ConstantInt::get(IntTy, i)),
+              CharUnits::fromQuantity(4));
+    }  
+
+    std::string str;
+    llvm::raw_string_ostream os(str);
+    Result->print(os);
+    printf("Value info: %s\n", str.c_str());
+    return Result;
+  }*/

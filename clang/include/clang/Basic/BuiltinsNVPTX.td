@@ -2547,7 +2547,6 @@ def __dmma_m8n8k4_ld_c : NVPTXBuiltinSMAndPTX<"void(double *, double const *, un
 def __dmma_m8n8k4_st_c_f64 : NVPTXBuiltinSMAndPTX<"void(double *, double const *, unsigned int, _Constant int)", SM_80, PTX70>;
 def __dmma_m8n8k4_mma_f64 : NVPTXBuiltinSMAndPTX<"void(double *, double const *, double const *, double const *, _Constant int, _Constant int)", SM_80, PTX70>;
 
-def __asm_mma_m16n8k4_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double *, double, double , double , double)", SM_80, PTX70>;
 
 def __mma_bf16_m16n16k16_ld_a : NVPTXBuiltinSMAndPTX<"void(int *, int const *, unsigned int, _Constant int)", SM_80, PTX70>;
 def __mma_bf16_m16n16k16_ld_b : NVPTXBuiltinSMAndPTX<"void(int *, int const *, unsigned int, _Constant int)", SM_80, PTX70>;
@@ -2574,7 +2573,7 @@ def __nvvm_cp_async_mbarrier_arrive_noinc_shared : NVPTXBuiltinSMAndPTX<"void(in
 def __nvvm_cp_async_ca_shared_global_4 : NVPTXBuiltinSMAndPTX<"void(void address_space<3> *, void const address_space<1> *, ...)", SM_80, PTX70>;
 def __nvvm_cp_async_ca_shared_global_8 : NVPTXBuiltinSMAndPTX<"void(void address_space<3> *, void const address_space<1> *, ...)", SM_80, PTX70>;
 def __nvvm_cp_async_ca_shared_global_16 : NVPTXBuiltinSMAndPTX<"void(void address_space<3> *, void const address_space<1> *, ...)", SM_80, PTX70>;
-def __nvvm_cp_async_cg_shared_global_16 : NVPTXBuiltinSMAndPTX<"void(void address_space<3> *, void const address_space<1> *, ...)", SM_80, PTX70>;
+def __nvvm_cp_async_cg_shared_global_16 : NVPTXBuiltinSMAndPTX<"void(void address_space<3> *, void const address_space<1> *)", SM_80, PTX70>;
 
 def __nvvm_cp_async_commit_group : NVPTXBuiltinSMAndPTX<"void()", SM_80, PTX70>;
 def __nvvm_cp_async_wait_group : NVPTXBuiltinSMAndPTX<"void(_Constant int)", SM_80, PTX70>;
@@ -2591,3 +2590,27 @@ def __nvvm_mapa : NVPTXBuiltinSMAndPTX<"void *(void *, int)", SM_90, PTX78>;
 def __nvvm_mapa_shared_cluster : NVPTXBuiltinSMAndPTX<"void address_space<3> *(void address_space<3> *, int)", SM_90, PTX78>;
 def __nvvm_getctarank : NVPTXBuiltinSMAndPTX<"int(void *)", SM_90, PTX78>;
 def __nvvm_getctarank_shared_cluster : NVPTXBuiltinSMAndPTX<"int(void address_space<3> *)", SM_90, PTX78>;
+
+def __asm_hmma_m16n8k16_mma_f16f16f32f32 : NVPTXBuiltinSMAndPTX<"void(float *, int, int, int, int, int, int, float*)", SM_80, PTX60>;
+def __asm_dmma_m8n8k4_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double *, double, double , double , double)", SM_80, PTX70>;
+
+def __asm_dmma_m16n8k4_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double *, double const, double const, double const, double const *)", SM_80, PTX70>;
+def __asm_dmma_m16n8k16_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double *, double const *, double const *, double const *)", SM_80, PTX70>;
+
+// def __asm_mma_m16n8k8_f32_tf32_tf32_f32 : NVPTXBuiltinSMAndPTX<"void(float *, unsigned int const *, unsigned int const *, float const *)", SM_80, PTX70>;
+
+def __asm_mma_m16n8k8_f32_tf32_tf32_f32 : NVPTXBuiltinSMAndPTX<"void(float *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, float const *)", SM_80, PTX70>;
+
+def __asm_wgmma_m64n16k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90, PTX80>;
+
+def __asm_wgmma_m64n16k16_f32_f16_f16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90, PTX80>;
+// def __asm_wgmma_m64n256k16_f32_f16_f16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90, PTX80>;
+
+
+def __asm_wgmma_m64n8k8_f32_tf32_tf32 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90, PTX80>;
+
+
+def __nvvm_warpgroup_arrive:  NVPTXBuiltinSMAndPTX<"void()", SM_90, PTX80>;
+def __nvvm_warpgroup_commit_batch: NVPTXBuiltinSMAndPTX<"void()", SM_90, PTX80>;
+def __nvvm_warpgroup_wait: NVPTXBuiltinSMAndPTX<"void(int64_t)", SM_90, PTX80>;
+
