@@ -2591,15 +2591,27 @@ def __nvvm_mapa_shared_cluster : NVPTXBuiltinSMAndPTX<"void address_space<3> *(v
 def __nvvm_getctarank : NVPTXBuiltinSMAndPTX<"int(void *)", SM_90, PTX78>;
 def __nvvm_getctarank_shared_cluster : NVPTXBuiltinSMAndPTX<"int(void address_space<3> *)", SM_90, PTX78>;
 
-def __asm_hmma_m16n8k16_mma_f16f16f32f32 : NVPTXBuiltinSMAndPTX<"void(float *, int, int, int, int, int, int, float*)", SM_80, PTX60>;
-def __asm_dmma_m8n8k4_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double *, double, double , double , double)", SM_80, PTX70>;
+// MMA intrinsics — Scheme A: one builtin per precision x shape
+// Param order: D0*..Dn* (output ptrs), A0..An, B0..Bn, C0..Cn (scalar values)
 
-def __asm_dmma_m16n8k4_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double *, double const, double const, double const, double const *)", SM_80, PTX70>;
-def __asm_dmma_m16n8k16_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double *, double const *, double const *, double const *)", SM_80, PTX70>;
+// FP16 mma.sync (A/B: packed f16x2 in i32, C/D: f32)
+def __asm_mma_m8n8k4_f32_f16_f16_f32 : NVPTXBuiltinSMAndPTX<"void(float*,float*,float*,float*, int,int, float,float,float,float)", SM_70, PTX64>;
+def __asm_mma_m16n8k8_f32_f16_f16_f32 : NVPTXBuiltinSMAndPTX<"void(float*,float*,float*,float*, int,int,int, float,float,float,float)", SM_75, PTX65>;
+def __asm_mma_m16n8k16_f32_f16_f16_f32 : NVPTXBuiltinSMAndPTX<"void(float*,float*,float*,float*, int,int,int,int, int,int, float,float,float,float)", SM_80, PTX70>;
 
-// def __asm_mma_m16n8k8_f32_tf32_tf32_f32 : NVPTXBuiltinSMAndPTX<"void(float *, unsigned int const *, unsigned int const *, float const *)", SM_80, PTX70>;
+// BF16 mma.sync (A/B: packed bf16x2 in i32, C/D: f32)
+def __asm_mma_m16n8k8_f32_bf16_bf16_f32 : NVPTXBuiltinSMAndPTX<"void(float*,float*,float*,float*, int,int,int, float,float,float,float)", SM_80, PTX70>;
+def __asm_mma_m16n8k16_f32_bf16_bf16_f32 : NVPTXBuiltinSMAndPTX<"void(float*,float*,float*,float*, int,int,int,int, int,int, float,float,float,float)", SM_80, PTX70>;
 
-def __asm_mma_m16n8k8_f32_tf32_tf32_f32 : NVPTXBuiltinSMAndPTX<"void(float *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, float const *)", SM_80, PTX70>;
+// TF32 mma.sync (A/B: tf32 in u32, C/D: f32)
+def __asm_mma_m16n8k4_f32_tf32_tf32_f32 : NVPTXBuiltinSMAndPTX<"void(float*,float*,float*,float*, unsigned int,unsigned int,unsigned int, float,float,float,float)", SM_80, PTX70>;
+def __asm_mma_m16n8k8_f32_tf32_tf32_f32 : NVPTXBuiltinSMAndPTX<"void(float*,float*,float*,float*, unsigned int,unsigned int,unsigned int,unsigned int, unsigned int,unsigned int, float,float,float,float)", SM_80, PTX70>;
+
+// FP64 mma.sync (A/B/C/D: f64)
+def __asm_mma_m8n8k4_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double*,double*, double,double, double,double)", SM_80, PTX70>;
+def __asm_mma_m16n8k4_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double*,double*,double*,double*, double,double, double, double,double,double,double)", SM_80, PTX70>;
+def __asm_mma_m16n8k8_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double*,double*,double*,double*, double,double,double,double, double,double, double,double,double,double)", SM_80, PTX78>;
+def __asm_mma_m16n8k16_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double*,double*,double*,double*, double,double,double,double,double,double,double,double, double,double,double,double, double,double,double,double)", SM_80, PTX78>;
 
 def __asm_wgmma_m64n16k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90, PTX80>;
 

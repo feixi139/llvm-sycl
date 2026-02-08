@@ -246,6 +246,11 @@ class WMMA_REGS<string Geom, string Frag, string PtxEltType> {
     !eq(gft,"m16n8k4:c:f64") : !listsplat(llvm_double_ty, 4),
     !eq(gft,"m16n8k4:d:f64") : !listsplat(llvm_double_ty, 4),
 
+    !eq(gft,"m16n8k8:a:f64") : !listsplat(llvm_double_ty, 4),
+    !eq(gft,"m16n8k8:b:f64") : !listsplat(llvm_double_ty, 2),
+    !eq(gft,"m16n8k8:c:f64") : !listsplat(llvm_double_ty, 4),
+    !eq(gft,"m16n8k8:d:f64") : !listsplat(llvm_double_ty, 4),
+
     !eq(gft,"m16n8k16:a:f64") : !listsplat(llvm_double_ty, 8),
     !eq(gft,"m16n8k16:b:f64") : !listsplat(llvm_double_ty, 4),
     !eq(gft,"m16n8k16:c:f64") : !listsplat(llvm_double_ty, 4),
@@ -573,7 +578,7 @@ class NVVM_MMA_OPS {
             ["m16n8k16", "m16n8k8"],
             ["bf16"], [], ["f32"], []>.ret;
   list<list<WMMA_REGS>> f64_mma_ops = MMA_OPS<
-             ["m8n8k4", "m16n8k16", "m16n8k4"],
+             ["m8n8k4", "m16n8k4", "m16n8k8", "m16n8k16"],
             ["f64"], [], ["f64"], []>.ret;
   list<list<WMMA_REGS>> fp_mma_ops = MMA_OPS<
             ["m8n8k4", "m16n8k8", "m16n8k16"],

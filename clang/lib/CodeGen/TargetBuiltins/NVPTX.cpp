@@ -13,7 +13,6 @@
 #include "CGBuiltin.h"
 #include "clang/Basic/TargetBuiltins.h"
 #include "llvm/IR/IntrinsicsNVPTX.h"
-// lzdebug
 #include <iostream>
 #include <string>
 #include <thread>
@@ -190,7 +189,6 @@ static NVPTXMmaLdstInfo getNVPTXMmaLdstInfo(unsigned BuiltinID) {
 #undef MMA_LDST
 #undef MMA_INTR
 
-
 struct NVPTXMmaInfo {
   unsigned NumEltsA;
   unsigned NumEltsB;
@@ -270,182 +268,13 @@ static NVPTXMmaInfo getNVPTXMmaInfo(unsigned BuiltinID) {
   // FP MMA
   // Note that 'type' argument of MMA_SATF_VARIANTS uses D_C notation, while
   // NumEltsN of return value are ordered as A,B,C,D.
-  case NVPTX::BI__hmma_m16n16k16_mma_f16f16: {
-    printf("in this branch NVPTX::BI__hmma_m16n16k16_mma_f16f16\n");
-    return {8, 8, 4, 4, {{MMA_SATF_VARIANTS(m16n16k16, f16_f16)}}};
-  }
-  case NVPTX::BI__hmma_m16n16k16_mma_f32f16: {
-    printf("in this branch NVPTX::BI__hmma_m16n16k16_mma_f32f16\n");
-    return {8, 8, 4, 8, {{MMA_SATF_VARIANTS(m16n16k16, f32_f16)}}};
-  }
-  case NVPTX::BI__hmma_m16n16k16_mma_f16f32: {
-    printf("in this branch NVPTX::BI__hmma_m16n16k16_mma_f16f32\n");
-    return {8, 8, 8, 4, {{MMA_SATF_VARIANTS(m16n16k16, f16_f32)}}};
-  }
-  case NVPTX::BI__hmma_m16n16k16_mma_f32f32: {
-    printf("in this branch NVPTX::BI__hmma_m16n16k16_mma_f32f32\n");
-    return {8, 8, 8, 8, {{MMA_SATF_VARIANTS(m16n16k16, f32_f32)}}};
-  }
-  case NVPTX::BI__hmma_m32n8k16_mma_f16f16: {
-    printf("in this branch NVPTX::BI__hmma_m32n8k16_mma_f16f16\n");
-    return {8, 8, 4, 4, {{MMA_SATF_VARIANTS(m32n8k16, f16_f16)}}};
-  }
-  case NVPTX::BI__hmma_m32n8k16_mma_f32f16: {
-    printf("in this branch NVPTX::BI__hmma_m32n8k16_mma_f32f16\n");
-    return {8, 8, 4, 8, {{MMA_SATF_VARIANTS(m32n8k16, f32_f16)}}};
-  }
-  case NVPTX::BI__hmma_m32n8k16_mma_f16f32: {
-    printf("in this branch NVPTX::BI__hmma_m32n8k16_mma_f16f32\n");
-    return {8, 8, 8, 4, {{MMA_SATF_VARIANTS(m32n8k16, f16_f32)}}};
-  }
-  case NVPTX::BI__hmma_m32n8k16_mma_f32f32: {
-    printf("in this branch NVPTX::BI__hmma_m32n8k16_mma_f32f32\n");
-    return {8, 8, 8, 8, {{MMA_SATF_VARIANTS(m32n8k16, f32_f32)}}};
-  }
-  case NVPTX::BI__hmma_m8n32k16_mma_f16f16: {
-    printf("in this branch NVPTX::BI__hmma_m8n32k16_mma_f16f16\n");
-    return {8, 8, 4, 4, {{MMA_SATF_VARIANTS(m8n32k16, f16_f16)}}};
-  }
-  case NVPTX::BI__hmma_m8n32k16_mma_f32f16: {
-    printf("in this branch NVPTX::BI__hmma_m8n32k16_mma_f32f16\n");
-    return {8, 8, 4, 8, {{MMA_SATF_VARIANTS(m8n32k16, f32_f16)}}};
-  }
-  case NVPTX::BI__hmma_m8n32k16_mma_f16f32: {
-    printf("in this branch NVPTX::BI__hmma_m8n32k16_mma_f16f32\n");
-    return {8, 8, 8, 4, {{MMA_SATF_VARIANTS(m8n32k16, f16_f32)}}};
-  }
-  case NVPTX::BI__hmma_m8n32k16_mma_f32f32: {
-    printf("in this branch NVPTX::BI__hmma_m8n32k16_mma_f32f32\n");
-    return {8, 8, 8, 8, {{MMA_SATF_VARIANTS(m8n32k16, f32_f32)}}};
-  }
-
-  // Integer MMA
-  case NVPTX::BI__imma_m16n16k16_mma_s8: {
-    printf("in this branch NVPTX::BI__imma_m16n16k16_mma_s8\n");
-    return {2, 2, 8, 8, {{MMA_SATF_VARIANTS(m16n16k16, s8)}}};
-  }
-  case NVPTX::BI__imma_m16n16k16_mma_u8: {
-    printf("in this branch NVPTX::BI__imma_m16n16k16_mma_u8\n");
-    return {2, 2, 8, 8, {{MMA_SATF_VARIANTS(m16n16k16, u8)}}};
-  }
-  case NVPTX::BI__imma_m32n8k16_mma_s8: {
-    printf("in this branch NVPTX::BI__imma_m32n8k16_mma_s8\n");
-    return {4, 1, 8, 8, {{MMA_SATF_VARIANTS(m32n8k16, s8)}}};
-  }
-  case NVPTX::BI__imma_m32n8k16_mma_u8: {
-    printf("in this branch NVPTX::BI__imma_m32n8k16_mma_u8\n");
-    return {4, 1, 8, 8, {{MMA_SATF_VARIANTS(m32n8k16, u8)}}};
-  }
-  case NVPTX::BI__imma_m8n32k16_mma_s8: {
-    printf("in this branch NVPTX::BI__imma_m8n32k16_mma_s8\n");
-    return {1, 4, 8, 8, {{MMA_SATF_VARIANTS(m8n32k16, s8)}}};
-  }
-  case NVPTX::BI__imma_m8n32k16_mma_u8: {
-    printf("in this branch NVPTX::BI__imma_m8n32k16_mma_u8\n");
-    return {1, 4, 8, 8, {{MMA_SATF_VARIANTS(m8n32k16, u8)}}};
-  }
-
-  // Sub-integer MMA
-  case NVPTX::BI__imma_m8n8k32_mma_s4: {
-    printf("in this branch NVPTX::BI__imma_m8n8k32_mma_s4\n");
-    return {1, 1, 2, 2, {{MMA_VARIANTS_I4(m8n8k32, s4)}}};
-  }
-  case NVPTX::BI__imma_m8n8k32_mma_u4: {
-    printf("in this branch NVPTX::BI__imma_m8n8k32_mma_u4\n");
-    return {1, 1, 2, 2, {{MMA_VARIANTS_I4(m8n8k32, u4)}}};
-  }
-  case NVPTX::BI__bmma_m8n8k128_mma_xor_popc_b1: {
-    printf("in this branch NVPTX::BI__bmma_m8n8k128_mma_xor_popc_b1\n");
-    return {1, 1, 2, 2, {{MMA_VARIANTS_B1_XOR(m8n8k128, b1)}}};
-  }
-  case NVPTX::BI__bmma_m8n8k128_mma_and_popc_b1: {
-    printf("in this branch NVPTX::BI__bmma_m8n8k128_mma_and_popc_b1\n");
-    return {1, 1, 2, 2, {{MMA_VARIANTS_B1_AND(m8n8k128, b1)}}};
-  }
-
-  // Double MMA
-  case NVPTX::BI__dmma_m8n8k4_mma_f64: {
-    printf("in this branch NVPTX::BI__dmma_m8n8k4_mma_f64\n");
-    return {1, 1, 2, 2, {{MMA_VARIANTS(m8n8k4, f64)}}};
-  }
-
-  case NVPTX::BI__asm_dmma_m8n8k4_f64_f64_f64_f64: {
-    printf("in this branch NVPTX::BI__asm_dmma_m8n8k4_f64_f64_f64_f64 at line 365\n");
-    return {1, 1, 2, 2, {{MMA_VARIANTS_1(m8n8k4, f64)}}};
-  }
-
-  case NVPTX::BI__asm_dmma_m16n8k4_f64_f64_f64_f64: {
-    printf("in this branch NVPTX::BI__asm_dmma_m16n8k4_f64_f64_f64_f64 at line 365\n");
-    return {2, 1, 4, 4, {{MMA_VARIANTS_1(m16n8k4, f64)}}};
-  }
-
-  case NVPTX::BI__asm_dmma_m16n8k16_f64_f64_f64_f64: {
-    printf("in this branch NVPTX::BI__asm_mma_m16n8k16_f64_f64_f64_f64 at line 365\n");
-    return {8, 4, 4, 4, {{MMA_VARIANTS_1(m16n8k16, f64)}}};
-  }
-
-  case NVPTX::BI__asm_hmma_m16n8k16_mma_f16f16f32f32: {
-    // anchor
-    printf("in this branch NVPTX::BI__asm_hmma_m16n8k16_mma_f16f16f32f32 at line 365\n");
-    return {4, 2, 4, 4, {{MMA_VARIANTS_1(m16n8k16, f32_f32)}}};
-  }
-
-  case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32: {
-    // anchor
-    printf("in this branch NVPTX::__asm_mma_m16n8k8_f32_tf32_tf32_f32 at line 384\n");
-    return {4, 2, 4, 4, {{MMA_VARIANTS_1(m16n8k8, tf32)}}};
-  }
-
-  // Alternate FP MMA
-  case NVPTX::BI__mma_bf16_m16n16k16_mma_f32: {
-    printf("in this branch NVPTX::BI__mma_bf16_m16n16k16_mma_f32\n");
-    return {4, 4, 8, 8, {{MMA_VARIANTS(m16n16k16, bf16)}}};
-  }
-  case NVPTX::BI__mma_bf16_m8n32k16_mma_f32: {
-    printf("in this branch NVPTX::BI__mma_bf16_m8n32k16_mma_f32\n");
-    return {2, 8, 8, 8, {{MMA_VARIANTS(m8n32k16, bf16)}}};
-  }
-  case NVPTX::BI__mma_bf16_m32n8k16_mma_f32: {
-    printf("in this branch NVPTX::BI__mma_bf16_m32n8k16_mma_f32\n");
-    return {8, 2, 8, 8, {{MMA_VARIANTS(m32n8k16, bf16)}}};
-  }
-  case NVPTX::BI__mma_tf32_m16n16k8_mma_f32: {
-    printf("in this branch NVPTX::BI__mma_tf32_m16n16k8_mma_f32\n");
-    return {4, 4, 8, 8, {{MMA_VARIANTS(m16n16k8, tf32)}}};
-  }
-  case NVPTX::BI__asm_wgmma_m64n16k16_f32_bf16_bf16: {
-    printf("in this branch NVPTX::BI__mma_tf32_m16n16k8_mma_f32\n");
-    return {4, 4, 8, 8, {{WGMMA_TRANS_VARIANTS(m64n16k16, f32_bf16_bf16)}}};
-  }
-  case NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16: {
-    printf("in this branch NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16\n");
-    return {4, 4, 8, 8, {{WGMMA_TRANS_VARIANTS(m64n16k16, f32_f16_f16)}}};
-  }
-  // case NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16: {
-  //   printf("in this branch NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16\n");
-  //   return {4, 4, 8, 128, {{WGMMA_TRANS_VARIANTS(m64n256k16, f32_f16_f16)}}};
-  // }
-  case NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32: {
-    printf("in this branch NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32\n");
-    return {4, 4, 4, 4, {{WGMMA_VARIANTS(m64n8k8, f32_tf32_tf32)}}};
-  }
-
-  default:
-    llvm_unreachable("Unexpected builtin ID.");
-  }
-
-  /*
-  switch (BuiltinID) {
-  // FP MMA
-  // Note that 'type' argument of MMA_SATF_VARIANTS uses D_C notation, while
-  // NumEltsN of return value are ordered as A,B,C,D.
   case NVPTX::BI__hmma_m16n16k16_mma_f16f16:
     return {8, 8, 4, 4, {{MMA_SATF_VARIANTS(m16n16k16, f16_f16)}}};
   case NVPTX::BI__hmma_m16n16k16_mma_f32f16:
     return {8, 8, 4, 8, {{MMA_SATF_VARIANTS(m16n16k16, f32_f16)}}};
   case NVPTX::BI__hmma_m16n16k16_mma_f16f32:
     return {8, 8, 8, 4, {{MMA_SATF_VARIANTS(m16n16k16, f16_f32)}}};
-  case NVPTX::BI__hmma_m16n16k16_mma_f32f32: 
+  case NVPTX::BI__hmma_m16n16k16_mma_f32f32:
     return {8, 8, 8, 8, {{MMA_SATF_VARIANTS(m16n16k16, f32_f32)}}};
   case NVPTX::BI__hmma_m32n8k16_mma_f16f16:
     return {8, 8, 4, 4, {{MMA_SATF_VARIANTS(m32n8k16, f16_f16)}}};
@@ -492,6 +321,35 @@ static NVPTXMmaInfo getNVPTXMmaInfo(unsigned BuiltinID) {
   case NVPTX::BI__dmma_m8n8k4_mma_f64:
     return {1, 1, 2, 2, {{MMA_VARIANTS(m8n8k4, f64)}}};
 
+  case NVPTX::BI__asm_mma_m8n8k4_f32_f16_f16_f32:
+    return {1, 1, 4, 4, {{MMA_VARIANTS_1(m8n8k4, f32_f32)}}};
+  case NVPTX::BI__asm_mma_m16n8k8_f32_f16_f16_f32:
+    return {2, 1, 4, 4, {{MMA_VARIANTS_1(m16n8k8, f32_f32)}}};
+  case NVPTX::BI__asm_mma_m16n8k16_f32_f16_f16_f32:
+    return {4, 2, 4, 4, {{MMA_VARIANTS_1(m16n8k16, f32_f32)}}};
+
+  // BF16 mma.sync (D=f32, A=bf16, B=bf16, C=f32)
+  case NVPTX::BI__asm_mma_m16n8k8_f32_bf16_bf16_f32:
+    return {2, 1, 4, 4, {{MMA_VARIANTS_1(m16n8k8, bf16)}}};
+  case NVPTX::BI__asm_mma_m16n8k16_f32_bf16_bf16_f32:
+    return {4, 2, 4, 4, {{MMA_VARIANTS_1(m16n8k16, bf16)}}};
+
+  // TF32 mma.sync (D=f32, A=tf32, B=tf32, C=f32)
+  case NVPTX::BI__asm_mma_m16n8k4_f32_tf32_tf32_f32:
+    return {2, 1, 4, 4, {{MMA_VARIANTS_1(m16n8k4, tf32)}}};
+  case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32:
+    return {4, 2, 4, 4, {{MMA_VARIANTS_1(m16n8k8, tf32)}}};
+
+  // FP64 mma.sync (D=f64, A=f64, B=f64, C=f64)
+  case NVPTX::BI__asm_mma_m8n8k4_f64_f64_f64_f64:
+    return {1, 1, 2, 2, {{MMA_VARIANTS_1(m8n8k4, f64)}}};
+  case NVPTX::BI__asm_mma_m16n8k4_f64_f64_f64_f64:
+    return {2, 1, 4, 4, {{MMA_VARIANTS_1(m16n8k4, f64)}}};
+  case NVPTX::BI__asm_mma_m16n8k8_f64_f64_f64_f64:
+    return {4, 2, 4, 4, {{MMA_VARIANTS_1(m16n8k8, f64)}}};
+  case NVPTX::BI__asm_mma_m16n8k16_f64_f64_f64_f64:
+    return {8, 4, 4, 4, {{MMA_VARIANTS_1(m16n8k16, f64)}}};
+
   // Alternate FP MMA
   case NVPTX::BI__mma_bf16_m16n16k16_mma_f32:
     return {4, 4, 8, 8, {{MMA_VARIANTS(m16n16k16, bf16)}}};
@@ -501,10 +359,21 @@ static NVPTXMmaInfo getNVPTXMmaInfo(unsigned BuiltinID) {
     return {8, 2, 8, 8, {{MMA_VARIANTS(m32n8k16, bf16)}}};
   case NVPTX::BI__mma_tf32_m16n16k8_mma_f32:
     return {4, 4, 8, 8, {{MMA_VARIANTS(m16n16k8, tf32)}}};
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_bf16_bf16:
+    return {4, 4, 8, 8, {{WGMMA_TRANS_VARIANTS(m64n16k16, f32_bf16_bf16)}}};
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16:
+    return {4, 4, 8, 8, {{WGMMA_TRANS_VARIANTS(m64n16k16, f32_f16_f16)}}};
+  // case NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16: {
+  //   printf("in this branch NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16\n");
+  //   return {4, 4, 8, 128, {{WGMMA_TRANS_VARIANTS(m64n256k16, f32_f16_f16)}}};
+  // }
+  case NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32:
+    return {4, 4, 4, 4, {{WGMMA_VARIANTS(m64n8k8, f32_tf32_tf32)}}};
+
   default:
     llvm_unreachable("Unexpected builtin ID.");
   }
-    */
+
 #undef MMA_VARIANTS
 #undef MMA_SATF_VARIANTS
 #undef MMA_VARIANTS_I4
@@ -551,14 +420,8 @@ static Value *MakeScopedAtomic(unsigned IntrinsicID, CodeGenFunction &CGF,
 static Value *MakeCpAsync(unsigned IntrinsicID, unsigned IntrinsicIDS,
                           CodeGenFunction &CGF, const CallExpr *E,
                           int SrcSize) {
-  printf("LZDEBUG!!! in branch MakeCpAsync");
   Function *Intrinsic =
         CGF.CGM.getIntrinsic(IntrinsicIDS);
-
-  std::string str1;
-  llvm::raw_string_ostream os1(str1);
-  Intrinsic->print(os1);
-  printf("LZDEBUG!!! MakeCpAsync Function IR:\n%s\n", str1.c_str());
 
   Value* result = E->getNumArgs() == 3
              ? CGF.Builder.CreateCall(CGF.CGM.getIntrinsic(IntrinsicIDS),
@@ -568,10 +431,6 @@ static Value *MakeCpAsync(unsigned IntrinsicID, unsigned IntrinsicIDS,
              : CGF.Builder.CreateCall(CGF.CGM.getIntrinsic(IntrinsicID),
                                       {CGF.EmitScalarExpr(E->getArg(0)),
                                        CGF.EmitScalarExpr(E->getArg(1))});
-  std::string str2;
-  llvm::raw_string_ostream os2(str2);
-  result->print(os2);
-  printf("LZDEBUG!!! MakeCpAsync Value IR:\n%s\n", str2.c_str());
 
   return result;
 }
@@ -614,7 +473,6 @@ static Value *MakeHalfType(unsigned IntrinsicID, unsigned BuiltinID,
 
 Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
                                              const CallExpr *E) {
-  printf("LZDEBUG!!! now is in EmitNVPTXBuiltinExpr Function at line 555 \n");
   auto MakeScopedLd = [&](unsigned IntrinsicID) {
     Value *Ptr = EmitScalarExpr(E->getArg(0));
     llvm::Type *ElemTy =
@@ -639,7 +497,6 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
         {Ptr, EmitScalarExpr(E->getArg(1)), EmitScalarExpr(E->getArg(2))});
   };
 
-  
   switch (BuiltinID) {
 
 #define LD_VOLATILE_CASES(ADDR_SPACE)                                          \
@@ -723,89 +580,58 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__nvvm_atom_add_gen_i:
   case NVPTX::BI__nvvm_atom_add_gen_l:
   case NVPTX::BI__nvvm_atom_add_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_add_gen_i \n");
     return MakeBinaryAtomicValue(*this, llvm::AtomicRMWInst::Add, E);
-  }
 
   case NVPTX::BI__nvvm_atom_sub_gen_i:
   case NVPTX::BI__nvvm_atom_sub_gen_l:
   case NVPTX::BI__nvvm_atom_sub_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sub_gen_i \n");
     return MakeBinaryAtomicValue(*this, llvm::AtomicRMWInst::Sub, E);
-  }
 
   case NVPTX::BI__nvvm_atom_and_gen_i:
   case NVPTX::BI__nvvm_atom_and_gen_l:
   case NVPTX::BI__nvvm_atom_and_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_and_gen_i \n");
     return MakeBinaryAtomicValue(*this, llvm::AtomicRMWInst::And, E);
-  }
 
   case NVPTX::BI__nvvm_atom_or_gen_i:
   case NVPTX::BI__nvvm_atom_or_gen_l:
   case NVPTX::BI__nvvm_atom_or_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_or_gen_i \n");
     return MakeBinaryAtomicValue(*this, llvm::AtomicRMWInst::Or, E);
-  }
 
   case NVPTX::BI__nvvm_atom_xor_gen_i:
   case NVPTX::BI__nvvm_atom_xor_gen_l:
   case NVPTX::BI__nvvm_atom_xor_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_xor_gen_i \n");
     return MakeBinaryAtomicValue(*this, llvm::AtomicRMWInst::Xor, E);
-  }
 
   case NVPTX::BI__nvvm_atom_xchg_gen_i:
   case NVPTX::BI__nvvm_atom_xchg_gen_l:
   case NVPTX::BI__nvvm_atom_xchg_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_xchg_gen_i \n");
     return MakeBinaryAtomicValue(*this, llvm::AtomicRMWInst::Xchg, E);
-  }
 
   case NVPTX::BI__nvvm_atom_max_gen_i:
   case NVPTX::BI__nvvm_atom_max_gen_l:
   case NVPTX::BI__nvvm_atom_max_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_max_gen_i \n");
     return MakeBinaryAtomicValue(*this, llvm::AtomicRMWInst::Max, E);
-  }
 
   case NVPTX::BI__nvvm_atom_max_gen_ui:
   case NVPTX::BI__nvvm_atom_max_gen_ul:
   case NVPTX::BI__nvvm_atom_max_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_max_gen_ui \n");
     return MakeBinaryAtomicValue(*this, llvm::AtomicRMWInst::UMax, E);
-  }
 
   case NVPTX::BI__nvvm_atom_min_gen_i:
   case NVPTX::BI__nvvm_atom_min_gen_l:
   case NVPTX::BI__nvvm_atom_min_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_min_gen_i \n");
     return MakeBinaryAtomicValue(*this, llvm::AtomicRMWInst::Min, E);
-  }
 
   case NVPTX::BI__nvvm_atom_min_gen_ui:
   case NVPTX::BI__nvvm_atom_min_gen_ul:
   case NVPTX::BI__nvvm_atom_min_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_min_gen_ui \n");
     return MakeBinaryAtomicValue(*this, llvm::AtomicRMWInst::UMin, E);
-  }
 
   case NVPTX::BI__nvvm_atom_cas_gen_us:
   case NVPTX::BI__nvvm_atom_cas_gen_i:
   case NVPTX::BI__nvvm_atom_cas_gen_l:
   case NVPTX::BI__nvvm_atom_cas_gen_ll:
   {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cas_gen_us \n");
     // __nvvm_atom_cas_gen_* should return the old value rather than the
     // success flag.
     return MakeAtomicCmpXchgValue(*this, E, /*ReturnBool=*/false);
@@ -813,7 +639,6 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
 
   case NVPTX::BI__nvvm_atom_add_gen_f:
   case NVPTX::BI__nvvm_atom_add_gen_d: {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_add_gen_d \n");
     Address DestAddr = EmitPointerWithAlignment(E->getArg(0));
     Value *Val = EmitScalarExpr(E->getArg(1));
 
@@ -823,29 +648,17 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
 
   case NVPTX::BI__nvvm_atom_xchg_gen_f:
   case NVPTX::BI__nvvm_atom_xchg_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_xchg_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_f, *this, E);
-  }
 
   case NVPTX::BI__nvvm_atom_cas_gen_f:
   case NVPTX::BI__nvvm_atom_cas_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cas_gen_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_f);
-  }
 
   case NVPTX::BI__nvvm_atom_inc_gen_ui:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_inc_gen_ui \n");
     return MakeBinaryAtomicValue(*this, llvm::AtomicRMWInst::UIncWrap, E);
-  }
 
   case NVPTX::BI__nvvm_atom_dec_gen_ui:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_dec_gen_ui \n");
     return MakeBinaryAtomicValue(*this, llvm::AtomicRMWInst::UDecWrap, E);
-  }
 
   case NVPTX::BI__nvvm_ldg_c:
   case NVPTX::BI__nvvm_ldg_sc:
@@ -882,7 +695,6 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__nvvm_ldg_d:
   case NVPTX::BI__nvvm_ldg_d2:
   {
-    printf("LZDEBUG!!! in this branch BI__nvvm_ldg_c \n");
     // PTX Interoperability section 2.2: "For a vector with an even number of
     // elements, its alignment is set to number of elements times the alignment
     // of its member: n*alignof(t)."
@@ -918,203 +730,118 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__nvvm_ldu_ul2:
   case NVPTX::BI__nvvm_ldu_ull:
   case NVPTX::BI__nvvm_ldu_ull2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_ldu_c \n");
     return MakeLdu(Intrinsic::nvvm_ldu_global_i, *this, E);
-  }
   case NVPTX::BI__nvvm_ldu_f:
   case NVPTX::BI__nvvm_ldu_f2:
   case NVPTX::BI__nvvm_ldu_f4:
   case NVPTX::BI__nvvm_ldu_d:
   case NVPTX::BI__nvvm_ldu_d2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_ldu_f \n");
     return MakeLdu(Intrinsic::nvvm_ldu_global_f, *this, E);
-  }
 
   case NVPTX::BI__nvvm_atom_cta_add_gen_i:
   case NVPTX::BI__nvvm_atom_cta_add_gen_l:
   case NVPTX::BI__nvvm_atom_cta_add_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_add_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_add_gen_i:
   case NVPTX::BI__nvvm_atom_sys_add_gen_l:
   case NVPTX::BI__nvvm_atom_sys_add_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_add_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_add_gen_f:
   case NVPTX::BI__nvvm_atom_cta_add_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_add_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_f_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_add_gen_f:
   case NVPTX::BI__nvvm_atom_sys_add_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_add_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_f_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_xchg_gen_i:
   case NVPTX::BI__nvvm_atom_cta_xchg_gen_l:
   case NVPTX::BI__nvvm_atom_cta_xchg_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_xchg_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_xchg_gen_f:
   case NVPTX::BI__nvvm_atom_cta_xchg_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_xchg_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_f_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_xchg_gen_i:
   case NVPTX::BI__nvvm_atom_sys_xchg_gen_l:
   case NVPTX::BI__nvvm_atom_sys_xchg_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_xchg_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_xchg_gen_f:
   case NVPTX::BI__nvvm_atom_sys_xchg_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_xchg_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_f_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_max_gen_i:
   case NVPTX::BI__nvvm_atom_cta_max_gen_l:
   case NVPTX::BI__nvvm_atom_cta_max_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_max_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_max_gen_ui:
   case NVPTX::BI__nvvm_atom_cta_max_gen_ul:
   case NVPTX::BI__nvvm_atom_cta_max_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_max_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_ui_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_max_gen_i:
   case NVPTX::BI__nvvm_atom_sys_max_gen_l:
   case NVPTX::BI__nvvm_atom_sys_max_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_max_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_max_gen_ui:
   case NVPTX::BI__nvvm_atom_sys_max_gen_ul:
   case NVPTX::BI__nvvm_atom_sys_max_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_max_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_ui_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_min_gen_i:
   case NVPTX::BI__nvvm_atom_cta_min_gen_l:
   case NVPTX::BI__nvvm_atom_cta_min_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_min_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_min_gen_ui:
   case NVPTX::BI__nvvm_atom_cta_min_gen_ul:
   case NVPTX::BI__nvvm_atom_cta_min_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_min_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_ui_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_min_gen_i:
   case NVPTX::BI__nvvm_atom_sys_min_gen_l:
   case NVPTX::BI__nvvm_atom_sys_min_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_min_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_min_gen_ui:
   case NVPTX::BI__nvvm_atom_sys_min_gen_ul:
   case NVPTX::BI__nvvm_atom_sys_min_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_min_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_ui_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_inc_gen_ui:
   case NVPTX::BI__nvvm_atom_cta_inc_gen_ul:
   case NVPTX::BI__nvvm_atom_cta_inc_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_inc_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_gen_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_dec_gen_ui:
   case NVPTX::BI__nvvm_atom_cta_dec_gen_ul:
   case NVPTX::BI__nvvm_atom_cta_dec_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_dec_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_gen_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_inc_gen_ui:
   case NVPTX::BI__nvvm_atom_sys_inc_gen_ul:
   case NVPTX::BI__nvvm_atom_sys_inc_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_inc_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_gen_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_dec_gen_ui:
   case NVPTX::BI__nvvm_atom_sys_dec_gen_ul:
   case NVPTX::BI__nvvm_atom_sys_dec_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_dec_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_gen_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_and_gen_i:
   case NVPTX::BI__nvvm_atom_cta_and_gen_l:
   case NVPTX::BI__nvvm_atom_cta_and_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_and_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_gen_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_and_gen_i:
   case NVPTX::BI__nvvm_atom_sys_and_gen_l:
   case NVPTX::BI__nvvm_atom_sys_and_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_and_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_gen_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_or_gen_i:
   case NVPTX::BI__nvvm_atom_cta_or_gen_l:
   case NVPTX::BI__nvvm_atom_cta_or_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_or_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_gen_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_or_gen_i:
   case NVPTX::BI__nvvm_atom_sys_or_gen_l:
   case NVPTX::BI__nvvm_atom_sys_or_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_or_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_gen_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_xor_gen_i:
   case NVPTX::BI__nvvm_atom_cta_xor_gen_l:
   case NVPTX::BI__nvvm_atom_cta_xor_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_xor_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_gen_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_xor_gen_i:
   case NVPTX::BI__nvvm_atom_sys_xor_gen_l:
   case NVPTX::BI__nvvm_atom_sys_xor_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_xor_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_gen_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_cas_gen_us:
   case NVPTX::BI__nvvm_atom_cta_cas_gen_i:
   case NVPTX::BI__nvvm_atom_cta_cas_gen_l:
   case NVPTX::BI__nvvm_atom_cta_cas_gen_ll: {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_cas_gen_ll \n");
     Value *Ptr = EmitScalarExpr(E->getArg(0));
     llvm::Type *ElemTy =
         ConvertTypeForMem(E->getArg(0)->getType()->getPointeeType());
@@ -1127,3716 +854,2221 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__nvvm_atom_sys_cas_gen_i:
   case NVPTX::BI__nvvm_atom_sys_cas_gen_l:
   case NVPTX::BI__nvvm_atom_sys_cas_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_cas_gen_us \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_i_sys);
-  }
   case NVPTX::BI__nvvm_atom_cta_cas_gen_f:
   case NVPTX::BI__nvvm_atom_cta_cas_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_cas_gen_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_f_cta);
-  }
   case NVPTX::BI__nvvm_atom_sys_cas_gen_f:
   case NVPTX::BI__nvvm_atom_sys_cas_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_cas_gen_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_f_sys);
-  }
   case NVPTX::BI__nvvm_atom_acquire_add_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_add_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_add_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_add_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_i_acquire, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_add_gen_f:
   case NVPTX::BI__nvvm_atom_acquire_add_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_add_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_f_acquire, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_xchg_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_xchg_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_xchg_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_xchg_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_xchg_gen_f:
   case NVPTX::BI__nvvm_atom_acquire_xchg_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_xchg_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_f_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_max_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_max_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_max_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_max_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_i_acquire, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_max_gen_ui:
   case NVPTX::BI__nvvm_atom_acquire_max_gen_ul:
   case NVPTX::BI__nvvm_atom_acquire_max_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_max_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_ui_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_min_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_min_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_min_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_min_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_i_acquire, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_min_gen_ui:
   case NVPTX::BI__nvvm_atom_acquire_min_gen_ul:
   case NVPTX::BI__nvvm_atom_acquire_min_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_min_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_ui_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_inc_gen_ui:
   case NVPTX::BI__nvvm_atom_acquire_inc_gen_ul:
   case NVPTX::BI__nvvm_atom_acquire_inc_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_inc_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_gen_i_acquire, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_dec_gen_ui:
   case NVPTX::BI__nvvm_atom_acquire_dec_gen_ul:
   case NVPTX::BI__nvvm_atom_acquire_dec_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_dec_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_gen_i_acquire, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_and_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_and_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_and_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_and_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_gen_i_acquire, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_or_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_or_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_or_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_or_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_gen_i_acquire, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_xor_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_xor_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_xor_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_xor_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_gen_i_acquire, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cas_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_cas_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_cas_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cas_gen_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_i_acquire);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cas_gen_f:
   case NVPTX::BI__nvvm_atom_acquire_cas_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cas_gen_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_f_acquire);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_add_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_add_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_add_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_add_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_i_acquire_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_add_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_add_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_add_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_add_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_i_acquire_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_add_gen_f:
   case NVPTX::BI__nvvm_atom_acquire_cta_add_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_add_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_f_acquire_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_add_gen_f:
   case NVPTX::BI__nvvm_atom_acquire_sys_add_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_add_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_f_acquire_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_xchg_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_gen_f:
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_xchg_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_f_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_xchg_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_gen_f:
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_xchg_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_f_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_max_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_max_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_max_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_max_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_i_acquire_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_max_gen_ui:
   case NVPTX::BI__nvvm_atom_acquire_cta_max_gen_ul:
   case NVPTX::BI__nvvm_atom_acquire_cta_max_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_max_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_ui_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_max_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_max_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_max_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_max_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_i_acquire_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_max_gen_ui:
   case NVPTX::BI__nvvm_atom_acquire_sys_max_gen_ul:
   case NVPTX::BI__nvvm_atom_acquire_sys_max_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_max_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_ui_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_min_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_min_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_min_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_min_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_i_acquire_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_min_gen_ui:
   case NVPTX::BI__nvvm_atom_acquire_cta_min_gen_ul:
   case NVPTX::BI__nvvm_atom_acquire_cta_min_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_min_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_ui_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_min_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_min_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_min_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_min_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_i_acquire_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_min_gen_ui:
   case NVPTX::BI__nvvm_atom_acquire_sys_min_gen_ul:
   case NVPTX::BI__nvvm_atom_acquire_sys_min_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_min_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_ui_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_inc_gen_ui:
   case NVPTX::BI__nvvm_atom_acquire_cta_inc_gen_ul:
   case NVPTX::BI__nvvm_atom_acquire_cta_inc_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_inc_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_gen_i_acquire_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_dec_gen_ui:
   case NVPTX::BI__nvvm_atom_acquire_cta_dec_gen_ul:
   case NVPTX::BI__nvvm_atom_acquire_cta_dec_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_dec_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_gen_i_acquire_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_inc_gen_ui:
   case NVPTX::BI__nvvm_atom_acquire_sys_inc_gen_ul:
   case NVPTX::BI__nvvm_atom_acquire_sys_inc_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_inc_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_gen_i_acquire_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_dec_gen_ui:
   case NVPTX::BI__nvvm_atom_acquire_sys_dec_gen_ul:
   case NVPTX::BI__nvvm_atom_acquire_sys_dec_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_dec_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_gen_i_acquire_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_and_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_and_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_and_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_and_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_gen_i_acquire_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_and_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_and_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_and_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_and_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_gen_i_acquire_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_or_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_or_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_or_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_or_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_gen_i_acquire_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_or_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_or_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_or_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_or_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_gen_i_acquire_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_xor_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_xor_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_xor_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_xor_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_gen_i_acquire_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_xor_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_xor_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_xor_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_xor_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_gen_i_acquire_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_cas_gen_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_i_acquire_cta);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_gen_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_gen_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_cas_gen_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_i_acquire_sys);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_gen_f:
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_cas_gen_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_f_acquire_cta);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_gen_f:
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_cas_gen_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_f_acquire_sys);
-  }
   case NVPTX::BI__nvvm_atom_release_add_gen_i:
   case NVPTX::BI__nvvm_atom_release_add_gen_l:
   case NVPTX::BI__nvvm_atom_release_add_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_add_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_i_release, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_add_gen_f:
   case NVPTX::BI__nvvm_atom_release_add_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_add_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_f_release, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_xchg_gen_i:
   case NVPTX::BI__nvvm_atom_release_xchg_gen_l:
   case NVPTX::BI__nvvm_atom_release_xchg_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_xchg_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_xchg_gen_f:
   case NVPTX::BI__nvvm_atom_release_xchg_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_xchg_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_f_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_max_gen_i:
   case NVPTX::BI__nvvm_atom_release_max_gen_l:
   case NVPTX::BI__nvvm_atom_release_max_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_max_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_i_release, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_max_gen_ui:
   case NVPTX::BI__nvvm_atom_release_max_gen_ul:
   case NVPTX::BI__nvvm_atom_release_max_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_max_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_ui_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_min_gen_i:
   case NVPTX::BI__nvvm_atom_release_min_gen_l:
   case NVPTX::BI__nvvm_atom_release_min_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_min_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_i_release, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_min_gen_ui:
   case NVPTX::BI__nvvm_atom_release_min_gen_ul:
   case NVPTX::BI__nvvm_atom_release_min_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_min_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_ui_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_inc_gen_ui:
   case NVPTX::BI__nvvm_atom_release_inc_gen_ul:
   case NVPTX::BI__nvvm_atom_release_inc_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_inc_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_gen_i_release, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_dec_gen_ui:
   case NVPTX::BI__nvvm_atom_release_dec_gen_ul:
   case NVPTX::BI__nvvm_atom_release_dec_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_dec_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_gen_i_release, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_and_gen_i:
   case NVPTX::BI__nvvm_atom_release_and_gen_l:
   case NVPTX::BI__nvvm_atom_release_and_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_and_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_gen_i_release, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_or_gen_i:
   case NVPTX::BI__nvvm_atom_release_or_gen_l:
   case NVPTX::BI__nvvm_atom_release_or_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_or_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_gen_i_release, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_xor_gen_i:
   case NVPTX::BI__nvvm_atom_release_xor_gen_l:
   case NVPTX::BI__nvvm_atom_release_xor_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_xor_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_gen_i_release, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cas_gen_i:
   case NVPTX::BI__nvvm_atom_release_cas_gen_l:
   case NVPTX::BI__nvvm_atom_release_cas_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cas_gen_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_i_release);
-  }
   case NVPTX::BI__nvvm_atom_release_cas_gen_f:
   case NVPTX::BI__nvvm_atom_release_cas_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cas_gen_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_f_release);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_add_gen_i:
   case NVPTX::BI__nvvm_atom_release_cta_add_gen_l:
   case NVPTX::BI__nvvm_atom_release_cta_add_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_add_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_i_release_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_add_gen_i:
   case NVPTX::BI__nvvm_atom_release_sys_add_gen_l:
   case NVPTX::BI__nvvm_atom_release_sys_add_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_add_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_i_release_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_add_gen_f:
   case NVPTX::BI__nvvm_atom_release_cta_add_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_add_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_f_release_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_add_gen_f:
   case NVPTX::BI__nvvm_atom_release_sys_add_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_add_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_f_release_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_xchg_gen_i:
   case NVPTX::BI__nvvm_atom_release_cta_xchg_gen_l:
   case NVPTX::BI__nvvm_atom_release_cta_xchg_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_xchg_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_xchg_gen_f:
   case NVPTX::BI__nvvm_atom_release_cta_xchg_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_xchg_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_f_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_xchg_gen_i:
   case NVPTX::BI__nvvm_atom_release_sys_xchg_gen_l:
   case NVPTX::BI__nvvm_atom_release_sys_xchg_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_xchg_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_xchg_gen_f:
   case NVPTX::BI__nvvm_atom_release_sys_xchg_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_xchg_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_f_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_max_gen_i:
   case NVPTX::BI__nvvm_atom_release_cta_max_gen_l:
   case NVPTX::BI__nvvm_atom_release_cta_max_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_max_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_i_release_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_max_gen_ui:
   case NVPTX::BI__nvvm_atom_release_cta_max_gen_ul:
   case NVPTX::BI__nvvm_atom_release_cta_max_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_max_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_ui_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_max_gen_i:
   case NVPTX::BI__nvvm_atom_release_sys_max_gen_l:
   case NVPTX::BI__nvvm_atom_release_sys_max_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_max_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_i_release_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_max_gen_ui:
   case NVPTX::BI__nvvm_atom_release_sys_max_gen_ul:
   case NVPTX::BI__nvvm_atom_release_sys_max_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_max_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_ui_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_min_gen_i:
   case NVPTX::BI__nvvm_atom_release_cta_min_gen_l:
   case NVPTX::BI__nvvm_atom_release_cta_min_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_min_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_i_release_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_min_gen_ui:
   case NVPTX::BI__nvvm_atom_release_cta_min_gen_ul:
   case NVPTX::BI__nvvm_atom_release_cta_min_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_min_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_ui_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_min_gen_i:
   case NVPTX::BI__nvvm_atom_release_sys_min_gen_l:
   case NVPTX::BI__nvvm_atom_release_sys_min_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_min_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_i_release_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_min_gen_ui:
   case NVPTX::BI__nvvm_atom_release_sys_min_gen_ul:
   case NVPTX::BI__nvvm_atom_release_sys_min_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_min_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_ui_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_inc_gen_ui:
   case NVPTX::BI__nvvm_atom_release_cta_inc_gen_ul:
   case NVPTX::BI__nvvm_atom_release_cta_inc_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_inc_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_gen_i_release_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_dec_gen_ui:
   case NVPTX::BI__nvvm_atom_release_cta_dec_gen_ul:
   case NVPTX::BI__nvvm_atom_release_cta_dec_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_dec_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_gen_i_release_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_inc_gen_ui:
   case NVPTX::BI__nvvm_atom_release_sys_inc_gen_ul:
   case NVPTX::BI__nvvm_atom_release_sys_inc_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_inc_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_gen_i_release_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_dec_gen_ui:
   case NVPTX::BI__nvvm_atom_release_sys_dec_gen_ul:
   case NVPTX::BI__nvvm_atom_release_sys_dec_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_dec_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_gen_i_release_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_and_gen_i:
   case NVPTX::BI__nvvm_atom_release_cta_and_gen_l:
   case NVPTX::BI__nvvm_atom_release_cta_and_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_and_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_gen_i_release_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_and_gen_i:
   case NVPTX::BI__nvvm_atom_release_sys_and_gen_l:
   case NVPTX::BI__nvvm_atom_release_sys_and_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_and_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_gen_i_release_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_or_gen_i:
   case NVPTX::BI__nvvm_atom_release_cta_or_gen_l:
   case NVPTX::BI__nvvm_atom_release_cta_or_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_or_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_gen_i_release_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_or_gen_i:
   case NVPTX::BI__nvvm_atom_release_sys_or_gen_l:
   case NVPTX::BI__nvvm_atom_release_sys_or_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_or_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_gen_i_release_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_xor_gen_i:
   case NVPTX::BI__nvvm_atom_release_cta_xor_gen_l:
   case NVPTX::BI__nvvm_atom_release_cta_xor_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_xor_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_gen_i_release_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_xor_gen_i:
   case NVPTX::BI__nvvm_atom_release_sys_xor_gen_l:
   case NVPTX::BI__nvvm_atom_release_sys_xor_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_xor_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_gen_i_release_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_cas_gen_i:
   case NVPTX::BI__nvvm_atom_release_cta_cas_gen_l:
   case NVPTX::BI__nvvm_atom_release_cta_cas_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_cas_gen_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_i_release_cta);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_cas_gen_i:
   case NVPTX::BI__nvvm_atom_release_sys_cas_gen_l:
   case NVPTX::BI__nvvm_atom_release_sys_cas_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_cas_gen_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_i_release_sys);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_cas_gen_f:
   case NVPTX::BI__nvvm_atom_release_cta_cas_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_cas_gen_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_f_release_cta);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_cas_gen_f:
   case NVPTX::BI__nvvm_atom_release_sys_cas_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_cas_gen_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_f_release_sys);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_add_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_add_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_add_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_add_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_i_acq_rel, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_add_gen_f:
   case NVPTX::BI__nvvm_atom_acq_rel_add_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_add_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_f_acq_rel, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_xchg_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_gen_f:
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_xchg_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_f_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_max_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_max_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_max_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_max_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_i_acq_rel, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_max_gen_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_max_gen_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_max_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_max_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_ui_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_min_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_min_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_min_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_min_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_i_acq_rel, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_min_gen_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_min_gen_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_min_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_min_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_ui_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_inc_gen_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_inc_gen_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_inc_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_inc_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_gen_i_acq_rel, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_dec_gen_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_dec_gen_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_dec_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_dec_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_gen_i_acq_rel, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_and_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_and_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_and_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_and_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_gen_i_acq_rel, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_or_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_or_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_or_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_or_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_gen_i_acq_rel, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_xor_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_xor_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_xor_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_xor_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_gen_i_acq_rel, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cas_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cas_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cas_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cas_gen_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_i_acq_rel);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cas_gen_f:
   case NVPTX::BI__nvvm_atom_acq_rel_cas_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cas_gen_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_f_acq_rel);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_add_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_i_acq_rel_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_add_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_i_acq_rel_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_gen_f:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_add_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_f_acq_rel_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_gen_f:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_add_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_gen_f_acq_rel_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_xchg_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_gen_f:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_xchg_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_f_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_xchg_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_gen_f:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_xchg_gen_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_gen_f_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_max_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_i_acq_rel_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_gen_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_gen_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_max_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_ui_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_max_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_i_acq_rel_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_gen_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_gen_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_max_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_gen_ui_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_min_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_i_acq_rel_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_gen_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_gen_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_min_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_ui_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_min_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_i_acq_rel_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_gen_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_gen_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_min_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_gen_ui_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_inc_gen_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_inc_gen_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_inc_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_inc_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_gen_i_acq_rel_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_dec_gen_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_dec_gen_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_dec_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_dec_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_gen_i_acq_rel_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_inc_gen_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_inc_gen_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_inc_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_inc_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_gen_i_acq_rel_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_dec_gen_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_dec_gen_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_dec_gen_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_dec_gen_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_gen_i_acq_rel_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_and_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_and_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_and_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_and_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_gen_i_acq_rel_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_and_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_and_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_and_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_and_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_gen_i_acq_rel_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_or_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_or_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_or_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_or_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_gen_i_acq_rel_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_or_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_or_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_or_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_or_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_gen_i_acq_rel_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xor_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xor_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xor_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_xor_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_gen_i_acq_rel_cta, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xor_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xor_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xor_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_xor_gen_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_gen_i_acq_rel_sys, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_cas_gen_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_i_acq_rel_cta);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_gen_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_gen_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_gen_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_cas_gen_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_i_acq_rel_sys);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_gen_f:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_cas_gen_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_f_acq_rel_cta);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_gen_f:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_gen_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_cas_gen_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_gen_f_acq_rel_sys);
-  }
   case NVPTX::BI__nvvm_atom_add_global_i:
   case NVPTX::BI__nvvm_atom_add_global_l:
   case NVPTX::BI__nvvm_atom_add_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_add_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_add_global_f:
   case NVPTX::BI__nvvm_atom_add_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_add_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_f, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_xchg_global_i:
   case NVPTX::BI__nvvm_atom_xchg_global_l:
   case NVPTX::BI__nvvm_atom_xchg_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_xchg_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_xchg_global_f:
   case NVPTX::BI__nvvm_atom_xchg_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_xchg_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_f, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_max_global_i:
   case NVPTX::BI__nvvm_atom_max_global_l:
   case NVPTX::BI__nvvm_atom_max_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_max_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_max_global_ui:
   case NVPTX::BI__nvvm_atom_max_global_ul:
   case NVPTX::BI__nvvm_atom_max_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_max_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_ui, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_min_global_i:
   case NVPTX::BI__nvvm_atom_min_global_l:
   case NVPTX::BI__nvvm_atom_min_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_min_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_min_global_ui:
   case NVPTX::BI__nvvm_atom_min_global_ul:
   case NVPTX::BI__nvvm_atom_min_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_min_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_ui, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_inc_global_ui:
   case NVPTX::BI__nvvm_atom_inc_global_ul:
   case NVPTX::BI__nvvm_atom_inc_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_inc_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_global_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_dec_global_ui:
   case NVPTX::BI__nvvm_atom_dec_global_ul:
   case NVPTX::BI__nvvm_atom_dec_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_dec_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_global_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_and_global_i:
   case NVPTX::BI__nvvm_atom_and_global_l:
   case NVPTX::BI__nvvm_atom_and_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_and_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_global_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_or_global_i:
   case NVPTX::BI__nvvm_atom_or_global_l:
   case NVPTX::BI__nvvm_atom_or_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_or_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_global_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_xor_global_i:
   case NVPTX::BI__nvvm_atom_xor_global_l:
   case NVPTX::BI__nvvm_atom_xor_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_xor_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_global_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cas_global_i:
   case NVPTX::BI__nvvm_atom_cas_global_l:
   case NVPTX::BI__nvvm_atom_cas_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cas_global_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_i);
-  }
   case NVPTX::BI__nvvm_atom_cas_global_f:
   case NVPTX::BI__nvvm_atom_cas_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cas_global_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_f);
-  }
   case NVPTX::BI__nvvm_atom_cta_add_global_i:
   case NVPTX::BI__nvvm_atom_cta_add_global_l:
   case NVPTX::BI__nvvm_atom_cta_add_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_add_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_add_global_i:
   case NVPTX::BI__nvvm_atom_sys_add_global_l:
   case NVPTX::BI__nvvm_atom_sys_add_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_add_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_add_global_f:
   case NVPTX::BI__nvvm_atom_cta_add_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_add_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_f_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_add_global_f:
   case NVPTX::BI__nvvm_atom_sys_add_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_add_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_f_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_xchg_global_i:
   case NVPTX::BI__nvvm_atom_cta_xchg_global_l:
   case NVPTX::BI__nvvm_atom_cta_xchg_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_xchg_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_xchg_global_f:
   case NVPTX::BI__nvvm_atom_cta_xchg_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_xchg_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_f_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_xchg_global_i:
   case NVPTX::BI__nvvm_atom_sys_xchg_global_l:
   case NVPTX::BI__nvvm_atom_sys_xchg_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_xchg_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_xchg_global_f:
   case NVPTX::BI__nvvm_atom_sys_xchg_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_xchg_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_f_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_max_global_i:
   case NVPTX::BI__nvvm_atom_cta_max_global_l:
   case NVPTX::BI__nvvm_atom_cta_max_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_max_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_max_global_ui:
   case NVPTX::BI__nvvm_atom_cta_max_global_ul:
   case NVPTX::BI__nvvm_atom_cta_max_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_max_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_ui_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_max_global_i:
   case NVPTX::BI__nvvm_atom_sys_max_global_l:
   case NVPTX::BI__nvvm_atom_sys_max_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_max_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_max_global_ui:
   case NVPTX::BI__nvvm_atom_sys_max_global_ul:
   case NVPTX::BI__nvvm_atom_sys_max_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_max_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_ui_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_min_global_i:
   case NVPTX::BI__nvvm_atom_cta_min_global_l:
   case NVPTX::BI__nvvm_atom_cta_min_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_min_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_min_global_ui:
   case NVPTX::BI__nvvm_atom_cta_min_global_ul:
   case NVPTX::BI__nvvm_atom_cta_min_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_min_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_ui_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_min_global_i:
   case NVPTX::BI__nvvm_atom_sys_min_global_l:
   case NVPTX::BI__nvvm_atom_sys_min_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_min_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_min_global_ui:
   case NVPTX::BI__nvvm_atom_sys_min_global_ul:
   case NVPTX::BI__nvvm_atom_sys_min_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_min_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_ui_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_inc_global_ui:
   case NVPTX::BI__nvvm_atom_cta_inc_global_ul:
   case NVPTX::BI__nvvm_atom_cta_inc_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_inc_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_global_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_dec_global_ui:
   case NVPTX::BI__nvvm_atom_cta_dec_global_ul:
   case NVPTX::BI__nvvm_atom_cta_dec_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_dec_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_global_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_inc_global_ui:
   case NVPTX::BI__nvvm_atom_sys_inc_global_ul:
   case NVPTX::BI__nvvm_atom_sys_inc_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_inc_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_global_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_dec_global_ui:
   case NVPTX::BI__nvvm_atom_sys_dec_global_ul:
   case NVPTX::BI__nvvm_atom_sys_dec_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_dec_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_global_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_and_global_i:
   case NVPTX::BI__nvvm_atom_cta_and_global_l:
   case NVPTX::BI__nvvm_atom_cta_and_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_and_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_global_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_and_global_i:
   case NVPTX::BI__nvvm_atom_sys_and_global_l:
   case NVPTX::BI__nvvm_atom_sys_and_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_and_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_global_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_or_global_i:
   case NVPTX::BI__nvvm_atom_cta_or_global_l:
   case NVPTX::BI__nvvm_atom_cta_or_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_or_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_global_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_or_global_i:
   case NVPTX::BI__nvvm_atom_sys_or_global_l:
   case NVPTX::BI__nvvm_atom_sys_or_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_or_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_global_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_xor_global_i:
   case NVPTX::BI__nvvm_atom_cta_xor_global_l:
   case NVPTX::BI__nvvm_atom_cta_xor_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_xor_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_global_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_xor_global_i:
   case NVPTX::BI__nvvm_atom_sys_xor_global_l:
   case NVPTX::BI__nvvm_atom_sys_xor_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_xor_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_global_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_cas_global_i:
   case NVPTX::BI__nvvm_atom_cta_cas_global_l:
   case NVPTX::BI__nvvm_atom_cta_cas_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_cas_global_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_i_cta);
-  }
   case NVPTX::BI__nvvm_atom_sys_cas_global_i:
   case NVPTX::BI__nvvm_atom_sys_cas_global_l:
   case NVPTX::BI__nvvm_atom_sys_cas_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_cas_global_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_i_sys);
-  }
   case NVPTX::BI__nvvm_atom_cta_cas_global_f:
   case NVPTX::BI__nvvm_atom_cta_cas_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_cas_global_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_f_cta);
-  }
   case NVPTX::BI__nvvm_atom_sys_cas_global_f:
   case NVPTX::BI__nvvm_atom_sys_cas_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_cas_global_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_f_sys);
-  }
   case NVPTX::BI__nvvm_atom_acquire_add_global_i:
   case NVPTX::BI__nvvm_atom_acquire_add_global_l:
   case NVPTX::BI__nvvm_atom_acquire_add_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_add_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_add_global_f:
   case NVPTX::BI__nvvm_atom_acquire_add_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_add_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_f_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_xchg_global_i:
   case NVPTX::BI__nvvm_atom_acquire_xchg_global_l:
   case NVPTX::BI__nvvm_atom_acquire_xchg_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_xchg_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_xchg_global_f:
   case NVPTX::BI__nvvm_atom_acquire_xchg_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_xchg_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_f_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_max_global_i:
   case NVPTX::BI__nvvm_atom_acquire_max_global_l:
   case NVPTX::BI__nvvm_atom_acquire_max_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_max_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_max_global_ui:
   case NVPTX::BI__nvvm_atom_acquire_max_global_ul:
   case NVPTX::BI__nvvm_atom_acquire_max_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_max_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_ui_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_min_global_i:
   case NVPTX::BI__nvvm_atom_acquire_min_global_l:
   case NVPTX::BI__nvvm_atom_acquire_min_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_min_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_min_global_ui:
   case NVPTX::BI__nvvm_atom_acquire_min_global_ul:
   case NVPTX::BI__nvvm_atom_acquire_min_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_min_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_ui_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_inc_global_ui:
   case NVPTX::BI__nvvm_atom_acquire_inc_global_ul:
   case NVPTX::BI__nvvm_atom_acquire_inc_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_inc_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_global_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_dec_global_ui:
   case NVPTX::BI__nvvm_atom_acquire_dec_global_ul:
   case NVPTX::BI__nvvm_atom_acquire_dec_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_dec_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_global_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_and_global_i:
   case NVPTX::BI__nvvm_atom_acquire_and_global_l:
   case NVPTX::BI__nvvm_atom_acquire_and_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_and_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_global_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_or_global_i:
   case NVPTX::BI__nvvm_atom_acquire_or_global_l:
   case NVPTX::BI__nvvm_atom_acquire_or_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_or_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_global_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_xor_global_i:
   case NVPTX::BI__nvvm_atom_acquire_xor_global_l:
   case NVPTX::BI__nvvm_atom_acquire_xor_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_xor_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_global_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cas_global_i:
   case NVPTX::BI__nvvm_atom_acquire_cas_global_l:
   case NVPTX::BI__nvvm_atom_acquire_cas_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cas_global_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_i_acquire);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cas_global_f:
   case NVPTX::BI__nvvm_atom_acquire_cas_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cas_global_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_f_acquire);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_add_global_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_add_global_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_add_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_add_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_add_global_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_add_global_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_add_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_add_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_add_global_f:
   case NVPTX::BI__nvvm_atom_acquire_cta_add_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_add_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_f_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_add_global_f:
   case NVPTX::BI__nvvm_atom_acquire_sys_add_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_add_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_f_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_global_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_global_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_xchg_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_global_f:
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_xchg_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_f_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_global_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_global_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_xchg_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_global_f:
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_xchg_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_f_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_max_global_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_max_global_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_max_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_max_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_max_global_ui:
   case NVPTX::BI__nvvm_atom_acquire_cta_max_global_ul:
   case NVPTX::BI__nvvm_atom_acquire_cta_max_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_max_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_ui_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_max_global_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_max_global_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_max_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_max_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_max_global_ui:
   case NVPTX::BI__nvvm_atom_acquire_sys_max_global_ul:
   case NVPTX::BI__nvvm_atom_acquire_sys_max_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_max_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_ui_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_min_global_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_min_global_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_min_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_min_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_min_global_ui:
   case NVPTX::BI__nvvm_atom_acquire_cta_min_global_ul:
   case NVPTX::BI__nvvm_atom_acquire_cta_min_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_min_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_ui_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_min_global_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_min_global_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_min_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_min_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_min_global_ui:
   case NVPTX::BI__nvvm_atom_acquire_sys_min_global_ul:
   case NVPTX::BI__nvvm_atom_acquire_sys_min_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_min_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_ui_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_inc_global_ui:
   case NVPTX::BI__nvvm_atom_acquire_cta_inc_global_ul:
   case NVPTX::BI__nvvm_atom_acquire_cta_inc_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_inc_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_global_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_dec_global_ui:
   case NVPTX::BI__nvvm_atom_acquire_cta_dec_global_ul:
   case NVPTX::BI__nvvm_atom_acquire_cta_dec_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_dec_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_global_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_inc_global_ui:
   case NVPTX::BI__nvvm_atom_acquire_sys_inc_global_ul:
   case NVPTX::BI__nvvm_atom_acquire_sys_inc_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_inc_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_global_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_dec_global_ui:
   case NVPTX::BI__nvvm_atom_acquire_sys_dec_global_ul:
   case NVPTX::BI__nvvm_atom_acquire_sys_dec_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_dec_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_global_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_and_global_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_and_global_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_and_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_and_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_global_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_and_global_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_and_global_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_and_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_and_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_global_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_or_global_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_or_global_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_or_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_or_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_global_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_or_global_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_or_global_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_or_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_or_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_global_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_xor_global_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_xor_global_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_xor_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_xor_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_global_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_xor_global_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_xor_global_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_xor_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_xor_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_global_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_global_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_global_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_cas_global_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_i_acquire_cta);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_global_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_global_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_cas_global_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_i_acquire_sys);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_global_f:
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_cas_global_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_f_acquire_cta);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_global_f:
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_cas_global_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_f_acquire_sys);
-  }
   case NVPTX::BI__nvvm_atom_release_add_global_i:
   case NVPTX::BI__nvvm_atom_release_add_global_l:
   case NVPTX::BI__nvvm_atom_release_add_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_add_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_add_global_f:
   case NVPTX::BI__nvvm_atom_release_add_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_add_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_f_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_xchg_global_i:
   case NVPTX::BI__nvvm_atom_release_xchg_global_l:
   case NVPTX::BI__nvvm_atom_release_xchg_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_xchg_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_xchg_global_f:
   case NVPTX::BI__nvvm_atom_release_xchg_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_xchg_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_f_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_max_global_i:
   case NVPTX::BI__nvvm_atom_release_max_global_l:
   case NVPTX::BI__nvvm_atom_release_max_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_max_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_max_global_ui:
   case NVPTX::BI__nvvm_atom_release_max_global_ul:
   case NVPTX::BI__nvvm_atom_release_max_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_max_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_ui_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_min_global_i:
   case NVPTX::BI__nvvm_atom_release_min_global_l:
   case NVPTX::BI__nvvm_atom_release_min_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_min_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_min_global_ui:
   case NVPTX::BI__nvvm_atom_release_min_global_ul:
   case NVPTX::BI__nvvm_atom_release_min_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_min_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_ui_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_inc_global_ui:
   case NVPTX::BI__nvvm_atom_release_inc_global_ul:
   case NVPTX::BI__nvvm_atom_release_inc_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_inc_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_global_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_dec_global_ui:
   case NVPTX::BI__nvvm_atom_release_dec_global_ul:
   case NVPTX::BI__nvvm_atom_release_dec_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_dec_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_global_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_and_global_i:
   case NVPTX::BI__nvvm_atom_release_and_global_l:
   case NVPTX::BI__nvvm_atom_release_and_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_and_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_global_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_or_global_i:
   case NVPTX::BI__nvvm_atom_release_or_global_l:
   case NVPTX::BI__nvvm_atom_release_or_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_or_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_global_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_xor_global_i:
   case NVPTX::BI__nvvm_atom_release_xor_global_l:
   case NVPTX::BI__nvvm_atom_release_xor_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_xor_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_global_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_cas_global_i:
   case NVPTX::BI__nvvm_atom_release_cas_global_l:
   case NVPTX::BI__nvvm_atom_release_cas_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cas_global_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_i_release);
-  }
   case NVPTX::BI__nvvm_atom_release_cas_global_f:
   case NVPTX::BI__nvvm_atom_release_cas_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cas_global_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_f_release);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_add_global_i:
   case NVPTX::BI__nvvm_atom_release_cta_add_global_l:
   case NVPTX::BI__nvvm_atom_release_cta_add_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_add_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_add_global_i:
   case NVPTX::BI__nvvm_atom_release_sys_add_global_l:
   case NVPTX::BI__nvvm_atom_release_sys_add_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_add_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_add_global_f:
   case NVPTX::BI__nvvm_atom_release_cta_add_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_add_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_f_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_add_global_f:
   case NVPTX::BI__nvvm_atom_release_sys_add_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_add_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_f_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_xchg_global_i:
   case NVPTX::BI__nvvm_atom_release_cta_xchg_global_l:
   case NVPTX::BI__nvvm_atom_release_cta_xchg_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_xchg_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_xchg_global_f:
   case NVPTX::BI__nvvm_atom_release_cta_xchg_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_xchg_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_f_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_xchg_global_i:
   case NVPTX::BI__nvvm_atom_release_sys_xchg_global_l:
   case NVPTX::BI__nvvm_atom_release_sys_xchg_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_xchg_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_xchg_global_f:
   case NVPTX::BI__nvvm_atom_release_sys_xchg_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_xchg_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_f_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_max_global_i:
   case NVPTX::BI__nvvm_atom_release_cta_max_global_l:
   case NVPTX::BI__nvvm_atom_release_cta_max_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_max_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_max_global_ui:
   case NVPTX::BI__nvvm_atom_release_cta_max_global_ul:
   case NVPTX::BI__nvvm_atom_release_cta_max_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_max_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_ui_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_max_global_i:
   case NVPTX::BI__nvvm_atom_release_sys_max_global_l:
   case NVPTX::BI__nvvm_atom_release_sys_max_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_max_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_max_global_ui:
   case NVPTX::BI__nvvm_atom_release_sys_max_global_ul:
   case NVPTX::BI__nvvm_atom_release_sys_max_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_max_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_ui_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_min_global_i:
   case NVPTX::BI__nvvm_atom_release_cta_min_global_l:
   case NVPTX::BI__nvvm_atom_release_cta_min_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_min_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_min_global_ui:
   case NVPTX::BI__nvvm_atom_release_cta_min_global_ul:
   case NVPTX::BI__nvvm_atom_release_cta_min_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_min_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_ui_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_min_global_i:
   case NVPTX::BI__nvvm_atom_release_sys_min_global_l:
   case NVPTX::BI__nvvm_atom_release_sys_min_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_min_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_min_global_ui:
   case NVPTX::BI__nvvm_atom_release_sys_min_global_ul:
   case NVPTX::BI__nvvm_atom_release_sys_min_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_min_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_ui_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_inc_global_ui:
   case NVPTX::BI__nvvm_atom_release_cta_inc_global_ul:
   case NVPTX::BI__nvvm_atom_release_cta_inc_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_inc_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_global_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_dec_global_ui:
   case NVPTX::BI__nvvm_atom_release_cta_dec_global_ul:
   case NVPTX::BI__nvvm_atom_release_cta_dec_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_dec_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_global_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_inc_global_ui:
   case NVPTX::BI__nvvm_atom_release_sys_inc_global_ul:
   case NVPTX::BI__nvvm_atom_release_sys_inc_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_inc_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_global_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_dec_global_ui:
   case NVPTX::BI__nvvm_atom_release_sys_dec_global_ul:
   case NVPTX::BI__nvvm_atom_release_sys_dec_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_dec_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_global_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_and_global_i:
   case NVPTX::BI__nvvm_atom_release_cta_and_global_l:
   case NVPTX::BI__nvvm_atom_release_cta_and_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_and_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_global_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_and_global_i:
   case NVPTX::BI__nvvm_atom_release_sys_and_global_l:
   case NVPTX::BI__nvvm_atom_release_sys_and_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_and_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_global_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_or_global_i:
   case NVPTX::BI__nvvm_atom_release_cta_or_global_l:
   case NVPTX::BI__nvvm_atom_release_cta_or_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_or_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_global_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_or_global_i:
   case NVPTX::BI__nvvm_atom_release_sys_or_global_l:
   case NVPTX::BI__nvvm_atom_release_sys_or_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_or_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_global_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_xor_global_i:
   case NVPTX::BI__nvvm_atom_release_cta_xor_global_l:
   case NVPTX::BI__nvvm_atom_release_cta_xor_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_xor_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_global_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_xor_global_i:
   case NVPTX::BI__nvvm_atom_release_sys_xor_global_l:
   case NVPTX::BI__nvvm_atom_release_sys_xor_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_xor_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_global_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_cas_global_i:
   case NVPTX::BI__nvvm_atom_release_cta_cas_global_l:
   case NVPTX::BI__nvvm_atom_release_cta_cas_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_cas_global_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_i_release_cta);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_cas_global_i:
   case NVPTX::BI__nvvm_atom_release_sys_cas_global_l:
   case NVPTX::BI__nvvm_atom_release_sys_cas_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_cas_global_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_i_release_sys);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_cas_global_f:
   case NVPTX::BI__nvvm_atom_release_cta_cas_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_cas_global_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_f_release_cta);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_cas_global_f:
   case NVPTX::BI__nvvm_atom_release_sys_cas_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_cas_global_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_f_release_sys);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_add_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_add_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_add_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_add_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_add_global_f:
   case NVPTX::BI__nvvm_atom_acq_rel_add_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_add_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_f_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_xchg_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_global_f:
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_xchg_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_f_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_max_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_max_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_max_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_max_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_max_global_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_max_global_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_max_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_max_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_ui_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_min_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_min_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_min_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_min_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_min_global_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_min_global_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_min_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_min_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_ui_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_inc_global_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_inc_global_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_inc_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_inc_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_global_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_dec_global_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_dec_global_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_dec_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_dec_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_global_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_and_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_and_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_and_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_and_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_global_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_or_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_or_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_or_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_or_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_global_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_xor_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_xor_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_xor_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_xor_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_global_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cas_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cas_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cas_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cas_global_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_i_acq_rel);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cas_global_f:
   case NVPTX::BI__nvvm_atom_acq_rel_cas_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cas_global_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_f_acq_rel);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_add_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_add_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_global_f:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_add_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_f_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_global_f:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_add_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_global_f_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_xchg_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_global_f:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_xchg_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_f_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_xchg_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_global_f:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_xchg_global_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_global_f_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_max_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_global_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_global_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_max_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_ui_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_max_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_global_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_global_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_max_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_global_ui_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_min_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_global_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_global_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_min_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_ui_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_min_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_global_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_global_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_min_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_global_ui_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_inc_global_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_inc_global_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_inc_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_inc_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_global_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_dec_global_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_dec_global_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_dec_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_dec_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_global_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_inc_global_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_inc_global_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_inc_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_inc_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_global_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_dec_global_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_dec_global_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_dec_global_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_dec_global_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_global_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_and_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_and_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_and_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_and_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_global_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_and_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_and_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_and_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_and_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_global_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_or_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_or_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_or_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_or_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_global_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_or_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_or_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_or_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_or_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_global_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xor_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xor_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xor_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_xor_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_global_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xor_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xor_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xor_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_xor_global_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_global_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_cas_global_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_i_acq_rel_cta);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_global_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_global_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_global_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_cas_global_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_i_acq_rel_sys);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_global_f:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_cas_global_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_f_acq_rel_cta);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_global_f:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_global_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_cas_global_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_global_f_acq_rel_sys);
-  }
   case NVPTX::BI__nvvm_atom_add_shared_i:
   case NVPTX::BI__nvvm_atom_add_shared_l:
   case NVPTX::BI__nvvm_atom_add_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_add_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_add_shared_f:
   case NVPTX::BI__nvvm_atom_add_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_add_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_f, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_xchg_shared_i:
   case NVPTX::BI__nvvm_atom_xchg_shared_l:
   case NVPTX::BI__nvvm_atom_xchg_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_xchg_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_xchg_shared_f:
   case NVPTX::BI__nvvm_atom_xchg_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_xchg_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_f, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_max_shared_i:
   case NVPTX::BI__nvvm_atom_max_shared_l:
   case NVPTX::BI__nvvm_atom_max_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_max_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_max_shared_ui:
   case NVPTX::BI__nvvm_atom_max_shared_ul:
   case NVPTX::BI__nvvm_atom_max_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_max_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_ui, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_min_shared_i:
   case NVPTX::BI__nvvm_atom_min_shared_l:
   case NVPTX::BI__nvvm_atom_min_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_min_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_min_shared_ui:
   case NVPTX::BI__nvvm_atom_min_shared_ul:
   case NVPTX::BI__nvvm_atom_min_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_min_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_ui, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_inc_shared_ui:
   case NVPTX::BI__nvvm_atom_inc_shared_ul:
   case NVPTX::BI__nvvm_atom_inc_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_inc_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_shared_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_dec_shared_ui:
   case NVPTX::BI__nvvm_atom_dec_shared_ul:
   case NVPTX::BI__nvvm_atom_dec_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_dec_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_shared_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_and_shared_i:
   case NVPTX::BI__nvvm_atom_and_shared_l:
   case NVPTX::BI__nvvm_atom_and_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_and_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_shared_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_or_shared_i:
   case NVPTX::BI__nvvm_atom_or_shared_l:
   case NVPTX::BI__nvvm_atom_or_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_or_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_shared_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_xor_shared_i:
   case NVPTX::BI__nvvm_atom_xor_shared_l:
   case NVPTX::BI__nvvm_atom_xor_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_xor_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_shared_i, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cas_shared_i:
   case NVPTX::BI__nvvm_atom_cas_shared_l:
   case NVPTX::BI__nvvm_atom_cas_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cas_shared_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_i);
-  }
   case NVPTX::BI__nvvm_atom_cas_shared_f:
   case NVPTX::BI__nvvm_atom_cas_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cas_shared_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_f);
-  }
   case NVPTX::BI__nvvm_atom_cta_add_shared_i:
   case NVPTX::BI__nvvm_atom_cta_add_shared_l:
   case NVPTX::BI__nvvm_atom_cta_add_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_add_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_add_shared_i:
   case NVPTX::BI__nvvm_atom_sys_add_shared_l:
   case NVPTX::BI__nvvm_atom_sys_add_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_add_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_add_shared_f:
   case NVPTX::BI__nvvm_atom_cta_add_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_add_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_f_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_add_shared_f:
   case NVPTX::BI__nvvm_atom_sys_add_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_add_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_f_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_xchg_shared_i:
   case NVPTX::BI__nvvm_atom_cta_xchg_shared_l:
   case NVPTX::BI__nvvm_atom_cta_xchg_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_xchg_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_xchg_shared_f:
   case NVPTX::BI__nvvm_atom_cta_xchg_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_xchg_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_f_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_xchg_shared_i:
   case NVPTX::BI__nvvm_atom_sys_xchg_shared_l:
   case NVPTX::BI__nvvm_atom_sys_xchg_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_xchg_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_xchg_shared_f:
   case NVPTX::BI__nvvm_atom_sys_xchg_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_xchg_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_f_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_max_shared_i:
   case NVPTX::BI__nvvm_atom_cta_max_shared_l:
   case NVPTX::BI__nvvm_atom_cta_max_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_max_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_max_shared_ui:
   case NVPTX::BI__nvvm_atom_cta_max_shared_ul:
   case NVPTX::BI__nvvm_atom_cta_max_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_max_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_ui_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_max_shared_i:
   case NVPTX::BI__nvvm_atom_sys_max_shared_l:
   case NVPTX::BI__nvvm_atom_sys_max_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_max_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_max_shared_ui:
   case NVPTX::BI__nvvm_atom_sys_max_shared_ul:
   case NVPTX::BI__nvvm_atom_sys_max_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_max_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_ui_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_min_shared_i:
   case NVPTX::BI__nvvm_atom_cta_min_shared_l:
   case NVPTX::BI__nvvm_atom_cta_min_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_min_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_min_shared_ui:
   case NVPTX::BI__nvvm_atom_cta_min_shared_ul:
   case NVPTX::BI__nvvm_atom_cta_min_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_min_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_ui_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_min_shared_i:
   case NVPTX::BI__nvvm_atom_sys_min_shared_l:
   case NVPTX::BI__nvvm_atom_sys_min_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_min_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_min_shared_ui:
   case NVPTX::BI__nvvm_atom_sys_min_shared_ul:
   case NVPTX::BI__nvvm_atom_sys_min_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_min_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_ui_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_inc_shared_ui:
   case NVPTX::BI__nvvm_atom_cta_inc_shared_ul:
   case NVPTX::BI__nvvm_atom_cta_inc_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_inc_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_shared_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_dec_shared_ui:
   case NVPTX::BI__nvvm_atom_cta_dec_shared_ul:
   case NVPTX::BI__nvvm_atom_cta_dec_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_dec_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_shared_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_inc_shared_ui:
   case NVPTX::BI__nvvm_atom_sys_inc_shared_ul:
   case NVPTX::BI__nvvm_atom_sys_inc_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_inc_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_shared_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_dec_shared_ui:
   case NVPTX::BI__nvvm_atom_sys_dec_shared_ul:
   case NVPTX::BI__nvvm_atom_sys_dec_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_dec_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_shared_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_and_shared_i:
   case NVPTX::BI__nvvm_atom_cta_and_shared_l:
   case NVPTX::BI__nvvm_atom_cta_and_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_and_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_shared_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_and_shared_i:
   case NVPTX::BI__nvvm_atom_sys_and_shared_l:
   case NVPTX::BI__nvvm_atom_sys_and_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_and_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_shared_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_or_shared_i:
   case NVPTX::BI__nvvm_atom_cta_or_shared_l:
   case NVPTX::BI__nvvm_atom_cta_or_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_or_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_shared_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_or_shared_i:
   case NVPTX::BI__nvvm_atom_sys_or_shared_l:
   case NVPTX::BI__nvvm_atom_sys_or_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_or_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_shared_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_xor_shared_i:
   case NVPTX::BI__nvvm_atom_cta_xor_shared_l:
   case NVPTX::BI__nvvm_atom_cta_xor_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_xor_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_shared_i_cta, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_sys_xor_shared_i:
   case NVPTX::BI__nvvm_atom_sys_xor_shared_l:
   case NVPTX::BI__nvvm_atom_sys_xor_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_xor_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_shared_i_sys, *this, E);
-  }
   case NVPTX::BI__nvvm_atom_cta_cas_shared_i:
   case NVPTX::BI__nvvm_atom_cta_cas_shared_l:
   case NVPTX::BI__nvvm_atom_cta_cas_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_cas_shared_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_i_cta);
-  }
   case NVPTX::BI__nvvm_atom_sys_cas_shared_i:
   case NVPTX::BI__nvvm_atom_sys_cas_shared_l:
   case NVPTX::BI__nvvm_atom_sys_cas_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_cas_shared_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_i_sys);
-  }
   case NVPTX::BI__nvvm_atom_cta_cas_shared_f:
   case NVPTX::BI__nvvm_atom_cta_cas_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_cta_cas_shared_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_f_cta);
-  }
   case NVPTX::BI__nvvm_atom_sys_cas_shared_f:
   case NVPTX::BI__nvvm_atom_sys_cas_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_sys_cas_shared_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_f_sys);
-  }
   case NVPTX::BI__nvvm_atom_acquire_add_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_add_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_add_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_add_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_add_shared_f:
   case NVPTX::BI__nvvm_atom_acquire_add_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_add_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_f_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_xchg_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_xchg_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_xchg_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_xchg_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_xchg_shared_f:
   case NVPTX::BI__nvvm_atom_acquire_xchg_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_xchg_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_f_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_max_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_max_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_max_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_max_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_max_shared_ui:
   case NVPTX::BI__nvvm_atom_acquire_max_shared_ul:
   case NVPTX::BI__nvvm_atom_acquire_max_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_max_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_ui_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_min_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_min_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_min_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_min_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_min_shared_ui:
   case NVPTX::BI__nvvm_atom_acquire_min_shared_ul:
   case NVPTX::BI__nvvm_atom_acquire_min_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_min_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_ui_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_inc_shared_ui:
   case NVPTX::BI__nvvm_atom_acquire_inc_shared_ul:
   case NVPTX::BI__nvvm_atom_acquire_inc_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_inc_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_shared_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_dec_shared_ui:
   case NVPTX::BI__nvvm_atom_acquire_dec_shared_ul:
   case NVPTX::BI__nvvm_atom_acquire_dec_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_dec_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_shared_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_and_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_and_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_and_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_and_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_shared_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_or_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_or_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_or_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_or_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_shared_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_xor_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_xor_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_xor_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_xor_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_shared_i_acquire, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cas_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_cas_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_cas_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cas_shared_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_i_acquire);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cas_shared_f:
   case NVPTX::BI__nvvm_atom_acquire_cas_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cas_shared_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_f_acquire);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_add_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_add_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_add_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_add_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_add_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_add_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_add_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_add_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_add_shared_f:
   case NVPTX::BI__nvvm_atom_acquire_cta_add_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_add_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_f_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_add_shared_f:
   case NVPTX::BI__nvvm_atom_acquire_sys_add_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_add_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_f_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_xchg_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_shared_f:
   case NVPTX::BI__nvvm_atom_acquire_cta_xchg_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_xchg_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_f_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_xchg_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_shared_f:
   case NVPTX::BI__nvvm_atom_acquire_sys_xchg_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_xchg_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_f_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_max_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_max_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_max_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_max_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_max_shared_ui:
   case NVPTX::BI__nvvm_atom_acquire_cta_max_shared_ul:
   case NVPTX::BI__nvvm_atom_acquire_cta_max_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_max_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_ui_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_max_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_max_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_max_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_max_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_max_shared_ui:
   case NVPTX::BI__nvvm_atom_acquire_sys_max_shared_ul:
   case NVPTX::BI__nvvm_atom_acquire_sys_max_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_max_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_ui_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_min_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_min_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_min_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_min_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_min_shared_ui:
   case NVPTX::BI__nvvm_atom_acquire_cta_min_shared_ul:
   case NVPTX::BI__nvvm_atom_acquire_cta_min_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_min_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_ui_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_min_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_min_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_min_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_min_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_min_shared_ui:
   case NVPTX::BI__nvvm_atom_acquire_sys_min_shared_ul:
   case NVPTX::BI__nvvm_atom_acquire_sys_min_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_min_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_ui_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_inc_shared_ui:
   case NVPTX::BI__nvvm_atom_acquire_cta_inc_shared_ul:
   case NVPTX::BI__nvvm_atom_acquire_cta_inc_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_inc_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_shared_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_dec_shared_ui:
   case NVPTX::BI__nvvm_atom_acquire_cta_dec_shared_ul:
   case NVPTX::BI__nvvm_atom_acquire_cta_dec_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_dec_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_shared_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_inc_shared_ui:
   case NVPTX::BI__nvvm_atom_acquire_sys_inc_shared_ul:
   case NVPTX::BI__nvvm_atom_acquire_sys_inc_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_inc_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_shared_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_dec_shared_ui:
   case NVPTX::BI__nvvm_atom_acquire_sys_dec_shared_ul:
   case NVPTX::BI__nvvm_atom_acquire_sys_dec_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_dec_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_shared_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_and_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_and_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_and_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_and_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_shared_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_and_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_and_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_and_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_and_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_shared_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_or_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_or_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_or_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_or_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_shared_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_or_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_or_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_or_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_or_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_shared_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_xor_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_xor_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_xor_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_xor_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_shared_i_acquire_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_xor_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_xor_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_xor_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_xor_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_shared_i_acquire_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_cas_shared_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_i_acquire_cta);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_shared_i:
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_shared_l:
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_cas_shared_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_i_acquire_sys);
-  }
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_shared_f:
   case NVPTX::BI__nvvm_atom_acquire_cta_cas_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_cta_cas_shared_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_f_acquire_cta);
-  }
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_shared_f:
   case NVPTX::BI__nvvm_atom_acquire_sys_cas_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acquire_sys_cas_shared_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_f_acquire_sys);
-  }
   case NVPTX::BI__nvvm_atom_release_add_shared_i:
   case NVPTX::BI__nvvm_atom_release_add_shared_l:
   case NVPTX::BI__nvvm_atom_release_add_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_add_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_add_shared_f:
   case NVPTX::BI__nvvm_atom_release_add_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_add_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_f_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_xchg_shared_i:
   case NVPTX::BI__nvvm_atom_release_xchg_shared_l:
   case NVPTX::BI__nvvm_atom_release_xchg_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_xchg_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_xchg_shared_f:
   case NVPTX::BI__nvvm_atom_release_xchg_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_xchg_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_f_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_max_shared_i:
   case NVPTX::BI__nvvm_atom_release_max_shared_l:
   case NVPTX::BI__nvvm_atom_release_max_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_max_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_max_shared_ui:
   case NVPTX::BI__nvvm_atom_release_max_shared_ul:
   case NVPTX::BI__nvvm_atom_release_max_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_max_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_ui_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_min_shared_i:
   case NVPTX::BI__nvvm_atom_release_min_shared_l:
   case NVPTX::BI__nvvm_atom_release_min_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_min_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_min_shared_ui:
   case NVPTX::BI__nvvm_atom_release_min_shared_ul:
   case NVPTX::BI__nvvm_atom_release_min_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_min_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_ui_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_inc_shared_ui:
   case NVPTX::BI__nvvm_atom_release_inc_shared_ul:
   case NVPTX::BI__nvvm_atom_release_inc_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_inc_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_shared_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_dec_shared_ui:
   case NVPTX::BI__nvvm_atom_release_dec_shared_ul:
   case NVPTX::BI__nvvm_atom_release_dec_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_dec_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_shared_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_and_shared_i:
   case NVPTX::BI__nvvm_atom_release_and_shared_l:
   case NVPTX::BI__nvvm_atom_release_and_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_and_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_shared_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_or_shared_i:
   case NVPTX::BI__nvvm_atom_release_or_shared_l:
   case NVPTX::BI__nvvm_atom_release_or_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_or_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_shared_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_xor_shared_i:
   case NVPTX::BI__nvvm_atom_release_xor_shared_l:
   case NVPTX::BI__nvvm_atom_release_xor_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_xor_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_shared_i_release, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_release_cas_shared_i:
   case NVPTX::BI__nvvm_atom_release_cas_shared_l:
   case NVPTX::BI__nvvm_atom_release_cas_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cas_shared_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_i_release);
-  }
   case NVPTX::BI__nvvm_atom_release_cas_shared_f:
   case NVPTX::BI__nvvm_atom_release_cas_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cas_shared_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_f_release);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_add_shared_i:
   case NVPTX::BI__nvvm_atom_release_cta_add_shared_l:
   case NVPTX::BI__nvvm_atom_release_cta_add_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_add_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_add_shared_i:
   case NVPTX::BI__nvvm_atom_release_sys_add_shared_l:
   case NVPTX::BI__nvvm_atom_release_sys_add_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_add_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_add_shared_f:
   case NVPTX::BI__nvvm_atom_release_cta_add_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_add_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_f_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_add_shared_f:
   case NVPTX::BI__nvvm_atom_release_sys_add_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_add_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_f_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_xchg_shared_i:
   case NVPTX::BI__nvvm_atom_release_cta_xchg_shared_l:
   case NVPTX::BI__nvvm_atom_release_cta_xchg_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_xchg_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_xchg_shared_f:
   case NVPTX::BI__nvvm_atom_release_cta_xchg_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_xchg_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_f_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_xchg_shared_i:
   case NVPTX::BI__nvvm_atom_release_sys_xchg_shared_l:
   case NVPTX::BI__nvvm_atom_release_sys_xchg_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_xchg_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_xchg_shared_f:
   case NVPTX::BI__nvvm_atom_release_sys_xchg_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_xchg_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_f_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_max_shared_i:
   case NVPTX::BI__nvvm_atom_release_cta_max_shared_l:
   case NVPTX::BI__nvvm_atom_release_cta_max_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_max_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_max_shared_ui:
   case NVPTX::BI__nvvm_atom_release_cta_max_shared_ul:
   case NVPTX::BI__nvvm_atom_release_cta_max_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_max_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_ui_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_max_shared_i:
   case NVPTX::BI__nvvm_atom_release_sys_max_shared_l:
   case NVPTX::BI__nvvm_atom_release_sys_max_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_max_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_max_shared_ui:
   case NVPTX::BI__nvvm_atom_release_sys_max_shared_ul:
   case NVPTX::BI__nvvm_atom_release_sys_max_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_max_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_ui_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_min_shared_i:
   case NVPTX::BI__nvvm_atom_release_cta_min_shared_l:
   case NVPTX::BI__nvvm_atom_release_cta_min_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_min_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_min_shared_ui:
   case NVPTX::BI__nvvm_atom_release_cta_min_shared_ul:
   case NVPTX::BI__nvvm_atom_release_cta_min_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_min_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_ui_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_min_shared_i:
   case NVPTX::BI__nvvm_atom_release_sys_min_shared_l:
   case NVPTX::BI__nvvm_atom_release_sys_min_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_min_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_min_shared_ui:
   case NVPTX::BI__nvvm_atom_release_sys_min_shared_ul:
   case NVPTX::BI__nvvm_atom_release_sys_min_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_min_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_ui_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_inc_shared_ui:
   case NVPTX::BI__nvvm_atom_release_cta_inc_shared_ul:
   case NVPTX::BI__nvvm_atom_release_cta_inc_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_inc_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_shared_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_dec_shared_ui:
   case NVPTX::BI__nvvm_atom_release_cta_dec_shared_ul:
   case NVPTX::BI__nvvm_atom_release_cta_dec_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_dec_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_shared_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_inc_shared_ui:
   case NVPTX::BI__nvvm_atom_release_sys_inc_shared_ul:
   case NVPTX::BI__nvvm_atom_release_sys_inc_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_inc_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_shared_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_dec_shared_ui:
   case NVPTX::BI__nvvm_atom_release_sys_dec_shared_ul:
   case NVPTX::BI__nvvm_atom_release_sys_dec_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_dec_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_shared_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_and_shared_i:
   case NVPTX::BI__nvvm_atom_release_cta_and_shared_l:
   case NVPTX::BI__nvvm_atom_release_cta_and_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_and_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_shared_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_and_shared_i:
   case NVPTX::BI__nvvm_atom_release_sys_and_shared_l:
   case NVPTX::BI__nvvm_atom_release_sys_and_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_and_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_shared_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_or_shared_i:
   case NVPTX::BI__nvvm_atom_release_cta_or_shared_l:
   case NVPTX::BI__nvvm_atom_release_cta_or_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_or_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_shared_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_or_shared_i:
   case NVPTX::BI__nvvm_atom_release_sys_or_shared_l:
   case NVPTX::BI__nvvm_atom_release_sys_or_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_or_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_shared_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_xor_shared_i:
   case NVPTX::BI__nvvm_atom_release_cta_xor_shared_l:
   case NVPTX::BI__nvvm_atom_release_cta_xor_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_xor_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_shared_i_release_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_xor_shared_i:
   case NVPTX::BI__nvvm_atom_release_sys_xor_shared_l:
   case NVPTX::BI__nvvm_atom_release_sys_xor_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_xor_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_shared_i_release_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_cas_shared_i:
   case NVPTX::BI__nvvm_atom_release_cta_cas_shared_l:
   case NVPTX::BI__nvvm_atom_release_cta_cas_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_cas_shared_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_i_release_cta);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_cas_shared_i:
   case NVPTX::BI__nvvm_atom_release_sys_cas_shared_l:
   case NVPTX::BI__nvvm_atom_release_sys_cas_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_cas_shared_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_i_release_sys);
-  }
   case NVPTX::BI__nvvm_atom_release_cta_cas_shared_f:
   case NVPTX::BI__nvvm_atom_release_cta_cas_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_cta_cas_shared_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_f_release_cta);
-  }
   case NVPTX::BI__nvvm_atom_release_sys_cas_shared_f:
   case NVPTX::BI__nvvm_atom_release_sys_cas_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_release_sys_cas_shared_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_f_release_sys);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_add_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_add_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_add_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_add_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_add_shared_f:
   case NVPTX::BI__nvvm_atom_acq_rel_add_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_add_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_f_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_xchg_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_shared_f:
   case NVPTX::BI__nvvm_atom_acq_rel_xchg_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_xchg_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_f_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_max_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_max_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_max_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_max_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_max_shared_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_max_shared_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_max_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_max_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_ui_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_min_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_min_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_min_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_min_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_min_shared_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_min_shared_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_min_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_min_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_ui_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_inc_shared_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_inc_shared_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_inc_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_inc_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_shared_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_dec_shared_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_dec_shared_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_dec_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_dec_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_shared_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_and_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_and_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_and_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_and_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_shared_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_or_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_or_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_or_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_or_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_shared_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_xor_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_xor_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_xor_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_xor_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_shared_i_acq_rel, *this,
                             E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cas_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cas_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cas_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cas_shared_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_i_acq_rel);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cas_shared_f:
   case NVPTX::BI__nvvm_atom_acq_rel_cas_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cas_shared_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_f_acq_rel);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_add_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_add_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_shared_f:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_add_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_add_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_f_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_shared_f:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_add_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_add_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_add_shared_f_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_xchg_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_shared_f:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xchg_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_xchg_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_f_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_xchg_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_shared_f:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xchg_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_xchg_shared_f \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_exch_shared_f_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_max_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_shared_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_shared_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_max_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_max_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_ui_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_max_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_shared_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_shared_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_max_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_max_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_max_shared_ui_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_min_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_shared_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_shared_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_min_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_min_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_ui_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_min_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_shared_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_shared_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_min_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_min_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_min_shared_ui_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_inc_shared_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_inc_shared_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_inc_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_inc_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_shared_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_dec_shared_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_dec_shared_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_dec_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_dec_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_shared_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_inc_shared_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_inc_shared_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_inc_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_inc_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_inc_shared_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_dec_shared_ui:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_dec_shared_ul:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_dec_shared_ull:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_dec_shared_ui \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_dec_shared_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_and_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_and_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_and_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_and_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_shared_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_and_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_and_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_and_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_and_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_and_shared_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_or_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_or_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_or_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_or_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_shared_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_or_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_or_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_or_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_or_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_or_shared_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xor_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xor_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_xor_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_xor_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_shared_i_acq_rel_cta,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xor_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xor_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_xor_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_xor_shared_i \n");
     return MakeScopedAtomic(Intrinsic::nvvm_atomic_xor_shared_i_acq_rel_sys,
                             *this, E);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_cas_shared_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_i_acq_rel_cta);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_shared_i:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_shared_l:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_shared_ll:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_cas_shared_i \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_i_acq_rel_sys);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_shared_f:
   case NVPTX::BI__nvvm_atom_acq_rel_cta_cas_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_cta_cas_shared_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_f_acq_rel_cta);
-  }
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_shared_f:
   case NVPTX::BI__nvvm_atom_acq_rel_sys_cas_shared_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_atom_acq_rel_sys_cas_shared_f \n");
     return MakeScopedCasAtomic(Intrinsic::nvvm_atomic_cas_shared_f_acq_rel_sys);
-  }
 
   case NVPTX::BI__nvvm_match_all_sync_i32p:
   case NVPTX::BI__nvvm_match_all_sync_i64p: {
-    printf("LZDEBUG!!! in this branch BI__nvvm_match_all_sync_i64p \n");
     Value *Mask = EmitScalarExpr(E->getArg(0));
     Value *Val = EmitScalarExpr(E->getArg(1));
     Address PredOutPtr = EmitPointerWithAlignment(E->getArg(2));
@@ -4903,12 +3135,7 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__mma_tf32_m16n16k8_ld_a:
   case NVPTX::BI__mma_tf32_m16n16k8_ld_b:
   case NVPTX::BI__mma_tf32_m16n16k8_ld_c: {
-    printf("===========================================================================\n");
-    // E->dump();
-    printf("===========================================================================\n");
 
-    printf("LZDEBUG!!! in this branch BI__mma_tf32_m16n16k8_ld_c \n");
-    // question: find define of Address, mma need ?
     Address Dst = EmitPointerWithAlignment(E->getArg(0));
     Value *Src = EmitScalarExpr(E->getArg(1));
     Value *Ldm = EmitScalarExpr(E->getArg(2));
@@ -4942,11 +3169,6 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
             CharUnits::fromQuantity(4));
       }
     }
-    // lzdebug
-    std::string str;
-    llvm::raw_string_ostream os(str);
-    Result->print(os);
-    printf("load after store, Value info: %s\n", str.c_str());
     return Result;
   }
 
@@ -4992,92 +3214,6 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
     Value *Result = Builder.CreateCall(Intrinsic, Values);
     return Result;
   }
-/*
-    case NVPTX::BI__mma_m16n16k8_st_c_f32: {
-    Value *Dst = EmitScalarExpr(E->getArg(0));
-    Address Src = EmitPointerWithAlignment(E->getArg(1));
-    Value *Ldm = EmitScalarExpr(E->getArg(2));
-    std::optional<llvm::APSInt> isColMajorArg =
-        E->getArg(3)->getIntegerConstantExpr(getContext());
-    if (!isColMajorArg)
-      return nullptr;
-    bool isColMajor = isColMajorArg->getSExtValue();
-    NVPTXMmaLdstInfo II = getNVPTXMmaLdstInfo(BuiltinID);
-    unsigned IID = isColMajor ? II.IID_col : II.IID_row;
-    if (IID == 0)
-      return nullptr;
-    Function *Intrinsic =
-        CGM.getIntrinsic(IID, Dst->getType());
-    llvm::Type *ParamType = Intrinsic->getFunctionType()->getParamType(1);
-    SmallVector<Value *, 10> Values = {Dst};
-    for (unsigned i = 0; i < II.NumResults; ++i) {
-      Value *V = Builder.CreateAlignedLoad(
-          Src.getElementType(),
-          Builder.CreateGEP(Src.getElementType(), Src.emitRawPointer(*this),
-                            llvm::ConstantInt::get(IntTy, i)),
-          CharUnits::fromQuantity(4));
-      Values.push_back(Builder.CreateBitCast(V, ParamType));
-    }
-    Values.push_back(Ldm);
-    Value *Result = Builder.CreateCall(Intrinsic, Values);
-    return Result;
-  }
-    */
-  /*
-  case NVPTX::BI__mma_m16n16k8_st_c_f32: {
-    printf("LZDEBUG!!! in this branch BI__mma_m16n16k8_st_c_f32 \n");
-    printf("===========================================================================\n");
-    // E->dump();
-    printf("===========================================================================\n");
-
-    Value *Dst = EmitScalarExpr(E->getArg(0));
-    Address Src = EmitPointerWithAlignment(E->getArg(1));
-    Value *Ldm = EmitScalarExpr(E->getArg(2));
-
-    std::optional<llvm::APSInt> isColMajorArg =
-        E->getArg(3)->getIntegerConstantExpr(getContext());
-    if (!isColMajorArg)
-      return nullptr;
-    bool isColMajor = isColMajorArg->getSExtValue();
-
-    NVPTXMmaLdstInfo II = getNVPTXMmaLdstInfo(BuiltinID);
-    unsigned IID = isColMajor ? II.IID_col : II.IID_row;
-    if (IID == 0)
-      return nullptr;
-    
-    // question::为什么这里是Function呢？
-    // question::Function可以打印吗？
-    Function *Intrinsic =
-        CGM.getIntrinsic(IID, Dst->getType());
-
-    std::string str1;
-    llvm::raw_string_ostream os1(str1);
-    Intrinsic->print(os1);
-    printf("LZDEBUG!!! Function IR:\n%s\n", str1.c_str());
-
-    llvm::Type *ParamType = Intrinsic->getFunctionType()->getParamType(1);
-    SmallVector<Value *, 10> Values = {Dst};
-    for (unsigned i = 0; i < II.NumResults; ++i) {
-      Value *V = Builder.CreateAlignedLoad(
-        // question:为什么这里直接获得type呢？
-          Src.getElementType(),
-          Builder.CreateGEP(Src.getElementType(), Src.emitRawPointer(*this),
-                            llvm::ConstantInt::get(IntTy, i)),
-          CharUnits::fromQuantity(4));
-      Values.push_back(Builder.CreateBitCast(V, ParamType));
-    }
-    Values.push_back(Ldm);
-    // question::这里的Value的构造方式，和调用的时候 def __mma_m16n16k8_st_c_f32 好像不一致，那么这里与哪相对应呢？
-    Value *Result = Builder.CreateCall(Intrinsic, Values);
-    // lzdebug
-    std::string str;
-    llvm::raw_string_ostream os(str);
-    Result->print(os);
-    printf("Value info: %s\n", str.c_str());
-    return Result;
-  }
-    */
-
 
   // BI__hmma_m16n16k16_mma_<Dtype><CType>(d, a, b, c, layout, satf) -->
   // Intrinsic::nvvm_wmma_m16n16k16_mma_sync<layout A,B><DType><CType><Satf>
@@ -5108,12 +3244,6 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__mma_bf16_m8n32k16_mma_f32:
   case NVPTX::BI__mma_bf16_m32n8k16_mma_f32:
   case NVPTX::BI__mma_tf32_m16n16k8_mma_f32: {
-    // lzdebug
-    printf("LZDEBUG!!! in this branch BI__mma_tf32_m16n16k8_mma_f32 \n");
-    printf("LZDEBUG!!! use this line in NVPTX.cpp at line 3180\n");
-    printf("===========================================================================\n");
-    E->dump();
-    printf("===========================================================================\n");
     Address Dst = EmitPointerWithAlignment(E->getArg(0));
     Address SrcA = EmitPointerWithAlignment(E->getArg(1));
     Address SrcB = EmitPointerWithAlignment(E->getArg(2));
@@ -5142,7 +3272,6 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
     unsigned IID = MI.getMMAIntrinsic(Layout, Satf);
     if (IID == 0)  // Unsupported combination of Layout/Satf.
       return nullptr;
-    printf("LZDEBUG!!! IID is %d\n", IID);
 
     SmallVector<Value *, 24> Values;
     Function *Intrinsic = CGM.getIntrinsic(IID);
@@ -5186,354 +3315,171 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
                             llvm::ConstantInt::get(IntTy, i)),
           CharUnits::fromQuantity(4));
 
-    // lzdebug
-    std::string str;
-    llvm::raw_string_ostream os(str);
-    Result->print(os);
-    printf("Value info: %s\n", str.c_str());
     return Result;
   }
   // The following builtins require half type support
   case NVPTX::BI__nvvm_ex2_approx_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_ex2_approx_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_ex2_approx_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_ex2_approx_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_ex2_approx_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_ex2_approx_f16x2, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_ff2f16x2_rn:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_ff2f16x2_rn \n");
     return MakeHalfType(Intrinsic::nvvm_ff2f16x2_rn, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_ff2f16x2_rn_relu:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_ff2f16x2_rn_relu \n");
     return MakeHalfType(Intrinsic::nvvm_ff2f16x2_rn_relu, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_ff2f16x2_rz:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_ff2f16x2_rz \n");
     return MakeHalfType(Intrinsic::nvvm_ff2f16x2_rz, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_ff2f16x2_rz_relu:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_ff2f16x2_rz_relu \n");
     return MakeHalfType(Intrinsic::nvvm_ff2f16x2_rz_relu, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fma_rn_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fma_rn_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fma_rn_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fma_rn_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fma_rn_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fma_rn_f16x2, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fma_rn_ftz_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fma_rn_ftz_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fma_rn_ftz_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fma_rn_ftz_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fma_rn_ftz_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fma_rn_ftz_f16x2, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fma_rn_ftz_relu_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fma_rn_ftz_relu_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fma_rn_ftz_relu_f16, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fma_rn_ftz_relu_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fma_rn_ftz_relu_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fma_rn_ftz_relu_f16x2, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fma_rn_ftz_sat_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fma_rn_ftz_sat_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fma_rn_ftz_sat_f16, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fma_rn_ftz_sat_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fma_rn_ftz_sat_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fma_rn_ftz_sat_f16x2, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fma_rn_relu_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fma_rn_relu_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fma_rn_relu_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fma_rn_relu_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fma_rn_relu_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fma_rn_relu_f16x2, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fma_rn_sat_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fma_rn_sat_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fma_rn_sat_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fma_rn_sat_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fma_rn_sat_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fma_rn_sat_f16x2, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmax_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmax_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_f16x2, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmax_ftz_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_ftz_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_ftz_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmax_ftz_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_ftz_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_ftz_f16x2, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmax_ftz_nan_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_ftz_nan_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_ftz_nan_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmax_ftz_nan_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_ftz_nan_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_ftz_nan_f16x2, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fmax_ftz_nan_xorsign_abs_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_ftz_nan_xorsign_abs_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_ftz_nan_xorsign_abs_f16, BuiltinID,
                         E, *this);
-  }
   case NVPTX::BI__nvvm_fmax_ftz_nan_xorsign_abs_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_ftz_nan_xorsign_abs_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_ftz_nan_xorsign_abs_f16x2,
                         BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmax_ftz_xorsign_abs_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_ftz_xorsign_abs_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_ftz_xorsign_abs_f16, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fmax_ftz_xorsign_abs_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_ftz_xorsign_abs_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_ftz_xorsign_abs_f16x2, BuiltinID,
                         E, *this);
-  }
   case NVPTX::BI__nvvm_fmax_nan_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_nan_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_nan_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmax_nan_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_nan_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_nan_f16x2, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmax_nan_xorsign_abs_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_nan_xorsign_abs_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_nan_xorsign_abs_f16, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fmax_nan_xorsign_abs_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_nan_xorsign_abs_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_nan_xorsign_abs_f16x2, BuiltinID,
                         E, *this);
-  }
   case NVPTX::BI__nvvm_fmax_xorsign_abs_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_xorsign_abs_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_xorsign_abs_f16, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fmax_xorsign_abs_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmax_xorsign_abs_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmax_xorsign_abs_f16x2, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fmin_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmin_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_f16x2, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmin_ftz_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_ftz_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_ftz_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmin_ftz_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_ftz_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_ftz_f16x2, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmin_ftz_nan_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_ftz_nan_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_ftz_nan_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmin_ftz_nan_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_ftz_nan_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_ftz_nan_f16x2, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fmin_ftz_nan_xorsign_abs_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_ftz_nan_xorsign_abs_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_ftz_nan_xorsign_abs_f16, BuiltinID,
                         E, *this);
-  }
   case NVPTX::BI__nvvm_fmin_ftz_nan_xorsign_abs_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_ftz_nan_xorsign_abs_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_ftz_nan_xorsign_abs_f16x2,
                         BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmin_ftz_xorsign_abs_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_ftz_xorsign_abs_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_ftz_xorsign_abs_f16, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fmin_ftz_xorsign_abs_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_ftz_xorsign_abs_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_ftz_xorsign_abs_f16x2, BuiltinID,
                         E, *this);
-  }
   case NVPTX::BI__nvvm_fmin_nan_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_nan_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_nan_f16, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmin_nan_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_nan_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_nan_f16x2, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_fmin_nan_xorsign_abs_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_nan_xorsign_abs_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_nan_xorsign_abs_f16, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fmin_nan_xorsign_abs_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_nan_xorsign_abs_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_nan_xorsign_abs_f16x2, BuiltinID,
                         E, *this);
-  }
   case NVPTX::BI__nvvm_fmin_xorsign_abs_f16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_xorsign_abs_f16 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_xorsign_abs_f16, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fmin_xorsign_abs_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fmin_xorsign_abs_f16x2 \n");
     return MakeHalfType(Intrinsic::nvvm_fmin_xorsign_abs_f16x2, BuiltinID, E,
                         *this);
-  }
   case NVPTX::BI__nvvm_fabs_f:
   case NVPTX::BI__nvvm_abs_bf16:
   case NVPTX::BI__nvvm_abs_bf16x2:
   case NVPTX::BI__nvvm_fabs_f16:
   case NVPTX::BI__nvvm_fabs_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fabs_f \n");
     return Builder.CreateUnaryIntrinsic(Intrinsic::nvvm_fabs,
                                         EmitScalarExpr(E->getArg(0)));
-  }
   case NVPTX::BI__nvvm_fabs_ftz_f:
   case NVPTX::BI__nvvm_fabs_ftz_f16:
   case NVPTX::BI__nvvm_fabs_ftz_f16x2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fabs_ftz_f \n");
     return Builder.CreateUnaryIntrinsic(Intrinsic::nvvm_fabs_ftz,
                                         EmitScalarExpr(E->getArg(0)));
-  }
   case NVPTX::BI__nvvm_fabs_d:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fabs_d \n");
     return Builder.CreateUnaryIntrinsic(Intrinsic::fabs,
                                         EmitScalarExpr(E->getArg(0)));
-  }
   case NVPTX::BI__nvvm_ldg_h:
   case NVPTX::BI__nvvm_ldg_h2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_ldg_h \n");
     return MakeHalfType(Intrinsic::not_intrinsic, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_ldu_h:
   case NVPTX::BI__nvvm_ldu_h2:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_ldu_h \n");
     return MakeHalfType(Intrinsic::nvvm_ldu_global_f, BuiltinID, E, *this);
-  }
   case NVPTX::BI__nvvm_cp_async_ca_shared_global_4:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_cp_async_ca_shared_global_4 \n");
     return MakeCpAsync(Intrinsic::nvvm_cp_async_ca_shared_global_4,
                        Intrinsic::nvvm_cp_async_ca_shared_global_4_s, *this, E,
                        4);
-  }
   case NVPTX::BI__nvvm_cp_async_ca_shared_global_8:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_cp_async_ca_shared_global_8 \n");
     return MakeCpAsync(Intrinsic::nvvm_cp_async_ca_shared_global_8,
                        Intrinsic::nvvm_cp_async_ca_shared_global_8_s, *this, E,
                        8);
-  }
   case NVPTX::BI__nvvm_cp_async_ca_shared_global_16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_cp_async_ca_shared_global_16 \n");
     return MakeCpAsync(Intrinsic::nvvm_cp_async_ca_shared_global_16,
                        Intrinsic::nvvm_cp_async_ca_shared_global_16_s, *this, E,
                        16);
-  }
   // lz debug
   case NVPTX::BI__nvvm_warpgroup_arrive:
-  {
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_wgmma_fence_sync_aligned));
-  }
   case NVPTX::BI__nvvm_warpgroup_commit_batch:
-  {
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_wgmma_commit_group_sync_aligned));
-  }
   // case NVPTX::BI__nvvm_warpgroup_wait:
   // {
   //   return Builder.CreateCall(
@@ -5558,488 +3504,157 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
         CGM.getIntrinsic(Intrinsic::nvvm_wgmma_wait_group_sync_aligned), {Arg});
   }
   case NVPTX::BI__nvvm_cp_async_cg_shared_global_16:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_cp_async_cg_shared_global_16 \n");
-    E->dump();
-    printf("======================================================");
     return MakeCpAsync(Intrinsic::nvvm_cp_async_cg_shared_global_16,
                        Intrinsic::nvvm_cp_async_cg_shared_global_16_s, *this, E,
                        16);
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_clusterid_x:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_clusterid_x \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_clusterid_x));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_clusterid_y:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_clusterid_y \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_clusterid_y));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_clusterid_z:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_clusterid_z \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_clusterid_z));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_clusterid_w:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_clusterid_w \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_clusterid_w));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_nclusterid_x:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_nclusterid_x \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_nclusterid_x));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_nclusterid_y:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_nclusterid_y \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_nclusterid_y));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_nclusterid_z:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_nclusterid_z \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_nclusterid_z));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_nclusterid_w:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_nclusterid_w \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_nclusterid_w));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_cluster_ctaid_x:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_cluster_ctaid_x \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_cluster_ctaid_x));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_cluster_ctaid_y:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_cluster_ctaid_y \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_cluster_ctaid_y));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_cluster_ctaid_z:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_cluster_ctaid_z \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_cluster_ctaid_z));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_cluster_ctaid_w:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_cluster_ctaid_w \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_cluster_ctaid_w));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_cluster_nctaid_x:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_cluster_nctaid_x \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_cluster_nctaid_x));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_cluster_nctaid_y:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_cluster_nctaid_y \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_cluster_nctaid_y));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_cluster_nctaid_z:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_cluster_nctaid_z \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_cluster_nctaid_z));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_cluster_nctaid_w:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_cluster_nctaid_w \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_cluster_nctaid_w));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_cluster_ctarank:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_cluster_ctarank \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_cluster_ctarank));
-  }
   case NVPTX::BI__nvvm_read_ptx_sreg_cluster_nctarank:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_read_ptx_sreg_cluster_nctarank \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_read_ptx_sreg_cluster_nctarank));
-  }
   case NVPTX::BI__nvvm_is_explicit_cluster:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_is_explicit_cluster \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_is_explicit_cluster));
-  }
   case NVPTX::BI__nvvm_isspacep_shared_cluster:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_isspacep_shared_cluster \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_isspacep_shared_cluster),
         EmitScalarExpr(E->getArg(0)));
-  }
   case NVPTX::BI__nvvm_mapa:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_mapa \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_mapa),
         {EmitScalarExpr(E->getArg(0)), EmitScalarExpr(E->getArg(1))});
-  }
   case NVPTX::BI__nvvm_mapa_shared_cluster:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_mapa_shared_cluster \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_mapa_shared_cluster),
         {EmitScalarExpr(E->getArg(0)), EmitScalarExpr(E->getArg(1))});
-  }
   case NVPTX::BI__nvvm_getctarank:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_getctarank \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_getctarank),
         EmitScalarExpr(E->getArg(0)));
-  }
   case NVPTX::BI__nvvm_getctarank_shared_cluster:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_getctarank_shared_cluster \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_getctarank_shared_cluster),
         EmitScalarExpr(E->getArg(0)));
-  }
   case NVPTX::BI__nvvm_barrier_cluster_arrive:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_barrier_cluster_arrive \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_barrier_cluster_arrive));
-  }
   case NVPTX::BI__nvvm_barrier_cluster_arrive_relaxed:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_barrier_cluster_arrive_relaxed \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_barrier_cluster_arrive_relaxed));
-  }
   case NVPTX::BI__nvvm_barrier_cluster_wait:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_barrier_cluster_wait \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_barrier_cluster_wait));
-  }
   case NVPTX::BI__nvvm_fence_sc_cluster:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_fence_sc_cluster \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_fence_sc_cluster));
-  }
   case NVPTX::BI__nvvm_bar_sync:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_bar_sync \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_barrier_cta_sync_aligned_all),
         EmitScalarExpr(E->getArg(0)));
-  }
   case NVPTX::BI__syncthreads:
-  {
-    printf("LZDEBUG!!! in this branch BI__syncthreads \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_barrier_cta_sync_aligned_all),
         Builder.getInt32(0));
-  }
   case NVPTX::BI__nvvm_barrier_sync:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_barrier_sync \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_barrier_cta_sync_all),
         EmitScalarExpr(E->getArg(0)));
-  }
   case NVPTX::BI__nvvm_barrier_sync_cnt:
-  {
-    printf("LZDEBUG!!! in this branch BI__nvvm_barrier_sync_cnt \n");
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_barrier_cta_sync_count),
         {EmitScalarExpr(E->getArg(0)), EmitScalarExpr(E->getArg(1))});
-  }
-  case NVPTX::BI__asm_dmma_m8n8k4_f64_f64_f64_f64: {
-    Address Dst = EmitPointerWithAlignment(E->getArg(0));
-    Value *Src_a_0 = EmitScalarExpr(E->getArg(1));
-    Value *Src_b_0 = EmitScalarExpr(E->getArg(2));
-    Value *Src_c_0 = EmitScalarExpr(E->getArg(3));
-    Value *Src_c_1 = EmitScalarExpr(E->getArg(4));
-
+  // Scheme A: unified mma.sync codegen for FP16/BF16/TF32/FP64
+  // All A/B/C as scalar Value*, D as individual output pointers (Value*)
+  // Param order: D0*..Dn*, A0..An, B0..Bn, C0..Cn
+  case NVPTX::BI__asm_mma_m8n8k4_f32_f16_f16_f32:
+  case NVPTX::BI__asm_mma_m16n8k8_f32_f16_f16_f32:
+  case NVPTX::BI__asm_mma_m16n8k16_f32_f16_f16_f32:
+  case NVPTX::BI__asm_mma_m16n8k8_f32_bf16_bf16_f32:
+  case NVPTX::BI__asm_mma_m16n8k16_f32_bf16_bf16_f32:
+  case NVPTX::BI__asm_mma_m16n8k4_f32_tf32_tf32_f32:
+  case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32:
+  case NVPTX::BI__asm_mma_m8n8k4_f64_f64_f64_f64:
+  case NVPTX::BI__asm_mma_m16n8k4_f64_f64_f64_f64:
+  case NVPTX::BI__asm_mma_m16n8k8_f64_f64_f64_f64:
+  case NVPTX::BI__asm_mma_m16n8k16_f64_f64_f64_f64: {
     NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
     unsigned IID = MI.getMMAIntrinsic(0, 0);
+    Function *Intrinsic = CGM.getIntrinsic(IID);
 
+    // D output pointers
+    SmallVector<Address, 4> DstPtrs;
+    for (unsigned i = 0; i < MI.NumEltsD; ++i)
+      DstPtrs.push_back(EmitPointerWithAlignment(E->getArg(i)));
+
+    // A, B, C scalar values with BitCast to intrinsic param types
     SmallVector<Value *, 24> Values;
-    Function *Intrinsic = CGM.getIntrinsic(IID);
-    Intrinsic->dump();
-    Value *Result = Builder.CreateCall(Intrinsic, {Src_a_0, Src_b_0, Src_c_0, Src_c_1});
-    for(int i = 0; i < 2; i ++) {
-      Builder.CreateAlignedStore(
-              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
-                                    Dst.getElementType()),
-              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
-                                llvm::ConstantInt::get(IntTy, i)),
-              CharUnits::fromQuantity(4));
-    }       
-    std::string str;
-    llvm::raw_string_ostream os(str);
-    Result->print(os);
-    printf("Value info: %s\n", str.c_str());
-    return Result;
-  }
-
-  case NVPTX::BI__asm_dmma_m16n8k4_f64_f64_f64_f64: {
-    Address Dst = EmitPointerWithAlignment(E->getArg(0));
-    Value *Src_a_0 = EmitScalarExpr(E->getArg(1));
-    Value *Src_a_1 = EmitScalarExpr(E->getArg(2));
-    Value *Src_b_0 = EmitScalarExpr(E->getArg(3));
-    Address Scr_c = EmitPointerWithAlignment(E->getArg(4));
-
-    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
-    unsigned IID = MI.getMMAIntrinsic(0, 0);
-
-    SmallVector<Value *, 24> Values = {Src_a_0, Src_a_1, Src_b_0};
-    Function *Intrinsic = CGM.getIntrinsic(IID);
-    Intrinsic->dump();
-
-    llvm::Type *CType =
-        Intrinsic->getFunctionType()->getParamType(MI.NumEltsA + MI.NumEltsB);
-    for (unsigned i = 0; i < MI.NumEltsC; ++i) {
-      Value *V = Builder.CreateAlignedLoad(
-          Scr_c.getElementType(),
-          Builder.CreateGEP(Scr_c.getElementType(), Scr_c.emitRawPointer(*this),
-                            llvm::ConstantInt::get(IntTy, i)),
-          CharUnits::fromQuantity(4));
-      Values.push_back(Builder.CreateBitCast(V, CType));
+    unsigned argIdx = MI.NumEltsD;
+    for (unsigned i = 0; i < MI.NumEltsA + MI.NumEltsB + MI.NumEltsC; ++i) {
+      Value *V = EmitScalarExpr(E->getArg(argIdx++));
+      llvm::Type *PT = Intrinsic->getFunctionType()->getParamType(i);
+      Values.push_back(Builder.CreateBitCast(V, PT));
     }
 
+    // Call intrinsic and store D results to individual output pointers
     Value *Result = Builder.CreateCall(Intrinsic, Values);
-    for(int i = 0; i < MI.NumEltsD; i ++) {
-      Builder.CreateAlignedStore(
-              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
-                                    Dst.getElementType()),
-              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
-                                llvm::ConstantInt::get(IntTy, i)),
-              CharUnits::fromQuantity(4));
-    }       
-    std::string str;
-    llvm::raw_string_ostream os(str);
-    Result->print(os);
-    printf("Value info: %s\n", str.c_str());
-    return Result;
-  }
-  
-  case NVPTX::BI__asm_hmma_m16n8k16_mma_f16f16f32f32: {
-    // anchor
-    printf("BI__asm_hmma_m16n8k16_mma_f16f16f32f32, LZDEBUG!!! in this line 5760 \n");
-    Address Dst = EmitPointerWithAlignment(E->getArg(0));
-    // Value *Dst_d_0 = EmitScalarExpr(E->getArg(0));
-    // Value *Dst_d_1 = EmitScalarExpr(E->getArg(1));
-    Value *Src_a_0 = EmitScalarExpr(E->getArg(1));
-    Value *Src_a_1 = EmitScalarExpr(E->getArg(2));
-    Value *Src_a_2 = EmitScalarExpr(E->getArg(3));
-    Value *Src_a_3 = EmitScalarExpr(E->getArg(4));
-    Value *Src_b_0 = EmitScalarExpr(E->getArg(5));
-    Value *Src_b_1 = EmitScalarExpr(E->getArg(6));
-    Address Src_c = EmitPointerWithAlignment(E->getArg(7));
-    
-
-    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
-    unsigned IID = MI.getMMAIntrinsic(0, 0);
-    Function *Intrinsic = CGM.getIntrinsic(IID);
-    Intrinsic->dump();
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    SmallVector<Value *, 24> Values;
-    llvm::Type *ParamType =
-        Intrinsic->getFunctionType()->getParamType(1);
-    Values.push_back(Builder.CreateBitCast(Src_a_0, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_a_1, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_a_2, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_a_3, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_b_0, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_b_1, ParamType));
-
-    // SmallVector<Value *, 24> Values = {Src_a_0, Src_a_1, Src_a_2, Src_a_3, Src_b_0, Src_b_1};
-    llvm::Type *CType =
-        Intrinsic->getFunctionType()->getParamType(7);
-    for (unsigned i = 0; i < MI.NumEltsC; ++i) {
-      Value *V = Builder.CreateAlignedLoad(
-          Src_c.getElementType(),
-          Builder.CreateGEP(Src_c.getElementType(), Src_c.emitRawPointer(*this),
-                            llvm::ConstantInt::get(IntTy, i)),
-          CharUnits::fromQuantity(4));
-      Values.push_back(Builder.CreateBitCast(V, CType));
-    }
-    Value *Result = Builder.CreateCall(Intrinsic, Values);
-
-    for(int i = 0; i < 4; i ++) {
-      Builder.CreateAlignedStore(
-              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
-                                    Dst.getElementType()),
-              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
-                                llvm::ConstantInt::get(IntTy, i)),
-              CharUnits::fromQuantity(4));
-    }  
-
-    std::string str;
-    llvm::raw_string_ostream os(str);
-    Result->print(os);
-    printf("Value info: %s\n", str.c_str());
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    // std::this_thread::sleep_for(std::chrono::seconds(50));
-    return Result;
-  }
-
-  case NVPTX::BI__asm_dmma_m16n8k16_f64_f64_f64_f64: {
-    printf("BI__asm_dmma_m16n8k16_f64_f64_f64_f64, LZDEBUG!!! in this line 5760 \n");
-
-    Address Dst = EmitPointerWithAlignment(E->getArg(0));
-    Address Src_a = EmitPointerWithAlignment(E->getArg(1));
-    Address Src_b = EmitPointerWithAlignment(E->getArg(2));
-    Address Src_c = EmitPointerWithAlignment(E->getArg(3));
-    
-    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
-    unsigned IID = MI.getMMAIntrinsic(0, 0);
-    Function *Intrinsic = CGM.getIntrinsic(IID);
-    Intrinsic->dump();
-
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    printf("==========================================================\n");
-    // std::this_thread::sleep_for(std::chrono::seconds(50));
-
-    SmallVector<Value *, 24> Values;
-
-    llvm::Type *AType =
-        Intrinsic->getFunctionType()->getParamType(0);
-    for (unsigned i = 0; i < MI.NumEltsA; ++i) {
-      Value *V = Builder.CreateAlignedLoad(
-          Src_a.getElementType(),
-          Builder.CreateGEP(Src_a.getElementType(), Src_a.emitRawPointer(*this),
-                            llvm::ConstantInt::get(IntTy, i)),
-          CharUnits::fromQuantity(4));
-      Values.push_back(Builder.CreateBitCast(V, AType));
-    }
-
-    llvm::Type *BType =
-        Intrinsic->getFunctionType()->getParamType(1);
-    for (unsigned i = 0; i < MI.NumEltsB; ++i) {
-      Value *V = Builder.CreateAlignedLoad(
-          Src_b.getElementType(),
-          Builder.CreateGEP(Src_b.getElementType(), Src_b.emitRawPointer(*this),
-                            llvm::ConstantInt::get(IntTy, i)),
-          CharUnits::fromQuantity(4));
-      Values.push_back(Builder.CreateBitCast(V, BType));
-    }
-
-    llvm::Type *CType =
-        Intrinsic->getFunctionType()->getParamType(2);
-    for (unsigned i = 0; i < MI.NumEltsC; ++i) {
-      Value *V = Builder.CreateAlignedLoad(
-          Src_c.getElementType(),
-          Builder.CreateGEP(Src_c.getElementType(), Src_c.emitRawPointer(*this),
-                            llvm::ConstantInt::get(IntTy, i)),
-          CharUnits::fromQuantity(4));
-      Values.push_back(Builder.CreateBitCast(V, CType));
-    }
-
-    Value *Result = Builder.CreateCall(Intrinsic, Values);
-    for(int i = 0; i < 4; i ++) {
-      Builder.CreateAlignedStore(
-              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
-                                    Dst.getElementType()),
-              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
-                                llvm::ConstantInt::get(IntTy, i)),
-              CharUnits::fromQuantity(4));
-    }  
-
-    std::string str;
-    llvm::raw_string_ostream os(str);
-    Result->print(os);
-    printf("Value info: %s\n", str.c_str());
-    return Result;
-  }
-
-  // anchor
-  case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32: {
-    printf("BI__asm_mma_m16n8k8_f32_tf32_tf32_f32, LZDEBUG!!! in this line 5760 \n");
-
-    Address Dst = EmitPointerWithAlignment(E->getArg(0));
-    Value *Src_a0 = EmitScalarExpr(E->getArg(1));
-    Value *Src_a1 = EmitScalarExpr(E->getArg(2));
-    Value *Src_a2 = EmitScalarExpr(E->getArg(3));
-    Value *Src_a3 = EmitScalarExpr(E->getArg(4));
-    Value *Src_b0 = EmitScalarExpr(E->getArg(5));
-    Value *Src_b1 = EmitScalarExpr(E->getArg(6));
-    Address Src_c = EmitPointerWithAlignment(E->getArg(7));
-    
-    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
-    unsigned IID = MI.getMMAIntrinsic(0, 0);
-    Function *Intrinsic = CGM.getIntrinsic(IID);
-    Intrinsic->dump();
-
-    SmallVector<Value *, 24> Values;
-
-    llvm::Type *ParamType =
-        Intrinsic->getFunctionType()->getParamType(1);
-    Values.push_back(Builder.CreateBitCast(Src_a0, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_a1, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_a2, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_a3, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_b0, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_b1, ParamType));
-
-    llvm::Type *CType =
-        Intrinsic->getFunctionType()->getParamType(MI.NumEltsA + MI.NumEltsB);
-    for (unsigned i = 0; i < MI.NumEltsC; ++i) {
-      Value *V = Builder.CreateAlignedLoad(
-          Src_c.getElementType(),
-          Builder.CreateGEP(Src_c.getElementType(), Src_c.emitRawPointer(*this),
-                            llvm::ConstantInt::get(IntTy, i)),
-          CharUnits::fromQuantity(4));
-      Values.push_back(Builder.CreateBitCast(V, CType));
-    }
-    Value *Result = Builder.CreateCall(Intrinsic, Values);
-    for(int i = 0; i < MI.NumEltsD; i ++) {
-      Builder.CreateAlignedStore(
-              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
-                                    Dst.getElementType()),
-              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
-                                llvm::ConstantInt::get(IntTy, i)),
-              CharUnits::fromQuantity(4));
-    }  
-
-    std::string str;
-    llvm::raw_string_ostream os(str);
-    Result->print(os);
-    printf("Value info: %s\n", str.c_str());
+    for (unsigned i = 0; i < MI.NumEltsD; ++i)
+      Builder.CreateStore(
+          Builder.CreateExtractValue(Result, i), DstPtrs[i]);
     return Result;
   }
   // case NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16
   case NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32:
   case NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16:
   case NVPTX::BI__asm_wgmma_m64n16k16_f32_bf16_bf16:{
-    printf("BI__asm_wgmma_m64n16k16_f32_bf16_bf16, LZDEBUG!!! in this line 5760 \n");
 
     Address Dst = EmitPointerWithAlignment(E->getArg(0));
     Value *desc_a = EmitScalarExpr(E->getArg(1));
@@ -6048,7 +3663,6 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
     NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
     unsigned IID = MI.getMMAIntrinsic(0, 0);
     Function *Intrinsic = CGM.getIntrinsic(IID);
-    Intrinsic->dump();
 
     // SmallVector<Value *, 24> Values = {desc_a, desc_b, scale_d, scale_a, scale_b, trans_a, trans_b};
 
@@ -6062,138 +3676,9 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
               CharUnits::fromQuantity(4));
     }  
 
-    std::string str;
-    llvm::raw_string_ostream os(str);
-    Result->print(os);
-    printf("Value info: %s\n", str.c_str());
     return Result;
   }
   default:
     return nullptr;
   }
 }
-/*
-  case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32: {
-    printf("BI__asm_mma_m16n8k8_f32_tf32_tf32_f32, LZDEBUG!!! in this line 5760 \n");
-
-    Address Dst = EmitPointerWithAlignment(E->getArg(0));
-    Address Src_a = EmitPointerWithAlignment(E->getArg(1));
-    Address Src_b = EmitPointerWithAlignment(E->getArg(2));
-    Address Src_c = EmitPointerWithAlignment(E->getArg(3));
-    
-    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
-    unsigned IID = MI.getMMAIntrinsic(0, 0);
-    Function *Intrinsic = CGM.getIntrinsic(IID);
-    Intrinsic->dump();
-
-    SmallVector<Value *, 24> Values;
-
-    llvm::Type *ParamType =
-        Intrinsic->getFunctionType()->getParamType(1);
-    
-    llvm::Type *AType =
-        Intrinsic->getFunctionType()->getParamType(0);
-    for (unsigned i = 0; i < MI.NumEltsA; ++i) {
-      Value *V = Builder.CreateAlignedLoad(
-          Src_a.getElementType(),
-          Builder.CreateGEP(Src_a.getElementType(), Src_a.emitRawPointer(*this),
-                            llvm::ConstantInt::get(IntTy, i)),
-          CharUnits::fromQuantity(4));
-      Values.push_back(Builder.CreateBitCast(V, AType));
-    }
-
-    llvm::Type *BType =
-        Intrinsic->getFunctionType()->getParamType(MI.NumEltsA);
-    for (unsigned i = 0; i < MI.NumEltsB; ++i) {
-      Value *V = Builder.CreateAlignedLoad(
-          Src_b.getElementType(),
-          Builder.CreateGEP(Src_b.getElementType(), Src_b.emitRawPointer(*this),
-                            llvm::ConstantInt::get(IntTy, i)),
-          CharUnits::fromQuantity(4));
-      Values.push_back(Builder.CreateBitCast(V, BType));
-    }
-
-    llvm::Type *CType =
-        Intrinsic->getFunctionType()->getParamType(MI.NumEltsA + MI.NumEltsB);
-    for (unsigned i = 0; i < MI.NumEltsC; ++i) {
-      Value *V = Builder.CreateAlignedLoad(
-          Src_c.getElementType(),
-          Builder.CreateGEP(Src_c.getElementType(), Src_c.emitRawPointer(*this),
-                            llvm::ConstantInt::get(IntTy, i)),
-          CharUnits::fromQuantity(4));
-      Values.push_back(Builder.CreateBitCast(V, CType));
-    }
-
-    Value *Result = Builder.CreateCall(Intrinsic, Values);
-    for(int i = 0; i < MI.NumEltsD; i ++) {
-      Builder.CreateAlignedStore(
-              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
-                                    Dst.getElementType()),
-              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
-                                llvm::ConstantInt::get(IntTy, i)),
-              CharUnits::fromQuantity(4));
-    }  
-
-    std::string str;
-    llvm::raw_string_ostream os(str);
-    Result->print(os);
-    printf("Value info: %s\n", str.c_str());
-    return Result;
-  }
-*/
-
-/*
-  case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32: {
-    printf("BI__asm_mma_m16n8k8_f32_tf32_tf32_f32, LZDEBUG!!! in this line 5760 \n");
-
-    Address Dst = EmitPointerWithAlignment(E->getArg(0));
-    Value *Src_a0 = EmitScalarExpr(E->getArg(1));
-    Value *Src_a1 = EmitScalarExpr(E->getArg(2));
-    Value *Src_a2 = EmitScalarExpr(E->getArg(3));
-    Value *Src_a3 = EmitScalarExpr(E->getArg(4));
-    Value *Src_b0 = EmitScalarExpr(E->getArg(5));
-    Value *Src_b1 = EmitScalarExpr(E->getArg(6));
-    Address Src_c = EmitPointerWithAlignment(E->getArg(7));
-    
-    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
-    unsigned IID = MI.getMMAIntrinsic(0, 0);
-    Function *Intrinsic = CGM.getIntrinsic(IID);
-    Intrinsic->dump();
-
-    SmallVector<Value *, 24> Values;
-
-    llvm::Type *ParamType =
-        Intrinsic->getFunctionType()->getParamType(1);
-    Values.push_back(Builder.CreateBitCast(Src_a0, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_a1, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_a2, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_a3, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_b0, ParamType));
-    Values.push_back(Builder.CreateBitCast(Src_b1, ParamType));
-
-    llvm::Type *CType =
-        Intrinsic->getFunctionType()->getParamType(MI.NumEltsA + MI.NumEltsB);
-    for (unsigned i = 0; i < MI.NumEltsC; ++i) {
-      Value *V = Builder.CreateAlignedLoad(
-          Src_c.getElementType(),
-          Builder.CreateGEP(Src_c.getElementType(), Src_c.emitRawPointer(*this),
-                            llvm::ConstantInt::get(IntTy, i)),
-          CharUnits::fromQuantity(4));
-      Values.push_back(Builder.CreateBitCast(V, CType));
-    }
-    Value *Result = Builder.CreateCall(Intrinsic, Values);
-    for(int i = 0; i < MI.NumEltsD; i ++) {
-      Builder.CreateAlignedStore(
-              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
-                                    Dst.getElementType()),
-              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
-                                llvm::ConstantInt::get(IntTy, i)),
-              CharUnits::fromQuantity(4));
-    }  
-
-    std::string str;
-    llvm::raw_string_ostream os(str);
-    Result->print(os);
-    printf("Value info: %s\n", str.c_str());
-    return Result;
-  }*/
