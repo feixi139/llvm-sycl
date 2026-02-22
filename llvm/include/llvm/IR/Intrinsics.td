@@ -337,6 +337,127 @@ def IIT_V6 : IIT_Vec<6, 60>;
 def IIT_V10 : IIT_Vec<10, 61>;
 def IIT_V2048: IIT_Vec<2048, 62>;
 def IIT_V4096: IIT_Vec<4096, 63>;
+// IIT_STRUCT10 .. IIT_STRUCT128: support wgmma intrinsics with >9 return values.
+// Numbers 64-182 are currently unused; we assign them sequentially here.
+def IIT_STRUCT10  : IIT_Base< 64>;
+def IIT_STRUCT11  : IIT_Base< 65>;
+def IIT_STRUCT12  : IIT_Base< 66>;
+def IIT_STRUCT13  : IIT_Base< 67>;
+def IIT_STRUCT14  : IIT_Base< 68>;
+def IIT_STRUCT15  : IIT_Base< 69>;
+def IIT_STRUCT16  : IIT_Base< 70>;
+def IIT_STRUCT17  : IIT_Base< 71>;
+def IIT_STRUCT18  : IIT_Base< 72>;
+def IIT_STRUCT19  : IIT_Base< 73>;
+def IIT_STRUCT20  : IIT_Base< 74>;
+def IIT_STRUCT21  : IIT_Base< 75>;
+def IIT_STRUCT22  : IIT_Base< 76>;
+def IIT_STRUCT23  : IIT_Base< 77>;
+def IIT_STRUCT24  : IIT_Base< 78>;
+def IIT_STRUCT25  : IIT_Base< 79>;
+def IIT_STRUCT26  : IIT_Base< 80>;
+def IIT_STRUCT27  : IIT_Base< 81>;
+def IIT_STRUCT28  : IIT_Base< 82>;
+def IIT_STRUCT29  : IIT_Base< 83>;
+def IIT_STRUCT30  : IIT_Base< 84>;
+def IIT_STRUCT31  : IIT_Base< 85>;
+def IIT_STRUCT32  : IIT_Base< 86>;
+def IIT_STRUCT33  : IIT_Base< 87>;
+def IIT_STRUCT34  : IIT_Base< 88>;
+def IIT_STRUCT35  : IIT_Base< 89>;
+def IIT_STRUCT36  : IIT_Base< 90>;
+def IIT_STRUCT37  : IIT_Base< 91>;
+def IIT_STRUCT38  : IIT_Base< 92>;
+def IIT_STRUCT39  : IIT_Base< 93>;
+def IIT_STRUCT40  : IIT_Base< 94>;
+def IIT_STRUCT41  : IIT_Base< 95>;
+def IIT_STRUCT42  : IIT_Base< 96>;
+def IIT_STRUCT43  : IIT_Base< 97>;
+def IIT_STRUCT44  : IIT_Base< 98>;
+def IIT_STRUCT45  : IIT_Base< 99>;
+def IIT_STRUCT46  : IIT_Base<100>;
+def IIT_STRUCT47  : IIT_Base<101>;
+def IIT_STRUCT48  : IIT_Base<102>;
+def IIT_STRUCT49  : IIT_Base<103>;
+def IIT_STRUCT50  : IIT_Base<104>;
+def IIT_STRUCT51  : IIT_Base<105>;
+def IIT_STRUCT52  : IIT_Base<106>;
+def IIT_STRUCT53  : IIT_Base<107>;
+def IIT_STRUCT54  : IIT_Base<108>;
+def IIT_STRUCT55  : IIT_Base<109>;
+def IIT_STRUCT56  : IIT_Base<110>;
+def IIT_STRUCT57  : IIT_Base<111>;
+def IIT_STRUCT58  : IIT_Base<112>;
+def IIT_STRUCT59  : IIT_Base<113>;
+def IIT_STRUCT60  : IIT_Base<114>;
+def IIT_STRUCT61  : IIT_Base<115>;
+def IIT_STRUCT62  : IIT_Base<116>;
+def IIT_STRUCT63  : IIT_Base<117>;
+def IIT_STRUCT64  : IIT_Base<118>;
+def IIT_STRUCT65  : IIT_Base<119>;
+def IIT_STRUCT66  : IIT_Base<120>;
+def IIT_STRUCT67  : IIT_Base<121>;
+def IIT_STRUCT68  : IIT_Base<122>;
+def IIT_STRUCT69  : IIT_Base<123>;
+def IIT_STRUCT70  : IIT_Base<124>;
+def IIT_STRUCT71  : IIT_Base<125>;
+def IIT_STRUCT72  : IIT_Base<126>;
+def IIT_STRUCT73  : IIT_Base<127>;
+def IIT_STRUCT74  : IIT_Base<128>;
+def IIT_STRUCT75  : IIT_Base<129>;
+def IIT_STRUCT76  : IIT_Base<130>;
+def IIT_STRUCT77  : IIT_Base<131>;
+def IIT_STRUCT78  : IIT_Base<132>;
+def IIT_STRUCT79  : IIT_Base<133>;
+def IIT_STRUCT80  : IIT_Base<134>;
+def IIT_STRUCT81  : IIT_Base<135>;
+def IIT_STRUCT82  : IIT_Base<136>;
+def IIT_STRUCT83  : IIT_Base<137>;
+def IIT_STRUCT84  : IIT_Base<138>;
+def IIT_STRUCT85  : IIT_Base<139>;
+def IIT_STRUCT86  : IIT_Base<140>;
+def IIT_STRUCT87  : IIT_Base<141>;
+def IIT_STRUCT88  : IIT_Base<142>;
+def IIT_STRUCT89  : IIT_Base<143>;
+def IIT_STRUCT90  : IIT_Base<144>;
+def IIT_STRUCT91  : IIT_Base<145>;
+def IIT_STRUCT92  : IIT_Base<146>;
+def IIT_STRUCT93  : IIT_Base<147>;
+def IIT_STRUCT94  : IIT_Base<148>;
+def IIT_STRUCT95  : IIT_Base<149>;
+def IIT_STRUCT96  : IIT_Base<150>;
+def IIT_STRUCT97  : IIT_Base<151>;
+def IIT_STRUCT98  : IIT_Base<152>;
+def IIT_STRUCT99  : IIT_Base<153>;
+def IIT_STRUCT100 : IIT_Base<154>;
+def IIT_STRUCT101 : IIT_Base<155>;
+def IIT_STRUCT102 : IIT_Base<156>;
+def IIT_STRUCT103 : IIT_Base<157>;
+def IIT_STRUCT104 : IIT_Base<158>;
+def IIT_STRUCT105 : IIT_Base<159>;
+def IIT_STRUCT106 : IIT_Base<160>;
+def IIT_STRUCT107 : IIT_Base<161>;
+def IIT_STRUCT108 : IIT_Base<162>;
+def IIT_STRUCT109 : IIT_Base<163>;
+def IIT_STRUCT110 : IIT_Base<164>;
+def IIT_STRUCT111 : IIT_Base<165>;
+def IIT_STRUCT112 : IIT_Base<166>;
+def IIT_STRUCT113 : IIT_Base<167>;
+def IIT_STRUCT114 : IIT_Base<168>;
+def IIT_STRUCT115 : IIT_Base<169>;
+def IIT_STRUCT116 : IIT_Base<170>;
+def IIT_STRUCT117 : IIT_Base<171>;
+def IIT_STRUCT118 : IIT_Base<172>;
+def IIT_STRUCT119 : IIT_Base<173>;
+def IIT_STRUCT120 : IIT_Base<174>;
+def IIT_STRUCT121 : IIT_Base<175>;
+def IIT_STRUCT122 : IIT_Base<176>;
+def IIT_STRUCT123 : IIT_Base<177>;
+def IIT_STRUCT124 : IIT_Base<178>;
+def IIT_STRUCT125 : IIT_Base<179>;
+def IIT_STRUCT126 : IIT_Base<180>;
+def IIT_STRUCT127 : IIT_Base<181>;
+def IIT_STRUCT128 : IIT_Base<182>;
 }
 
 defvar IIT_all_FixedTypes = !filter(iit, IIT_all,
@@ -346,8 +467,8 @@ defvar IIT_all_VectorTypes = !filter(iit, IIT_all,
   !isa<IIT_Vec>(iit));
 
 defvar IIT_RetNumbers = [
-  [IIT_Done.Number],
-  []<int>,
+  [IIT_Done.Number],    // 0 return values
+  []<int>,              // 1 return value
   [IIT_STRUCT2.Number],
   [IIT_STRUCT3.Number],
   [IIT_STRUCT4.Number],
@@ -356,6 +477,125 @@ defvar IIT_RetNumbers = [
   [IIT_STRUCT7.Number],
   [IIT_STRUCT8.Number],
   [IIT_STRUCT9.Number],
+  [IIT_STRUCT10.Number],
+  [IIT_STRUCT11.Number],
+  [IIT_STRUCT12.Number],
+  [IIT_STRUCT13.Number],
+  [IIT_STRUCT14.Number],
+  [IIT_STRUCT15.Number],
+  [IIT_STRUCT16.Number],
+  [IIT_STRUCT17.Number],
+  [IIT_STRUCT18.Number],
+  [IIT_STRUCT19.Number],
+  [IIT_STRUCT20.Number],
+  [IIT_STRUCT21.Number],
+  [IIT_STRUCT22.Number],
+  [IIT_STRUCT23.Number],
+  [IIT_STRUCT24.Number],
+  [IIT_STRUCT25.Number],
+  [IIT_STRUCT26.Number],
+  [IIT_STRUCT27.Number],
+  [IIT_STRUCT28.Number],
+  [IIT_STRUCT29.Number],
+  [IIT_STRUCT30.Number],
+  [IIT_STRUCT31.Number],
+  [IIT_STRUCT32.Number],
+  [IIT_STRUCT33.Number],
+  [IIT_STRUCT34.Number],
+  [IIT_STRUCT35.Number],
+  [IIT_STRUCT36.Number],
+  [IIT_STRUCT37.Number],
+  [IIT_STRUCT38.Number],
+  [IIT_STRUCT39.Number],
+  [IIT_STRUCT40.Number],
+  [IIT_STRUCT41.Number],
+  [IIT_STRUCT42.Number],
+  [IIT_STRUCT43.Number],
+  [IIT_STRUCT44.Number],
+  [IIT_STRUCT45.Number],
+  [IIT_STRUCT46.Number],
+  [IIT_STRUCT47.Number],
+  [IIT_STRUCT48.Number],
+  [IIT_STRUCT49.Number],
+  [IIT_STRUCT50.Number],
+  [IIT_STRUCT51.Number],
+  [IIT_STRUCT52.Number],
+  [IIT_STRUCT53.Number],
+  [IIT_STRUCT54.Number],
+  [IIT_STRUCT55.Number],
+  [IIT_STRUCT56.Number],
+  [IIT_STRUCT57.Number],
+  [IIT_STRUCT58.Number],
+  [IIT_STRUCT59.Number],
+  [IIT_STRUCT60.Number],
+  [IIT_STRUCT61.Number],
+  [IIT_STRUCT62.Number],
+  [IIT_STRUCT63.Number],
+  [IIT_STRUCT64.Number],
+  [IIT_STRUCT65.Number],
+  [IIT_STRUCT66.Number],
+  [IIT_STRUCT67.Number],
+  [IIT_STRUCT68.Number],
+  [IIT_STRUCT69.Number],
+  [IIT_STRUCT70.Number],
+  [IIT_STRUCT71.Number],
+  [IIT_STRUCT72.Number],
+  [IIT_STRUCT73.Number],
+  [IIT_STRUCT74.Number],
+  [IIT_STRUCT75.Number],
+  [IIT_STRUCT76.Number],
+  [IIT_STRUCT77.Number],
+  [IIT_STRUCT78.Number],
+  [IIT_STRUCT79.Number],
+  [IIT_STRUCT80.Number],
+  [IIT_STRUCT81.Number],
+  [IIT_STRUCT82.Number],
+  [IIT_STRUCT83.Number],
+  [IIT_STRUCT84.Number],
+  [IIT_STRUCT85.Number],
+  [IIT_STRUCT86.Number],
+  [IIT_STRUCT87.Number],
+  [IIT_STRUCT88.Number],
+  [IIT_STRUCT89.Number],
+  [IIT_STRUCT90.Number],
+  [IIT_STRUCT91.Number],
+  [IIT_STRUCT92.Number],
+  [IIT_STRUCT93.Number],
+  [IIT_STRUCT94.Number],
+  [IIT_STRUCT95.Number],
+  [IIT_STRUCT96.Number],
+  [IIT_STRUCT97.Number],
+  [IIT_STRUCT98.Number],
+  [IIT_STRUCT99.Number],
+  [IIT_STRUCT100.Number],
+  [IIT_STRUCT101.Number],
+  [IIT_STRUCT102.Number],
+  [IIT_STRUCT103.Number],
+  [IIT_STRUCT104.Number],
+  [IIT_STRUCT105.Number],
+  [IIT_STRUCT106.Number],
+  [IIT_STRUCT107.Number],
+  [IIT_STRUCT108.Number],
+  [IIT_STRUCT109.Number],
+  [IIT_STRUCT110.Number],
+  [IIT_STRUCT111.Number],
+  [IIT_STRUCT112.Number],
+  [IIT_STRUCT113.Number],
+  [IIT_STRUCT114.Number],
+  [IIT_STRUCT115.Number],
+  [IIT_STRUCT116.Number],
+  [IIT_STRUCT117.Number],
+  [IIT_STRUCT118.Number],
+  [IIT_STRUCT119.Number],
+  [IIT_STRUCT120.Number],
+  [IIT_STRUCT121.Number],
+  [IIT_STRUCT122.Number],
+  [IIT_STRUCT123.Number],
+  [IIT_STRUCT124.Number],
+  [IIT_STRUCT125.Number],
+  [IIT_STRUCT126.Number],
+  [IIT_STRUCT127.Number],
+  [IIT_STRUCT128.Number],
 ];
 
 //===----------------------------------------------------------------------===//

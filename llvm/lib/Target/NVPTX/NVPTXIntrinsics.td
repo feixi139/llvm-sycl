@@ -6820,11 +6820,11 @@ class WMMA_REGINFO<WMMA_REGS r, string op>
              !eq(geom, "m16n8k128"),
              !eq(geom, "m16n8k256"))) : [hasSM<80>, hasPTX<70>],
 
+    // wgmma: bf16/fp16 m64nNk16 (N=8..256 step 8, 32 geoms)
+    //        tf32   m64nNk8  (N=8,16,24,32, 4 geoms)
+    // All wgmma geometries start with "m64"; use prefix match to cover them all.
     !and(!eq(op,"wgmma"),
-         !or(!eq(geom, "m64n16k16"),
-             !eq(geom, "m64n32k16"),
-             !eq(geom, "m64n8k8"),
-             !eq(geom, "m64n64k16"))) : [hasSM<80>, hasPTX<70>],
+         !eq(!substr(geom, 0, 3), "m64")) : [hasSM90a, hasPTX<80>],
 
     !and(!eq(op,"ldmatrix"),
          !eq(ptx_elt_type,"b16"),

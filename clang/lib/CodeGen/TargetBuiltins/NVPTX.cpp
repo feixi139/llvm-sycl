@@ -213,10 +213,10 @@ struct NVPTXMmaInfo {
 static NVPTXMmaInfo getNVPTXMmaInfo(unsigned BuiltinID) {
   // clang-format off
 #define WGMMA_TRANS_VARIANTS(geom, type)                                    \
-      Intrinsic::nvvm_wgmma_##geom##_##type##_1_1_1_0_0, 
+      Intrinsic::nvvm_wgmma_##geom##_##type##_1_1_1_0_0,
 
 #define WGMMA_VARIANTS(geom, type)                                    \
-      Intrinsic::nvvm_wgmma_##geom##_##type##_1_1_1, 
+      Intrinsic::nvvm_wgmma_##geom##_##type##_1_1_1,
 
 #define MMA_VARIANTS(geom, type)                                    \
       Intrinsic::nvvm_wmma_##geom##_mma_row_row_##type,             \
@@ -359,17 +359,6 @@ static NVPTXMmaInfo getNVPTXMmaInfo(unsigned BuiltinID) {
     return {8, 2, 8, 8, {{MMA_VARIANTS(m32n8k16, bf16)}}};
   case NVPTX::BI__mma_tf32_m16n16k8_mma_f32:
     return {4, 4, 8, 8, {{MMA_VARIANTS(m16n16k8, tf32)}}};
-  case NVPTX::BI__asm_wgmma_m64n16k16_f32_bf16_bf16:
-    return {4, 4, 8, 8, {{WGMMA_TRANS_VARIANTS(m64n16k16, f32_bf16_bf16)}}};
-  case NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16:
-    return {4, 4, 8, 8, {{WGMMA_TRANS_VARIANTS(m64n16k16, f32_f16_f16)}}};
-  // case NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16: {
-  //   printf("in this branch NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16\n");
-  //   return {4, 4, 8, 128, {{WGMMA_TRANS_VARIANTS(m64n256k16, f32_f16_f16)}}};
-  // }
-  case NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32:
-    return {4, 4, 4, 4, {{WGMMA_VARIANTS(m64n8k8, f32_tf32_tf32)}}};
-
   default:
     llvm_unreachable("Unexpected builtin ID.");
   }
@@ -469,6 +458,223 @@ static Value *MakeHalfType(unsigned IntrinsicID, unsigned BuiltinID,
 
   return CGF.Builder.CreateCall(F, Args);
 }
+// getWgmmaInfo: map a wgmma builtin ID to {IntrinsicID, NumEltsD}.
+// NumEltsD formula:
+//   bf16 / fp16  (m64nNk16): NumEltsD = N / 2
+//   tf32         (m64nNk8) : NumEltsD = N / 2
+static std::pair<unsigned, unsigned> getWgmmaInfo(unsigned BuiltinID) {
+  switch (BuiltinID) {
+  // ---- bf16, m64nNk16 ----
+  case NVPTX::BI__asm_wgmma_m64n8k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n8k16_f32_bf16_bf16_1_1_1_0_0, 4};
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n16k16_f32_bf16_bf16_1_1_1_0_0, 8};
+  case NVPTX::BI__asm_wgmma_m64n24k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n24k16_f32_bf16_bf16_1_1_1_0_0, 12};
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n32k16_f32_bf16_bf16_1_1_1_0_0, 16};
+  case NVPTX::BI__asm_wgmma_m64n40k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n40k16_f32_bf16_bf16_1_1_1_0_0, 20};
+  case NVPTX::BI__asm_wgmma_m64n48k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n48k16_f32_bf16_bf16_1_1_1_0_0, 24};
+  case NVPTX::BI__asm_wgmma_m64n56k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n56k16_f32_bf16_bf16_1_1_1_0_0, 28};
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n64k16_f32_bf16_bf16_1_1_1_0_0, 32};
+  case NVPTX::BI__asm_wgmma_m64n72k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n72k16_f32_bf16_bf16_1_1_1_0_0, 36};
+  case NVPTX::BI__asm_wgmma_m64n80k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n80k16_f32_bf16_bf16_1_1_1_0_0, 40};
+  case NVPTX::BI__asm_wgmma_m64n88k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n88k16_f32_bf16_bf16_1_1_1_0_0, 44};
+  case NVPTX::BI__asm_wgmma_m64n96k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n96k16_f32_bf16_bf16_1_1_1_0_0, 48};
+  case NVPTX::BI__asm_wgmma_m64n104k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n104k16_f32_bf16_bf16_1_1_1_0_0, 52};
+  case NVPTX::BI__asm_wgmma_m64n112k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n112k16_f32_bf16_bf16_1_1_1_0_0, 56};
+  case NVPTX::BI__asm_wgmma_m64n120k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n120k16_f32_bf16_bf16_1_1_1_0_0, 60};
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n128k16_f32_bf16_bf16_1_1_1_0_0, 64};
+  case NVPTX::BI__asm_wgmma_m64n136k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n136k16_f32_bf16_bf16_1_1_1_0_0, 68};
+  case NVPTX::BI__asm_wgmma_m64n144k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n144k16_f32_bf16_bf16_1_1_1_0_0, 72};
+  case NVPTX::BI__asm_wgmma_m64n152k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n152k16_f32_bf16_bf16_1_1_1_0_0, 76};
+  case NVPTX::BI__asm_wgmma_m64n160k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n160k16_f32_bf16_bf16_1_1_1_0_0, 80};
+  case NVPTX::BI__asm_wgmma_m64n168k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n168k16_f32_bf16_bf16_1_1_1_0_0, 84};
+  case NVPTX::BI__asm_wgmma_m64n176k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n176k16_f32_bf16_bf16_1_1_1_0_0, 88};
+  case NVPTX::BI__asm_wgmma_m64n184k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n184k16_f32_bf16_bf16_1_1_1_0_0, 92};
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n192k16_f32_bf16_bf16_1_1_1_0_0, 96};
+  case NVPTX::BI__asm_wgmma_m64n200k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n200k16_f32_bf16_bf16_1_1_1_0_0, 100};
+  case NVPTX::BI__asm_wgmma_m64n208k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n208k16_f32_bf16_bf16_1_1_1_0_0, 104};
+  case NVPTX::BI__asm_wgmma_m64n216k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n216k16_f32_bf16_bf16_1_1_1_0_0, 108};
+  case NVPTX::BI__asm_wgmma_m64n224k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n224k16_f32_bf16_bf16_1_1_1_0_0, 112};
+  case NVPTX::BI__asm_wgmma_m64n232k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n232k16_f32_bf16_bf16_1_1_1_0_0, 116};
+  case NVPTX::BI__asm_wgmma_m64n240k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n240k16_f32_bf16_bf16_1_1_1_0_0, 120};
+  case NVPTX::BI__asm_wgmma_m64n248k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n248k16_f32_bf16_bf16_1_1_1_0_0, 124};
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16:
+    return {Intrinsic::nvvm_wgmma_m64n256k16_f32_bf16_bf16_1_1_1_0_0, 128};
+  // ---- fp16, m64nNk16 ----
+  case NVPTX::BI__asm_wgmma_m64n8k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n8k16_f32_f16_f16_1_1_1_0_0, 4};
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n16k16_f32_f16_f16_1_1_1_0_0, 8};
+  case NVPTX::BI__asm_wgmma_m64n24k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n24k16_f32_f16_f16_1_1_1_0_0, 12};
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n32k16_f32_f16_f16_1_1_1_0_0, 16};
+  case NVPTX::BI__asm_wgmma_m64n40k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n40k16_f32_f16_f16_1_1_1_0_0, 20};
+  case NVPTX::BI__asm_wgmma_m64n48k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n48k16_f32_f16_f16_1_1_1_0_0, 24};
+  case NVPTX::BI__asm_wgmma_m64n56k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n56k16_f32_f16_f16_1_1_1_0_0, 28};
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n64k16_f32_f16_f16_1_1_1_0_0, 32};
+  case NVPTX::BI__asm_wgmma_m64n72k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n72k16_f32_f16_f16_1_1_1_0_0, 36};
+  case NVPTX::BI__asm_wgmma_m64n80k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n80k16_f32_f16_f16_1_1_1_0_0, 40};
+  case NVPTX::BI__asm_wgmma_m64n88k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n88k16_f32_f16_f16_1_1_1_0_0, 44};
+  case NVPTX::BI__asm_wgmma_m64n96k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n96k16_f32_f16_f16_1_1_1_0_0, 48};
+  case NVPTX::BI__asm_wgmma_m64n104k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n104k16_f32_f16_f16_1_1_1_0_0, 52};
+  case NVPTX::BI__asm_wgmma_m64n112k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n112k16_f32_f16_f16_1_1_1_0_0, 56};
+  case NVPTX::BI__asm_wgmma_m64n120k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n120k16_f32_f16_f16_1_1_1_0_0, 60};
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n128k16_f32_f16_f16_1_1_1_0_0, 64};
+  case NVPTX::BI__asm_wgmma_m64n136k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n136k16_f32_f16_f16_1_1_1_0_0, 68};
+  case NVPTX::BI__asm_wgmma_m64n144k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n144k16_f32_f16_f16_1_1_1_0_0, 72};
+  case NVPTX::BI__asm_wgmma_m64n152k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n152k16_f32_f16_f16_1_1_1_0_0, 76};
+  case NVPTX::BI__asm_wgmma_m64n160k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n160k16_f32_f16_f16_1_1_1_0_0, 80};
+  case NVPTX::BI__asm_wgmma_m64n168k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n168k16_f32_f16_f16_1_1_1_0_0, 84};
+  case NVPTX::BI__asm_wgmma_m64n176k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n176k16_f32_f16_f16_1_1_1_0_0, 88};
+  case NVPTX::BI__asm_wgmma_m64n184k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n184k16_f32_f16_f16_1_1_1_0_0, 92};
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n192k16_f32_f16_f16_1_1_1_0_0, 96};
+  case NVPTX::BI__asm_wgmma_m64n200k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n200k16_f32_f16_f16_1_1_1_0_0, 100};
+  case NVPTX::BI__asm_wgmma_m64n208k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n208k16_f32_f16_f16_1_1_1_0_0, 104};
+  case NVPTX::BI__asm_wgmma_m64n216k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n216k16_f32_f16_f16_1_1_1_0_0, 108};
+  case NVPTX::BI__asm_wgmma_m64n224k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n224k16_f32_f16_f16_1_1_1_0_0, 112};
+  case NVPTX::BI__asm_wgmma_m64n232k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n232k16_f32_f16_f16_1_1_1_0_0, 116};
+  case NVPTX::BI__asm_wgmma_m64n240k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n240k16_f32_f16_f16_1_1_1_0_0, 120};
+  case NVPTX::BI__asm_wgmma_m64n248k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n248k16_f32_f16_f16_1_1_1_0_0, 124};
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16:
+    return {Intrinsic::nvvm_wgmma_m64n256k16_f32_f16_f16_1_1_1_0_0, 128};
+  // ---- tf32, m64nNk8 ----
+  case NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32:
+    return {Intrinsic::nvvm_wgmma_m64n8k8_f32_tf32_tf32_1_1_1, 4};
+  case NVPTX::BI__asm_wgmma_m64n16k8_f32_tf32_tf32:
+    return {Intrinsic::nvvm_wgmma_m64n16k8_f32_tf32_tf32_1_1_1, 8};
+  case NVPTX::BI__asm_wgmma_m64n24k8_f32_tf32_tf32:
+    return {Intrinsic::nvvm_wgmma_m64n24k8_f32_tf32_tf32_1_1_1, 12};
+  case NVPTX::BI__asm_wgmma_m64n32k8_f32_tf32_tf32:
+    return {Intrinsic::nvvm_wgmma_m64n32k8_f32_tf32_tf32_1_1_1, 16};
+  default:
+    llvm_unreachable("Unknown wgmma builtin");
+  }
+}
+
+// EmitWgmma: common codegen for all wgmma builtins.
+// Builtin signature: void(float * D, void AS3 * desc_a, void AS3 * desc_b)
+// Intrinsic signature: {f32 x NumEltsD} (ptr AS3, ptr AS3)
+static Value *EmitWgmma(unsigned IntrinsicID, unsigned NumEltsD,
+                        CodeGenFunction &CGF, const CallExpr *E) {
+  Address Dst = CGF.EmitPointerWithAlignment(E->getArg(0));
+  // Arg1/2 are AS3 pointers (void address_space<3> *); emit as pointer values
+  // and cast to ptr addrspace(3) for the intrinsic.
+  Value *RawA = CGF.EmitScalarExpr(E->getArg(1));
+  Value *RawB = CGF.EmitScalarExpr(E->getArg(2));
+  llvm::Type *SharedPtrTy = CGF.Builder.getPtrTy(/*AddrSpace=*/3);
+  // If already a ptr AS3, no-op bitcast; if integer (legacy path), inttoptr.
+  Value *DescA = RawA->getType()->isPointerTy()
+                     ? CGF.Builder.CreatePointerBitCastOrAddrSpaceCast(RawA, SharedPtrTy)
+                     : CGF.Builder.CreateIntToPtr(RawA, SharedPtrTy);
+  Value *DescB = RawB->getType()->isPointerTy()
+                     ? CGF.Builder.CreatePointerBitCastOrAddrSpaceCast(RawB, SharedPtrTy)
+                     : CGF.Builder.CreateIntToPtr(RawB, SharedPtrTy);
+
+  Function *Intr = CGF.CGM.getIntrinsic(IntrinsicID);
+  Value *Result = CGF.Builder.CreateCall(Intr, {DescA, DescB});
+
+  llvm::Type *ElemTy = Dst.getElementType();
+  for (unsigned i = 0; i < NumEltsD; ++i) {
+    Value *Elem = CGF.Builder.CreateExtractValue(Result, i);
+    if (Elem->getType() != ElemTy)
+      Elem = CGF.Builder.CreateBitCast(Elem, ElemTy);
+    Value *Ptr = CGF.Builder.CreateConstGEP1_32(ElemTy,
+                                                Dst.emitRawPointer(CGF), i);
+    CGF.Builder.CreateAlignedStore(Elem, Ptr, CharUnits::fromQuantity(4));
+  }
+  return Result;
+}
+
+// EmitLdMatrix: lower a __nvvm_ldmatrix_* builtin to the corresponding
+// llvm.nvvm.ldmatrix.sync.aligned.* intrinsic.
+//
+// Builtin signature:  void(int * dst, void const AS3 * src)
+//   dst  - caller-allocated int[NumResults] output array
+//   src  - shared-memory (AS3) or generic pointer to the matrix data
+//
+// The intrinsic returns a struct { i32 x NumResults }; we extract each
+// element and store it into dst[0..NumResults-1].
+static Value *EmitLdMatrix(unsigned IntrinsicID, unsigned NumResults,
+                           CodeGenFunction &CGF, const CallExpr *E) {
+  // Arg0: int * dst  (output)
+  Address DstAddr = CGF.EmitPointerWithAlignment(E->getArg(0));
+  // Arg1: void AS3 * src  (input)
+  Value *SrcPtr = CGF.EmitScalarExpr(E->getArg(1));
+
+  // The intrinsic is overloaded on the pointer type (anyptr).
+  Function *F = CGF.CGM.getIntrinsic(IntrinsicID, {SrcPtr->getType()});
+  Value *Result = CGF.Builder.CreateCall(F, {SrcPtr});
+
+  llvm::Type *I32Ty = CGF.Builder.getInt32Ty();
+  for (unsigned i = 0; i < NumResults; ++i) {
+    Value *Elem = NumResults == 1
+                      ? Result
+                      : CGF.Builder.CreateExtractValue(Result, i);
+    Value *GEP = CGF.Builder.CreateConstGEP1_32(
+        I32Ty, DstAddr.emitRawPointer(CGF), i);
+    Address GEPAddr = Address(GEP, I32Ty, DstAddr.getAlignment());
+    CGF.Builder.CreateStore(Elem, GEPAddr);
+  }
+  return Result;
+}
+
 } // namespace
 
 Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
@@ -3480,25 +3686,19 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__nvvm_warpgroup_commit_batch:
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_wgmma_commit_group_sync_aligned));
-  // case NVPTX::BI__nvvm_warpgroup_wait:
-  // {
-  //   return Builder.CreateCall(
-  //       CGM.getIntrinsic(Intrinsic::nvvm_wgmma_wait_group_sync_aligned),
-  //       {EmitScalarExpr(E->getArg(0))});
-  // }
   case NVPTX::BI__nvvm_warpgroup_wait: {
     llvm::Value *Arg = EmitScalarExpr(E->getArg(0));
-    // 尝试折叠为常量
+    // wgmma.wait_group requires a compile-time constant in [0, 7].
     if (auto *CI = dyn_cast<llvm::ConstantInt>(Arg)) {
       uint64_t Val = CI->getZExtValue();
       if (Val > 7) {
         CGM.ErrorUnsupported(E, "__nvvm_warpgroup_wait group ID must be 0-7");
-        Val = 0; // fallback
+        Val = 0;
       }
-      // 重新创建为 i32 常量（如果 intrinsic 用 i32）
       Arg = llvm::ConstantInt::get(CGM.Int64Ty, Val);
     } else {
       CGM.ErrorUnsupported(E, "__nvvm_warpgroup_wait requires compile-time constant");
+      return nullptr;
     }
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_wgmma_wait_group_sync_aligned), {Arg});
@@ -3651,33 +3851,157 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
           Builder.CreateExtractValue(Result, i), DstPtrs[i]);
     return Result;
   }
-  // case NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16
-  case NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32:
+  // =========================================================
+  // wgmma builtins — bf16/fp16 (m64nNk16) and tf32 (m64nNk8)
+  // All share the same CodeGen via getWgmmaInfo + EmitWgmma.
+  // Builtin signature: void(float * D, void AS3 * desc_a, void AS3 * desc_b)
+  // =========================================================
+  case NVPTX::BI__asm_wgmma_m64n8k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n24k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n40k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n48k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n56k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n72k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n80k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n88k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n96k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n104k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n112k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n120k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n136k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n144k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n152k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n160k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n168k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n176k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n184k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n200k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n208k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n216k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n224k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n232k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n240k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n248k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n8k16_f32_f16_f16:
   case NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16:
-  case NVPTX::BI__asm_wgmma_m64n16k16_f32_bf16_bf16:{
-
-    Address Dst = EmitPointerWithAlignment(E->getArg(0));
-    Value *desc_a = EmitScalarExpr(E->getArg(1));
-    Value *desc_b = EmitScalarExpr(E->getArg(2));
-
-    NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
-    unsigned IID = MI.getMMAIntrinsic(0, 0);
-    Function *Intrinsic = CGM.getIntrinsic(IID);
-
-    // SmallVector<Value *, 24> Values = {desc_a, desc_b, scale_d, scale_a, scale_b, trans_a, trans_b};
-
-    Value *Result = Builder.CreateCall(Intrinsic, {desc_a, desc_b});
-    for(int i = 0; i < MI.NumEltsD; i ++) {
-      Builder.CreateAlignedStore(
-              Builder.CreateBitCast(Builder.CreateExtractValue(Result, i),
-                                    Dst.getElementType()),
-              Builder.CreateGEP(Dst.getElementType(), Dst.emitRawPointer(*this),
-                                llvm::ConstantInt::get(IntTy, i)),
-              CharUnits::fromQuantity(4));
-    }  
-
-    return Result;
+  case NVPTX::BI__asm_wgmma_m64n24k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n40k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n48k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n56k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n72k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n80k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n88k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n96k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n104k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n112k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n120k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n136k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n144k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n152k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n160k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n168k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n176k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n184k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n200k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n208k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n216k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n224k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n232k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n240k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n248k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16:
+  case NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32:
+  case NVPTX::BI__asm_wgmma_m64n16k8_f32_tf32_tf32:
+  case NVPTX::BI__asm_wgmma_m64n24k8_f32_tf32_tf32:
+  case NVPTX::BI__asm_wgmma_m64n32k8_f32_tf32_tf32: {
+    auto [IID, NumEltsD] = getWgmmaInfo(BuiltinID);
+    return EmitWgmma(IID, NumEltsD, *this, E);
   }
+
+  // =========================================================
+  // ldmatrix builtins — lower to llvm.nvvm.ldmatrix.sync.aligned.*
+  // =========================================================
+
+  // --- m8n8 b16 (SM75+, PTX65+) ---
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m8n8_x1_b16:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m8n8_x1_b16, 1, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m8n8_x2_b16:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m8n8_x2_b16, 2, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m8n8_x4_b16:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m8n8_x4_b16, 4, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m8n8_x1_trans_b16:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m8n8_x1_trans_b16, 1, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m8n8_x2_trans_b16:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m8n8_x2_trans_b16, 2, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m8n8_x4_trans_b16:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m8n8_x4_trans_b16, 4, *this, E);
+
+  // --- m16n16 b8/b8x16 (SM100+, PTX86+, trans only) ---
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m16n16_x1_trans_b8:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m16n16_x1_trans_b8, 2, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m16n16_x2_trans_b8:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m16n16_x2_trans_b8, 4, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m16n16_x1_trans_b8x16_b6x16_p32:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m16n16_x1_trans_b8x16_b6x16_p32,
+        2, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m16n16_x2_trans_b8x16_b6x16_p32:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m16n16_x2_trans_b8x16_b6x16_p32,
+        4, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m16n16_x1_trans_b8x16_b4x16_p64:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m16n16_x1_trans_b8x16_b4x16_p64,
+        2, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m16n16_x2_trans_b8x16_b4x16_p64:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m16n16_x2_trans_b8x16_b4x16_p64,
+        4, *this, E);
+
+  // --- m8n16 b8x16 (SM100+, PTX86+, non-trans only) ---
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m8n16_x1_b8x16_b6x16_p32:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m8n16_x1_b8x16_b6x16_p32,
+        1, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m8n16_x2_b8x16_b6x16_p32:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m8n16_x2_b8x16_b6x16_p32,
+        2, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m8n16_x4_b8x16_b6x16_p32:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m8n16_x4_b8x16_b6x16_p32,
+        4, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m8n16_x1_b8x16_b4x16_p64:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m8n16_x1_b8x16_b4x16_p64,
+        1, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m8n16_x2_b8x16_b4x16_p64:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m8n16_x2_b8x16_b4x16_p64,
+        2, *this, E);
+  case NVPTX::BI__nvvm_ldmatrix_sync_aligned_m8n16_x4_b8x16_b4x16_p64:
+    return EmitLdMatrix(
+        Intrinsic::nvvm_ldmatrix_sync_aligned_m8n16_x4_b8x16_b4x16_p64,
+        4, *this, E);
+
   default:
     return nullptr;
   }

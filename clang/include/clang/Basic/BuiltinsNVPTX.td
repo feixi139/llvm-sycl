@@ -2613,16 +2613,135 @@ def __asm_mma_m16n8k4_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double*,doubl
 def __asm_mma_m16n8k8_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double*,double*,double*,double*, double,double,double,double, double,double, double,double,double,double)", SM_80, PTX78>;
 def __asm_mma_m16n8k16_f64_f64_f64_f64 : NVPTXBuiltinSMAndPTX<"void(double*,double*,double*,double*, double,double,double,double,double,double,double,double, double,double,double,double, double,double,double,double)", SM_80, PTX78>;
 
-def __asm_wgmma_m64n16k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90, PTX80>;
+def __asm_wgmma_m64n16k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
 
-def __asm_wgmma_m64n16k16_f32_f16_f16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90, PTX80>;
-// def __asm_wgmma_m64n256k16_f32_f16_f16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90, PTX80>;
-
-
-def __asm_wgmma_m64n8k8_f32_tf32_tf32 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90, PTX80>;
+def __asm_wgmma_m64n16k16_f32_f16_f16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+// def __asm_wgmma_m64n256k16_f32_f16_f16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
 
 
-def __nvvm_warpgroup_arrive:  NVPTXBuiltinSMAndPTX<"void()", SM_90, PTX80>;
-def __nvvm_warpgroup_commit_batch: NVPTXBuiltinSMAndPTX<"void()", SM_90, PTX80>;
-def __nvvm_warpgroup_wait: NVPTXBuiltinSMAndPTX<"void(int64_t)", SM_90, PTX80>;
+def __asm_wgmma_m64n8k8_f32_tf32_tf32 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+
+// wgmma bf16 — all N sizes (m64nNk16, N = 8,16,...,256 step 8)
+// Signature: void(float * D, void AS3 * desc_a, void AS3 * desc_b)
+def __asm_wgmma_m64n8k16_f32_bf16_bf16   : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n24k16_f32_bf16_bf16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n32k16_f32_bf16_bf16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n40k16_f32_bf16_bf16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n48k16_f32_bf16_bf16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n56k16_f32_bf16_bf16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n64k16_f32_bf16_bf16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n72k16_f32_bf16_bf16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n80k16_f32_bf16_bf16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n88k16_f32_bf16_bf16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n96k16_f32_bf16_bf16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n104k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n112k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n120k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n128k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n136k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n144k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n152k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n160k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n168k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n176k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n184k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n192k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n200k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n208k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n216k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n224k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n232k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n240k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n248k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n256k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+
+// wgmma fp16 — all N sizes (m64nNk16, N = 8,16,...,256 step 8)
+def __asm_wgmma_m64n8k16_f32_f16_f16    : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n24k16_f32_f16_f16   : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n32k16_f32_f16_f16   : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n40k16_f32_f16_f16   : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n48k16_f32_f16_f16   : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n56k16_f32_f16_f16   : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n64k16_f32_f16_f16   : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n72k16_f32_f16_f16   : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n80k16_f32_f16_f16   : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n88k16_f32_f16_f16   : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n96k16_f32_f16_f16   : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n104k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n112k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n120k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n128k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n136k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n144k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n152k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n160k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n168k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n176k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n184k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n192k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n200k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n208k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n216k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n224k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n232k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n240k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n248k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n256k16_f32_f16_f16  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+
+// wgmma tf32 — all N sizes (m64nNk8, N = 8,16,24,32)
+def __asm_wgmma_m64n16k8_f32_tf32_tf32  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n24k8_f32_tf32_tf32  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n32k8_f32_tf32_tf32  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+
+
+def __nvvm_warpgroup_arrive:  NVPTXBuiltinSMAndPTX<"void()", SM_90a, PTX80>;
+def __nvvm_warpgroup_commit_batch: NVPTXBuiltinSMAndPTX<"void()", SM_90a, PTX80>;
+def __nvvm_warpgroup_wait: NVPTXBuiltinSMAndPTX<"void(int64_t)", SM_90a, PTX80>;
+
+// ldmatrix builtins
+// Signature: void(int * dst, void const address_space<3> * src)
+// dst points to a caller-allocated int[N] array (N = 1/2/4 per variant).
+// CodeGen extracts elements from the intrinsic struct result and stores them.
+
+// === m8n8 b16 — SM75+, PTX65+ ===
+def __nvvm_ldmatrix_sync_aligned_m8n8_x1_b16
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_75, PTX65>;
+def __nvvm_ldmatrix_sync_aligned_m8n8_x2_b16
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_75, PTX65>;
+def __nvvm_ldmatrix_sync_aligned_m8n8_x4_b16
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_75, PTX65>;
+def __nvvm_ldmatrix_sync_aligned_m8n8_x1_trans_b16
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_75, PTX65>;
+def __nvvm_ldmatrix_sync_aligned_m8n8_x2_trans_b16
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_75, PTX65>;
+def __nvvm_ldmatrix_sync_aligned_m8n8_x4_trans_b16
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_75, PTX65>;
+
+// === m16n16 b8/b8x16_b6x16_p32/b8x16_b4x16_p64 — SM100+, PTX86+, trans only ===
+def __nvvm_ldmatrix_sync_aligned_m16n16_x1_trans_b8
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_100, PTX86>;
+def __nvvm_ldmatrix_sync_aligned_m16n16_x2_trans_b8
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_100, PTX86>;
+def __nvvm_ldmatrix_sync_aligned_m16n16_x1_trans_b8x16_b6x16_p32
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_100, PTX86>;
+def __nvvm_ldmatrix_sync_aligned_m16n16_x2_trans_b8x16_b6x16_p32
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_100, PTX86>;
+def __nvvm_ldmatrix_sync_aligned_m16n16_x1_trans_b8x16_b4x16_p64
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_100, PTX86>;
+def __nvvm_ldmatrix_sync_aligned_m16n16_x2_trans_b8x16_b4x16_p64
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_100, PTX86>;
+
+// === m8n16 b8x16_b6x16_p32/b8x16_b4x16_p64 — SM100+, PTX86+, non-trans only ===
+def __nvvm_ldmatrix_sync_aligned_m8n16_x1_b8x16_b6x16_p32
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_100, PTX86>;
+def __nvvm_ldmatrix_sync_aligned_m8n16_x2_b8x16_b6x16_p32
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_100, PTX86>;
+def __nvvm_ldmatrix_sync_aligned_m8n16_x4_b8x16_b6x16_p32
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_100, PTX86>;
+def __nvvm_ldmatrix_sync_aligned_m8n16_x1_b8x16_b4x16_p64
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_100, PTX86>;
+def __nvvm_ldmatrix_sync_aligned_m8n16_x2_b8x16_b4x16_p64
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_100, PTX86>;
+def __nvvm_ldmatrix_sync_aligned_m8n16_x4_b8x16_b4x16_p64
+  : NVPTXBuiltinSMAndPTX<"void(int *, void const address_space<3> *)", SM_100, PTX86>;
 

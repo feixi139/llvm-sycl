@@ -389,6 +389,18 @@ DecodeIITType(unsigned &NextElt, ArrayRef<unsigned char> Infos,
   case IIT_EMPTYSTRUCT:
     OutputTable.push_back(IITDescriptor::get(IITDescriptor::Struct, 0));
     return;
+  default:
+    // Support large struct return encodings used by wgmma intrinsics.
+    // Intrinsics.td assigns IIT_STRUCT10..IIT_STRUCT128 consecutively.
+    if (Info >= IIT_STRUCT10 && Info <= IIT_STRUCT128) {
+      StructElts = static_cast<unsigned>(Info) -
+                   static_cast<unsigned>(IIT_STRUCT10) + 10;
+      OutputTable.push_back(IITDescriptor::get(IITDescriptor::Struct, StructElts));
+      for (unsigned i = 0; i != StructElts; ++i)
+        DecodeIITType(NextElt, Infos, Info, OutputTable);
+      return;
+    }
+    break;
   case IIT_STRUCT9:
     ++StructElts;
     [[fallthrough]];
