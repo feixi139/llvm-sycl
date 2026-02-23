@@ -762,6 +762,18 @@ def __nvvm_mbarrier_test_wait_shared : NVPTXBuiltinSMAndPTX<"bool(int64_t addres
 
 def __nvvm_mbarrier_pending_count : NVPTXBuiltinSMAndPTX<"int(int64_t)", SM_80, PTX70>;
 
+// SM90/PTX80 mbarrier variants used by WGMMA/TMA paths.
+def __nvvm_mbarrier_arrive_expect_tx_shared :
+  NVPTXBuiltinSMAndPTX<"void(int64_t address_space<3> *, int)", SM_90, PTX80>;
+def __nvvm_mbarrier_try_wait_parity_shared :
+  NVPTXBuiltinSMAndPTX<"bool(int64_t address_space<3> *, int)", SM_90, PTX80>;
+def __nvvm_mbarrier_arrive_release_shared :
+  NVPTXBuiltinSMAndPTX<"void(int64_t address_space<3> *, int)", SM_90, PTX80>;
+def __nvvm_mbarrier_try_wait_parity_acquire_cluster_shared :
+  NVPTXBuiltinSMAndPTX<"bool(int64_t address_space<3> *, int)", SM_90, PTX80>;
+def __nvvm_mbarrier_arrive_shared_cluster :
+  NVPTXBuiltinSMAndPTX<"void(int64_t address_space<3> *, int)", SM_90, PTX80>;
+
 // Memcpy, Memset
 
 def __nvvm_memcpy : NVPTXBuiltin<"void(unsigned char *, unsigned char *, size_t, int)">;
@@ -2370,6 +2382,9 @@ let Attributes = [NoThrow] in {
   def __nvvm_compiler_warn : NVPTXBuiltin<"void(char const address_space<4> *)">;
 }
 
+// CUDA-style write-through global store used by WGMMA sample kernels.
+def __stwt : NVPTXBuiltinSMAndPTX<"void(void address_space<1> *, __bf16)", SM_90, PTX80>;
+
 def __nvvm_ldu_c : NVPTXBuiltin<"char(char const *)">;
 def __nvvm_ldu_sc : NVPTXBuiltin<"signed char(signed char const *)">;
 def __nvvm_ldu_s : NVPTXBuiltin<"short(short const *)">;
@@ -2579,6 +2594,12 @@ def __nvvm_cp_async_commit_group : NVPTXBuiltinSMAndPTX<"void()", SM_80, PTX70>;
 def __nvvm_cp_async_wait_group : NVPTXBuiltinSMAndPTX<"void(_Constant int)", SM_80, PTX70>;
 def __nvvm_cp_async_wait_all : NVPTXBuiltinSMAndPTX<"void()", SM_80, PTX70>;
 
+// TMA bulk tensor copy (G2S, 3D tile) used by wgmma path.
+def __nvvm_cp_async_bulk_tensor_g2s_tile_3d :
+  NVPTXBuiltinSMAndPTX<"void(void address_space<3> *, void address_space<3> *, void const *, int, int, int)", SM_90, PTX80>;
+def __nvvm_cp_async_bulk_tensor_g2s_tile_3d_multicast :
+  NVPTXBuiltinSMAndPTX<"void(void address_space<3> *, void address_space<3> *, void const *, int, int, int, unsigned short)", SM_90, PTX80>;
+
 
 // bf16, bf16x2 abs, neg
 def __nvvm_abs_bf16 : NVPTXBuiltinSMAndPTX<"__bf16(__bf16)", SM_80, PTX70>;
@@ -2655,6 +2676,24 @@ def __asm_wgmma_m64n240k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, v
 def __asm_wgmma_m64n248k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
 def __asm_wgmma_m64n256k16_f32_bf16_bf16 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
 
+// wgmma bf16 scale_d=0 variants used by bootstrap-accumulate path.
+def __asm_wgmma_m64n32k16_f32_bf16_bf16_scale_d0  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n64k16_f32_bf16_bf16_scale_d0  : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n128k16_f32_bf16_bf16_scale_d0 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n192k16_f32_bf16_bf16_scale_d0 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+def __asm_wgmma_m64n256k16_f32_bf16_bf16_scale_d0 : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
+
+// wgmma bf16 descriptor-u64 variants (debug/compat path).
+// Signature: void(float *D, unsigned long long desc_a, unsigned long long desc_b)
+def __asm_wgmma_m64n64k16_f32_bf16_bf16_u64
+  : NVPTXBuiltinSMAndPTX<"void(float *, unsigned long long int, unsigned long long int)", SM_90a, PTX80>;
+def __asm_wgmma_m64n128k16_f32_bf16_bf16_u64
+  : NVPTXBuiltinSMAndPTX<"void(float *, unsigned long long int, unsigned long long int)", SM_90a, PTX80>;
+def __asm_wgmma_m64n64k16_f32_bf16_bf16_scale_d0_u64
+  : NVPTXBuiltinSMAndPTX<"void(float *, unsigned long long int, unsigned long long int)", SM_90a, PTX80>;
+def __asm_wgmma_m64n128k16_f32_bf16_bf16_scale_d0_u64
+  : NVPTXBuiltinSMAndPTX<"void(float *, unsigned long long int, unsigned long long int)", SM_90a, PTX80>;
+
 // wgmma fp16 — all N sizes (m64nNk16, N = 8,16,...,256 step 8)
 def __asm_wgmma_m64n8k16_f32_f16_f16    : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
 def __asm_wgmma_m64n24k16_f32_f16_f16   : NVPTXBuiltinSMAndPTX<"void(float *, void address_space<3> *, void address_space<3> *)", SM_90a, PTX80>;
@@ -2697,6 +2736,12 @@ def __asm_wgmma_m64n32k8_f32_tf32_tf32  : NVPTXBuiltinSMAndPTX<"void(float *, vo
 def __nvvm_warpgroup_arrive:  NVPTXBuiltinSMAndPTX<"void()", SM_90a, PTX80>;
 def __nvvm_warpgroup_commit_batch: NVPTXBuiltinSMAndPTX<"void()", SM_90a, PTX80>;
 def __nvvm_warpgroup_wait: NVPTXBuiltinSMAndPTX<"void(int64_t)", SM_90a, PTX80>;
+
+// setmaxnreg.{inc,dec}.sync.aligned.u32
+def __nvvm_setmaxnreg_inc_sync_aligned_u32 :
+  NVPTXBuiltinSMAndPTX<"void(_Constant int)", SM_90, PTX80>;
+def __nvvm_setmaxnreg_dec_sync_aligned_u32 :
+  NVPTXBuiltinSMAndPTX<"void(_Constant int)", SM_90, PTX80>;
 
 // ldmatrix builtins
 // Signature: void(int * dst, void const address_space<3> * src)

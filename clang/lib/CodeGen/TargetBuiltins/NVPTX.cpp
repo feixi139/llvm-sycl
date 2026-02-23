@@ -409,9 +409,6 @@ static Value *MakeScopedAtomic(unsigned IntrinsicID, CodeGenFunction &CGF,
 static Value *MakeCpAsync(unsigned IntrinsicID, unsigned IntrinsicIDS,
                           CodeGenFunction &CGF, const CallExpr *E,
                           int SrcSize) {
-  Function *Intrinsic =
-        CGF.CGM.getIntrinsic(IntrinsicIDS);
-
   Value* result = E->getNumArgs() == 3
              ? CGF.Builder.CreateCall(CGF.CGM.getIntrinsic(IntrinsicIDS),
                                       {CGF.EmitScalarExpr(E->getArg(0)),
@@ -422,6 +419,42 @@ static Value *MakeCpAsync(unsigned IntrinsicID, unsigned IntrinsicIDS,
                                        CGF.EmitScalarExpr(E->getArg(1))});
 
   return result;
+}
+
+static Value *MakeCpAsyncBulkTensorG2S3D(unsigned IntrinsicID,
+                                         CodeGenFunction &CGF,
+                                         const CallExpr *E, bool HasMC) {
+  llvm::Function *F = CGF.CGM.getIntrinsic(IntrinsicID);
+  llvm::FunctionType *FTy = F->getFunctionType();
+  SmallVector<Value *, 10> Args;
+  Args.reserve(10);
+
+  // Common arguments: dst, mbarrier, tensormap, d0, d1, d2.
+  for (unsigned I = 0; I < 6; ++I)
+    Args.push_back(CGF.EmitScalarExpr(E->getArg(I)));
+
+  // Optional args in intrinsic signature:
+  //   i16 cta_mask, i64 cache_hint, i1 has_cta_mask, i1 has_cache_hint.
+  Value *CTA = HasMC ? CGF.EmitScalarExpr(E->getArg(6))
+                     : ConstantInt::get(CGF.Builder.getInt16Ty(), 0);
+  Args.push_back(CTA);
+  Args.push_back(ConstantInt::get(CGF.Builder.getInt64Ty(), 0));
+  Args.push_back(ConstantInt::get(CGF.Builder.getInt1Ty(), HasMC ? 1 : 0));
+  Args.push_back(ConstantInt::get(CGF.Builder.getInt1Ty(), 0));
+
+  for (unsigned I = 0; I < Args.size(); ++I) {
+    llvm::Type *PTy = FTy->getParamType(I);
+    if (Args[I]->getType() == PTy)
+      continue;
+    if (Args[I]->getType()->isPointerTy() && PTy->isPointerTy())
+      Args[I] = CGF.Builder.CreatePointerBitCastOrAddrSpaceCast(Args[I], PTy);
+    else if (Args[I]->getType()->isIntegerTy() && PTy->isIntegerTy())
+      Args[I] = CGF.Builder.CreateIntCast(Args[I], PTy, false);
+    else
+      Args[I] = CGF.Builder.CreateBitCast(Args[I], PTy);
+  }
+
+  return CGF.Builder.CreateCall(F, Args);
 }
 
 static Value *MakeHalfType(unsigned IntrinsicID, unsigned BuiltinID,
@@ -480,6 +513,7 @@ static std::pair<unsigned, unsigned> getWgmmaInfo(unsigned BuiltinID) {
   case NVPTX::BI__asm_wgmma_m64n56k16_f32_bf16_bf16:
     return {Intrinsic::nvvm_wgmma_m64n56k16_f32_bf16_bf16_1_1_1_0_0, 28};
   case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16_u64:
     return {Intrinsic::nvvm_wgmma_m64n64k16_f32_bf16_bf16_1_1_1_0_0, 32};
   case NVPTX::BI__asm_wgmma_m64n72k16_f32_bf16_bf16:
     return {Intrinsic::nvvm_wgmma_m64n72k16_f32_bf16_bf16_1_1_1_0_0, 36};
@@ -496,6 +530,7 @@ static std::pair<unsigned, unsigned> getWgmmaInfo(unsigned BuiltinID) {
   case NVPTX::BI__asm_wgmma_m64n120k16_f32_bf16_bf16:
     return {Intrinsic::nvvm_wgmma_m64n120k16_f32_bf16_bf16_1_1_1_0_0, 60};
   case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16_u64:
     return {Intrinsic::nvvm_wgmma_m64n128k16_f32_bf16_bf16_1_1_1_0_0, 64};
   case NVPTX::BI__asm_wgmma_m64n136k16_f32_bf16_bf16:
     return {Intrinsic::nvvm_wgmma_m64n136k16_f32_bf16_bf16_1_1_1_0_0, 68};
@@ -529,6 +564,19 @@ static std::pair<unsigned, unsigned> getWgmmaInfo(unsigned BuiltinID) {
     return {Intrinsic::nvvm_wgmma_m64n248k16_f32_bf16_bf16_1_1_1_0_0, 124};
   case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16:
     return {Intrinsic::nvvm_wgmma_m64n256k16_f32_bf16_bf16_1_1_1_0_0, 128};
+  // ---- bf16, scale_d = 0 variants ----
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16_scale_d0:
+    return {Intrinsic::nvvm_wgmma_m64n32k16_f32_bf16_bf16_0_1_1_0_0, 16};
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16_scale_d0:
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16_scale_d0_u64:
+    return {Intrinsic::nvvm_wgmma_m64n64k16_f32_bf16_bf16_0_1_1_0_0, 32};
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16_scale_d0:
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16_scale_d0_u64:
+    return {Intrinsic::nvvm_wgmma_m64n128k16_f32_bf16_bf16_0_1_1_0_0, 64};
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16_scale_d0:
+    return {Intrinsic::nvvm_wgmma_m64n192k16_f32_bf16_bf16_0_1_1_0_0, 96};
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16_scale_d0:
+    return {Intrinsic::nvvm_wgmma_m64n256k16_f32_bf16_bf16_0_1_1_0_0, 128};
   // ---- fp16, m64nNk16 ----
   case NVPTX::BI__asm_wgmma_m64n8k16_f32_f16_f16:
     return {Intrinsic::nvvm_wgmma_m64n8k16_f32_f16_f16_1_1_1_0_0, 4};
@@ -701,6 +749,26 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
     return Builder.CreateCall(
         CGM.getIntrinsic(IntrinsicID, {ElemTy, Ptr->getType()}),
         {Ptr, EmitScalarExpr(E->getArg(1)), EmitScalarExpr(E->getArg(2))});
+  };
+  auto MakeSetMaxNReg = [&](unsigned IntrinsicID) -> llvm::Value * {
+    llvm::Value *Arg = EmitScalarExpr(E->getArg(0));
+    auto *CI = dyn_cast<llvm::ConstantInt>(Arg);
+    if (!CI) {
+      CGM.ErrorUnsupported(
+          E, "__nvvm_setmaxnreg_{inc,dec}_sync_aligned_u32 requires compile-time constant");
+      return static_cast<llvm::Value *>(nullptr);
+    }
+
+    int64_t Val = CI->getSExtValue();
+    // PTX setmaxnreg immediate must be in [24, 256] and a multiple of 8.
+    if (Val < 24 || Val > 256 || (Val % 8) != 0) {
+      CGM.ErrorUnsupported(
+          E, "__nvvm_setmaxnreg_{inc,dec}_sync_aligned_u32 value must be a multiple of 8 in [24, 256]");
+      return static_cast<llvm::Value *>(nullptr);
+    }
+
+    return Builder.CreateCall(CGM.getIntrinsic(IntrinsicID),
+                              {Builder.getInt32(static_cast<int>(Val))});
   };
 
   switch (BuiltinID) {
@@ -943,6 +1011,22 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__nvvm_ldu_d:
   case NVPTX::BI__nvvm_ldu_d2:
     return MakeLdu(Intrinsic::nvvm_ldu_global_f, *this, E);
+
+  case NVPTX::BI__stwt: {
+    Value *Ptr = EmitScalarExpr(E->getArg(0));
+    // st.global.wt requires a global-memory address (addrspace(1)).
+    Ptr = Builder.CreatePointerBitCastOrAddrSpaceCast(Ptr, Builder.getPtrTy(1));
+    Value *Val = EmitScalarExpr(E->getArg(1));
+    llvm::Type *I16Ty = Builder.getInt16Ty();
+
+    if (Val->getType()->isBFloatTy() || Val->getType()->isHalfTy())
+      Val = Builder.CreateBitCast(Val, I16Ty);
+    else if (!Val->getType()->isIntegerTy(16))
+      llvm_unreachable("__stwt expects a 16-bit bf16/f16/i16 payload");
+
+    Function *F = CGM.getIntrinsic(Intrinsic::nvvm_st_global_wt_b16);
+    return Builder.CreateCall(F, {Ptr, Val});
+  }
 
   case NVPTX::BI__nvvm_atom_cta_add_gen_i:
   case NVPTX::BI__nvvm_atom_cta_add_gen_l:
@@ -3679,6 +3763,41 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
     return MakeCpAsync(Intrinsic::nvvm_cp_async_ca_shared_global_16,
                        Intrinsic::nvvm_cp_async_ca_shared_global_16_s, *this, E,
                        16);
+  case NVPTX::BI__nvvm_cp_async_bulk_tensor_g2s_tile_3d:
+    return MakeCpAsyncBulkTensorG2S3D(
+        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_3d, *this, E, false);
+  case NVPTX::BI__nvvm_cp_async_bulk_tensor_g2s_tile_3d_multicast:
+    return MakeCpAsyncBulkTensorG2S3D(
+        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_3d, *this, E, true);
+  case NVPTX::BI__nvvm_mbarrier_init_shared:
+    return Builder.CreateCall(
+        CGM.getIntrinsic(Intrinsic::nvvm_mbarrier_init_shared),
+        {EmitScalarExpr(E->getArg(0)), EmitScalarExpr(E->getArg(1))});
+  case NVPTX::BI__nvvm_mbarrier_arrive_expect_tx_shared:
+    return Builder.CreateCall(
+        CGM.getIntrinsic(Intrinsic::nvvm_mbarrier_arrive_expect_tx_shared),
+        {EmitScalarExpr(E->getArg(0)), EmitScalarExpr(E->getArg(1))});
+  case NVPTX::BI__nvvm_mbarrier_try_wait_parity_shared:
+    return Builder.CreateCall(
+        CGM.getIntrinsic(Intrinsic::nvvm_mbarrier_try_wait_parity_shared),
+        {EmitScalarExpr(E->getArg(0)), EmitScalarExpr(E->getArg(1))});
+  case NVPTX::BI__nvvm_mbarrier_arrive_release_shared:
+    return Builder.CreateCall(
+        CGM.getIntrinsic(Intrinsic::nvvm_mbarrier_arrive_release_shared),
+        {EmitScalarExpr(E->getArg(0)), EmitScalarExpr(E->getArg(1))});
+  case NVPTX::BI__nvvm_mbarrier_try_wait_parity_acquire_cluster_shared:
+    return Builder.CreateCall(
+        CGM.getIntrinsic(
+            Intrinsic::nvvm_mbarrier_try_wait_parity_acquire_cluster_shared),
+        {EmitScalarExpr(E->getArg(0)), EmitScalarExpr(E->getArg(1))});
+  case NVPTX::BI__nvvm_mbarrier_arrive_shared_cluster:
+    return Builder.CreateCall(
+        CGM.getIntrinsic(Intrinsic::nvvm_mbarrier_arrive_shared_cluster),
+        {EmitScalarExpr(E->getArg(0)), EmitScalarExpr(E->getArg(1))});
+  case NVPTX::BI__nvvm_setmaxnreg_inc_sync_aligned_u32:
+    return MakeSetMaxNReg(Intrinsic::nvvm_setmaxnreg_inc_sync_aligned_u32);
+  case NVPTX::BI__nvvm_setmaxnreg_dec_sync_aligned_u32:
+    return MakeSetMaxNReg(Intrinsic::nvvm_setmaxnreg_dec_sync_aligned_u32);
   // lz debug
   case NVPTX::BI__nvvm_warpgroup_arrive:
     return Builder.CreateCall(
@@ -3864,6 +3983,7 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__asm_wgmma_m64n48k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n56k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16_u64:
   case NVPTX::BI__asm_wgmma_m64n72k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n80k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n88k16_f32_bf16_bf16:
@@ -3872,6 +3992,7 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__asm_wgmma_m64n112k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n120k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16_u64:
   case NVPTX::BI__asm_wgmma_m64n136k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n144k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n152k16_f32_bf16_bf16:
@@ -3888,6 +4009,13 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__asm_wgmma_m64n240k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n248k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16_scale_d0:
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16_scale_d0:
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16_scale_d0_u64:
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16_scale_d0:
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16_scale_d0_u64:
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16_scale_d0:
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16_scale_d0:
   case NVPTX::BI__asm_wgmma_m64n8k16_f32_f16_f16:
   case NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16:
   case NVPTX::BI__asm_wgmma_m64n24k16_f32_f16_f16:

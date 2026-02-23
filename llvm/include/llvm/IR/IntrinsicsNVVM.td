@@ -1728,6 +1728,11 @@ let TargetPrefix = "nvvm" in {
   
   defm int_nvvm_ld_global   : PTXLdWithScope_fi;
   defm int_nvvm_st_global   : PTXStWithScope_fi;
+  // st.global.wt.b16 helper used by the CUDA-style __stwt builtin.
+  def int_nvvm_st_global_wt_b16 : NVVMBuiltin,
+      Intrinsic<[], [llvm_global_ptr_ty, llvm_i16_ty],
+          [IntrArgMemOnly, IntrWriteMem, IntrHasSideEffects, IntrNoCallback,
+           WriteOnly<ArgIndex<0>>, NoCapture<ArgIndex<0>>]>;
   defm int_nvvm_atomic_add_global   : PTXAtomicWithScope2_fi;
   defm int_nvvm_atomic_inc_global_i : PTXAtomicWithScope2_sem<llvm_anyint_ty>;
   defm int_nvvm_atomic_dec_global_i : PTXAtomicWithScope2_sem<llvm_anyint_ty>;
@@ -1888,6 +1893,18 @@ def int_nvvm_mbarrier_test_wait_shared : NVVMBuiltin,
 
 def int_nvvm_mbarrier_pending_count : NVVMBuiltin,
     Intrinsic<[llvm_i32_ty], [llvm_i64_ty], [IntrNoMem, IntrConvergent, IntrNoCallback]>;
+
+// mbarrier SM90/PTX80 variants used by WGMMA/TMA kernels.
+def int_nvvm_mbarrier_arrive_expect_tx_shared : NVVMBuiltin,
+    Intrinsic<[], [llvm_shared_ptr_ty, llvm_i32_ty], [IntrConvergent, IntrNoCallback]>;
+def int_nvvm_mbarrier_try_wait_parity_shared : NVVMBuiltin,
+    Intrinsic<[llvm_i1_ty], [llvm_shared_ptr_ty, llvm_i32_ty], [IntrConvergent, IntrNoCallback]>;
+def int_nvvm_mbarrier_arrive_release_shared : NVVMBuiltin,
+    Intrinsic<[], [llvm_shared_ptr_ty, llvm_i32_ty], [IntrConvergent, IntrNoCallback]>;
+def int_nvvm_mbarrier_try_wait_parity_acquire_cluster_shared : NVVMBuiltin,
+    Intrinsic<[llvm_i1_ty], [llvm_shared_ptr_ty, llvm_i32_ty], [IntrConvergent, IntrNoCallback]>;
+def int_nvvm_mbarrier_arrive_shared_cluster : NVVMBuiltin,
+    Intrinsic<[], [llvm_shared_ptr_ty, llvm_i32_ty], [IntrConvergent, IntrNoCallback]>;
 
 // Generated within nvvm. Use for ldu on sm_20 or later.  Second arg is the
 // pointer's alignment.

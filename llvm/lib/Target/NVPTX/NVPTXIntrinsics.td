@@ -517,14 +517,14 @@ multiclass CP_ASYNC_BULK_S2G_INTR<bit has_ch> {
       !if(has_ch,
           CpAsyncBulkStr<0, 1>.S2G # " [$dst], [$src], $size, $ch;",
           CpAsyncBulkStr<0, 0>.S2G # " [$dst], [$src], $size;"),
-      [(int_nvvm_cp_async_bulk_shared_cta_to_global addr:$dst, addr:$src, i32:$size, i64:$ch, !if(has_ch, -1, 0))]>,
+      [(int_nvvm_cp_async_bulk_shared_cta_to_global addr:$dst, addr:$src, i32:$size, i64:$ch, !if(has_ch, 1, 0))]>,
       Requires<[hasPTX<80>, hasSM<90>]>;
 
   def NAME # _BM : NVPTXInst<(outs), (ins ADDR:$dst, ADDR:$src, Int32Regs:$size, Int64Regs:$ch, Int16Regs:$mask),
       !if(has_ch,
           CpAsyncBulkStr<0, 1, 1>.S2G # " [$dst], [$src], $size, $ch, $mask;",
           CpAsyncBulkStr<0, 0, 1>.S2G # " [$dst], [$src], $size, $mask;"),
-      [(int_nvvm_cp_async_bulk_shared_cta_to_global_bytemask addr:$dst, addr:$src, i32:$size, i64:$ch, !if(has_ch, -1, 0), i16:$mask)]>,
+      [(int_nvvm_cp_async_bulk_shared_cta_to_global_bytemask addr:$dst, addr:$src, i32:$size, i64:$ch, !if(has_ch, 1, 0), i16:$mask)]>,
       Requires<[hasPTX<86>, hasSM<100>]>;
 }
 defm CP_ASYNC_BULK_S2G    : CP_ASYNC_BULK_S2G_INTR<has_ch = 0>;
@@ -539,7 +539,7 @@ multiclass CP_ASYNC_BULK_G2S_INTR<bit has_ch> {
       !if(has_ch,
           CpAsyncBulkStr<0, 1>.G2S # " [$dst], [$src], $size, [$mbar], $ch;",
           CpAsyncBulkStr<0, 0>.G2S # " [$dst], [$src], $size, [$mbar];"),
-      [(Intr addr:$dst, addr:$mbar, addr:$src, i32:$size, i16:$mask, i64:$ch, 0, !if(has_ch, -1, 0))]>,
+      [(Intr addr:$dst, addr:$mbar, addr:$src, i32:$size, i16:$mask, i64:$ch, 0, !if(has_ch, 1, 0))]>,
       Requires<[hasPTX<80>, hasSM<90>]>;
 
   def NAME # _MC : NVPTXInst<(outs),
@@ -548,7 +548,7 @@ multiclass CP_ASYNC_BULK_G2S_INTR<bit has_ch> {
       !if(has_ch,
           CpAsyncBulkStr<1, 1>.G2S # " [$dst], [$src], $size, [$mbar], $mask, $ch;",
           CpAsyncBulkStr<1, 0>.G2S # " [$dst], [$src], $size, [$mbar], $mask;"),
-      [(Intr addr:$dst, addr:$mbar, addr:$src, i32:$size, i16:$mask, i64:$ch, -1, !if(has_ch, -1, 0))]>,
+      [(Intr addr:$dst, addr:$mbar, addr:$src, i32:$size, i16:$mask, i64:$ch, 1, !if(has_ch, 1, 0))]>,
       Requires<[hasPTX<80>, hasSM<90>]>;
 }
 defm CP_ASYNC_BULK_G2S    : CP_ASYNC_BULK_G2S_INTR<has_ch = 0>;
@@ -565,7 +565,7 @@ multiclass CP_ASYNC_BULK_PREFETCH_INTR<bit has_ch> {
       !if(has_ch,
           "cp.async.bulk.prefetch.L2.global.L2::cache_hint" # " [$src], $size, $ch;",
           "cp.async.bulk.prefetch.L2.global" # " [$src], $size;"),
-      [(int_nvvm_cp_async_bulk_prefetch_L2 addr:$src, i32:$size, i64:$ch, !if(has_ch, -1, 0))]>,
+      [(int_nvvm_cp_async_bulk_prefetch_L2 addr:$src, i32:$size, i64:$ch, !if(has_ch, 1, 0))]>,
       Requires<[hasPTX<80>, hasSM<90>]>;
 }
 defm CP_ASYNC_BULK_PREFETCH    : CP_ASYNC_BULK_PREFETCH_INTR<has_ch = 0>;
@@ -635,6 +635,27 @@ foreach dim = [1, 2, 3, 4, 5] in {
     }
   }
 }
+
+// Explicitly bind 3D tile G2S intrinsics used by wgmma path.
+def INT_CP_ASYNC_BULK_TENSOR_G2S_TILE_3D : NVPTXInst<(outs),
+  (ins ADDR:$dst, ADDR:$mbar, ADDR:$tmap, Int32Regs:$d0, Int32Regs:$d1,
+       Int32Regs:$d2),
+  "cp.async.bulk.tensor.3d.shared::cluster.global.tile.mbarrier::complete_tx::bytes "
+  "[$dst], [$tmap, {{$d0, $d1, $d2}}], [$mbar];",
+  [(int_nvvm_cp_async_bulk_tensor_g2s_tile_3d
+      addr:$dst, addr:$mbar, addr:$tmap, i32:$d0, i32:$d1, i32:$d2,
+      0, 0, 0, 0)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
+def INT_CP_ASYNC_BULK_TENSOR_G2S_TILE_3D_MC : NVPTXInst<(outs),
+  (ins ADDR:$dst, ADDR:$mbar, ADDR:$tmap, Int32Regs:$d0, Int32Regs:$d1,
+       Int32Regs:$d2, Int16Regs:$mc),
+  "cp.async.bulk.tensor.3d.shared::cluster.global.tile.mbarrier::complete_tx::bytes.multicast::cluster "
+  "[$dst], [$tmap, {{$d0, $d1, $d2}}], [$mbar], $mc;",
+  [(int_nvvm_cp_async_bulk_tensor_g2s_tile_3d
+      addr:$dst, addr:$mbar, addr:$tmap, i32:$d0, i32:$d1, i32:$d2,
+      i16:$mc, 0, 1, 0)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
 
 // From Shared to Global memory (S2G)
 class S2G_STRINGS<int dim, string mode, bit ch,
@@ -900,6 +921,41 @@ class MBARRIER_PENDING_COUNT<Intrinsic Intrin> :
 
 def MBARRIER_PENDING_COUNT :
   MBARRIER_PENDING_COUNT<int_nvvm_mbarrier_pending_count>;
+
+// SM90/PTX80 mbarrier variants used by WGMMA/TMA paths.
+def INT_MBARRIER_ARRIVE_EXPECT_TX_SHARED : NVPTXInst<(outs),
+  (ins ADDR:$addr, Int32Regs:$bytes),
+  "mbarrier.arrive.expect_tx.shared::cta.b64 _, [$addr], $bytes;",
+  [(int_nvvm_mbarrier_arrive_expect_tx_shared addr:$addr, i32:$bytes)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
+def INT_MBARRIER_TRY_WAIT_PARITY_SHARED : NVPTXInst<(outs Int1Regs:$res),
+  (ins ADDR:$addr, Int32Regs:$phase),
+  "mbarrier.try_wait.parity.shared::cta.b64 $res, [$addr], $phase;",
+  [(set i1:$res, (int_nvvm_mbarrier_try_wait_parity_shared addr:$addr,
+                i32:$phase))]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
+def INT_MBARRIER_ARRIVE_RELEASE_SHARED : NVPTXInst<(outs),
+  (ins ADDR:$addr, Int32Regs:$count),
+  "mbarrier.arrive.release.cta.shared::cta.b64 _, [$addr], $count;",
+  [(int_nvvm_mbarrier_arrive_release_shared addr:$addr, i32:$count)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
+def INT_MBARRIER_TRY_WAIT_PARITY_ACQUIRE_CLUSTER_SHARED :
+  NVPTXInst<(outs Int1Regs:$res), (ins ADDR:$addr, Int32Regs:$phase),
+  "mbarrier.try_wait.parity.acquire.cluster.shared::cta.b64 $res, [$addr], "
+  "$phase;",
+  [(set i1:$res,
+    (int_nvvm_mbarrier_try_wait_parity_acquire_cluster_shared addr:$addr,
+      i32:$phase))]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
+def INT_MBARRIER_ARRIVE_SHARED_CLUSTER : NVPTXInst<(outs),
+  (ins ADDR:$addr, Int32Regs:$count),
+  "mbarrier.arrive.shared::cluster.b64 _, [$addr], $count;",
+  [(int_nvvm_mbarrier_arrive_shared_cluster addr:$addr, i32:$count)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
 
 //-----------------------------------
 // Math Functions
@@ -2373,6 +2429,11 @@ multiclass ATOM_st_impl {
 }
 
 defm INT_PTX_ST : ATOM_st_impl;
+
+def INT_PTX_ST_GLOBAL_WT_B16 : NVPTXInst<(outs), (ins ADDR:$src, Int16Regs:$b),
+  "st.global.wt.b16 \t[$src], $b;",
+  [(int_nvvm_st_global_wt_b16 addr:$src, i16:$b)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
 
 //-----------------------------------
 // Support for ldu on sm_20 or later
