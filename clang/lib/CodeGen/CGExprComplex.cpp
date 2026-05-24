@@ -20,8 +20,6 @@
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/MDBuilder.h"
 #include "llvm/IR/Metadata.h"
-#include <iostream>
-// lzdebug
 using namespace clang;
 using namespace CodeGen;
 
@@ -500,7 +498,6 @@ ComplexPairTy ComplexExprEmitter::VisitCallExpr(const CallExpr *E) {
   if (E->getCallReturnType(CGF.getContext())->isReferenceType())
     return EmitLoadOfLValue(E);
 
-  printf("LZDEBUG!!! call function EmitCallExpr in CGExprComplex.cpp at line 501 \n");
   return CGF.EmitCallExpr(E).getComplexVal();
 }
 

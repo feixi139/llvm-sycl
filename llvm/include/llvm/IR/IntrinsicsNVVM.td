@@ -170,7 +170,6 @@ class StrJoin<string sep, list<string> str_list> {
 // Geom: m<M>n<N>k<K>. E.g. m8n32k16
 // Frag: [a|b|c|d] ([x1|x2|x4] for ldmatrix)
 // PtxEltType: PTX type for the element.
-// lzdebug 表述寄存器布局
 class WMMA_REGS<string Geom, string Frag, string PtxEltType> {
   string geom = Geom;
   string frag = Frag;
@@ -570,7 +569,6 @@ class WMMA_REGS<string Geom, string Frag, string PtxEltType> {
   );
 }
 
-// lzdebug  自动生成 LLVM intrinsic 的名字（intr）和内部记录名（record），用于 WMMA 的加载（load）或存储（store）操作。
 class WMMA_NAME_LDST<string Op, WMMA_REGS Frag, string Layout, int WithStride> {
   string intr = "llvm.nvvm.wmma."
                 # Frag.geom
@@ -592,7 +590,6 @@ class WMMA_NAME_LDST<string Op, WMMA_REGS Frag, string Layout, int WithStride> {
                 # !if(WithStride, "_stride", "");
 }
 
-// lzdebug 生成能够标识mma操作的字符串
 class MMA_SIGNATURE<WMMA_REGS A, WMMA_REGS B, WMMA_REGS C, WMMA_REGS D> {
   list<WMMA_REGS> id_frags = !cond(
      // FP16 ops are identified by accumulator & result type.
@@ -604,7 +601,6 @@ class MMA_SIGNATURE<WMMA_REGS A, WMMA_REGS B, WMMA_REGS C, WMMA_REGS D> {
    string ret = !foldl("", id_frags, a, b, !strconcat(a, "_", b.ptx_elt_type));
 }
 
-// lzdebug 为 WMMA 的矩阵乘加（MMA）计算操作自动生成一个唯一的内部名称（record），用于 LLVM 中定义对应的 intrinsic。
 class WMMA_NAME<string ALayout, string BLayout, int Satfinite, string Rnd, string b1op,
                 WMMA_REGS A, WMMA_REGS B, WMMA_REGS C, WMMA_REGS D> {
   string signature = MMA_SIGNATURE<A, B, C, D>.ret;
@@ -619,7 +615,6 @@ class WMMA_NAME<string ALayout, string BLayout, int Satfinite, string Rnd, strin
                   # !if(Satfinite, "_satfinite", "");
 }
 
-// lzdebug 用于生成mma操作所对应的record
 class MMA_NAME<string ALayout, string BLayout, int Satfinite, string b1op,
                WMMA_REGS A, WMMA_REGS B, WMMA_REGS C, WMMA_REGS D> {
   string signature = MMA_SIGNATURE<A, B, C, D>.ret;
@@ -632,13 +627,11 @@ class MMA_NAME<string ALayout, string BLayout, int Satfinite, string b1op,
                   # signature;
 }
 
-// lzdebug 生成能够标识wgmma操作的字符串
 class WGMMA_SIGNATURE<WMMA_REGS A, WMMA_REGS B, WMMA_REGS C, WMMA_REGS D> {
   // string ret = "f32_bf16_bf16";
   string ret = !strconcat(D.ptx_elt_type, "_", A.ptx_elt_type, "_", B.ptx_elt_type);
 }
 
-// lzdebug 用于生成wgmma操作所对应的record 这里是int_nvvm_wgmma_m64k16n16_1_1_1_0_0;
 class WGMMA_NAME<int scale_d, int scale_a, int scale_b, int trans_a, int trans_b,
           WMMA_REGS A, WMMA_REGS B, WMMA_REGS C, WMMA_REGS D> {
   string signature = WGMMA_SIGNATURE<A, B, C, D>.ret;
@@ -652,7 +645,6 @@ class WGMMA_NAME<int scale_d, int scale_a, int scale_b, int trans_a, int trans_b
                       base);
 }
 
-// lzdebug 用于自动生成 LLVM intrinsic 的名称（intr）和内部记录名（record）。
 class LDMATRIX_NAME<WMMA_REGS Frag, int Trans> {
   string intr = "llvm.nvvm.ldmatrix.sync.aligned"
                 # "." # Frag.geom
@@ -664,7 +656,6 @@ class LDMATRIX_NAME<WMMA_REGS Frag, int Trans> {
                   !subst("llvm.", "int_", intr));
 }
 
-// lzdebug 把所有合法的 MMA 操作（由几何形状 + A/B/C/D 数据类型组成）自动列出来，形成一个四元组列表，每个四元组代表一种有效的 MMA 指令配置。
 //  WMMA_REGS<"m16n8k8", "a", "f16">, WMMA_REGS<"m16n8k8", "b", "f16">, WMMA_REGS<"m16n8k8", "c", "f32">, WMMA_REGS<"m16n8k8", "d", "f32"> 
 
 // Generates list of 4-tuples of WMMA_REGS representing a valid MMA op.
@@ -707,7 +698,6 @@ class MMA_OPS<list<string> Geom, list<string> TypeA, list<string> TypeB,
    list<list<string>> ops = !foreach(x, ret, [x[0].gft, x[1].gft, x[2].gft, x[3].gft]);
 }
 
-// lzdebug 生成存储所需的各种Frag，只是在描述该操作所需的寄存器类型而已
 class MMA_LDST_OPS<list<string> Geom, list<string> Frags, list<string> Types> {
   list<WMMA_REGS> ret =
      !foldl([]<WMMA_REGS>, Geom, t1, geom, !listconcat(t1,
@@ -729,7 +719,6 @@ class LDMATRIX_OPS<list<string> Geom, list<string> Frags, list<string> Types> {
    list<string> ops = !foreach(x, ret, x.gft);
 }
 
-// lzdebug 生成各种 NVIDIA Tensor Core MMA 相关操作的“总清单生成器”。
 // Creates list of valid combinations of fragments. This is the main list that
 // drives generation of corresponding intrinsics and instructions.
 class NVVM_MMA_OPS {
@@ -867,7 +856,6 @@ def NVVM_MMA_OPS : NVVM_MMA_OPS;
 //   def : FOO<>; // The record will only be defined for supported ops.
 //
 
-// lzdebug 判断某个 WMMA load/store 操作的 fragment + 内存布局组合是否被硬件支持。
 class NVVM_WMMA_LDST_SUPPORTED<WMMA_REGS frag, string layout> {
   string f = frag.frag;
   string t = frag.ptx_elt_type;
@@ -935,7 +923,6 @@ class NVVM_MMA_B1OPS<list<WMMA_REGS> frags> {
 //   def : FOO<>; // The record will only be defined for supported ops.
 //
 
-// lzdebug 针对mma指令是否被硬件所支持
 class NVVM_MMA_SUPPORTED<list<WMMA_REGS> frags, string layout_a, string layout_b, int satf> {
   // MMA ops check both layouts.
   string layout = layout_a # ":" # layout_b;
@@ -960,10 +947,9 @@ class NVVM_MMA_SUPPORTED<list<WMMA_REGS> frags, string layout_a, string layout_b
     // m8n8k4 has no C=f32 D=f16 variant.
     !eq(gcd, "m8n8k4:f32f16"): false,
 
-    // only m8n8k4 for f16 does not require row:col layout
-    !and(!ne(layout, "row:col"),
-         !or(!ne(geom, "m8n8k4"),
-             !ne(a_type, "f16"))) : false,
+    // Expose all layout spellings for the Clang builtins.  The generated PTX
+    // mnemonic carries the chosen A/B layout and ptxas remains the final
+    // arbiter for target-specific legality.
 
     // m16n8k8 requires A and B to be the same type and C and D to be the same
     // type.
@@ -980,7 +966,6 @@ class NVVM_MMA_SUPPORTED<list<WMMA_REGS> frags, string layout_a, string layout_b
   );
 }
 
-// lzdebug 针对mma指令是否被硬件所支持
 class NVVM_WGMMA_SUPPORTED<list<WMMA_REGS> frags, int trans_a, int trans_b> {
   // MMA ops check both layouts.
   string a_type = frags[0].ptx_elt_type;
@@ -1017,7 +1002,6 @@ class NVVM_WGMMA_SUPPORTED<list<WMMA_REGS> frags, int trans_a, int trans_b> {
 //   def : FOO<>; // The record will only be defined for supported ops.
 //
 
-//lzdebug  判断ldmatrix是否被硬件所支持
 class NVVM_LDMATRIX_SUPPORTED<WMMA_REGS frag, bit trans> {
   string g = frag.geom;
   string t = frag.ptx_elt_type;
@@ -1747,7 +1731,6 @@ let TargetPrefix = "nvvm" in {
   defm int_nvvm_atomic_cas_global : PTXAtomicWithScope3_fi;
 
 
-// lzdebug 截至
 // Bar.Sync
   def int_nvvm_barrier0_popc : ClangBuiltin<"__nvvm_bar0_popc">,
       Intrinsic<[llvm_i32_ty], [llvm_i32_ty], [IntrConvergent, IntrNoCallback]>;
@@ -1807,7 +1790,6 @@ foreach scope = ["cta", "cluster", "gpu", "sys"] in {
                   "llvm.nvvm.fence.proxy.tensormap_generic.acquire." # scope>;
 }
 
-// lzdebug cp.async
 // Async Copy
 let IntrProperties = [IntrConvergent, IntrNoCallback] in {
   def int_nvvm_cp_async_mbarrier_arrive : NVVMBuiltin,
@@ -2356,7 +2338,6 @@ def int_nvvm_wgmma_wait_group_sync_aligned
 //
 // WMMA.LOAD
 
-// lzdebug
 class NVVM_WMMA_LD<WMMA_REGS Frag, string Layout, int WithStride>
   : Intrinsic<Frag.regs,
               !if(WithStride, [llvm_anyptr_ty, llvm_i32_ty], [llvm_anyptr_ty]),

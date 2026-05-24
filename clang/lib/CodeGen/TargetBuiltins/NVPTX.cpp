@@ -13,10 +13,6 @@
 #include "CGBuiltin.h"
 #include "clang/Basic/TargetBuiltins.h"
 #include "llvm/IR/IntrinsicsNVPTX.h"
-#include <iostream>
-#include <string>
-#include <thread>
-#include <chrono>
 
 using namespace clang;
 using namespace CodeGen;
@@ -212,12 +208,6 @@ struct NVPTXMmaInfo {
   // Layout and Satf, 0 otherwise.
 static NVPTXMmaInfo getNVPTXMmaInfo(unsigned BuiltinID) {
   // clang-format off
-#define WGMMA_TRANS_VARIANTS(geom, type)                                    \
-      Intrinsic::nvvm_wgmma_##geom##_##type##_1_1_1_0_0,
-
-#define WGMMA_VARIANTS(geom, type)                                    \
-      Intrinsic::nvvm_wgmma_##geom##_##type##_1_1_1,
-
 #define MMA_VARIANTS(geom, type)                                    \
       Intrinsic::nvvm_wmma_##geom##_mma_row_row_##type,             \
       Intrinsic::nvvm_wmma_##geom##_mma_row_col_##type,             \
@@ -225,8 +215,10 @@ static NVPTXMmaInfo getNVPTXMmaInfo(unsigned BuiltinID) {
       Intrinsic::nvvm_wmma_##geom##_mma_col_col_##type
 
 #define MMA_VARIANTS_1(geom, type)                                    \
-      Intrinsic::nvvm_mma_##geom##_row_col_##type,             
-
+      Intrinsic::nvvm_mma_##geom##_row_row_##type,             \
+      Intrinsic::nvvm_mma_##geom##_row_col_##type,             \
+      Intrinsic::nvvm_mma_##geom##_col_row_##type,             \
+      Intrinsic::nvvm_mma_##geom##_col_col_##type
 #define MMA_SATF_VARIANTS(geom, type)                               \
       MMA_VARIANTS(geom, type),                                     \
       Intrinsic::nvvm_wmma_##geom##_mma_row_row_##type##_satfinite, \
@@ -321,32 +313,43 @@ static NVPTXMmaInfo getNVPTXMmaInfo(unsigned BuiltinID) {
   case NVPTX::BI__dmma_m8n8k4_mma_f64:
     return {1, 1, 2, 2, {{MMA_VARIANTS(m8n8k4, f64)}}};
 
+  case NVPTX::BI__asm_mma_m8n8k4_f32_f16_f16_f32_layout:
   case NVPTX::BI__asm_mma_m8n8k4_f32_f16_f16_f32:
     return {1, 1, 4, 4, {{MMA_VARIANTS_1(m8n8k4, f32_f32)}}};
+  case NVPTX::BI__asm_mma_m16n8k8_f32_f16_f16_f32_layout:
   case NVPTX::BI__asm_mma_m16n8k8_f32_f16_f16_f32:
     return {2, 1, 4, 4, {{MMA_VARIANTS_1(m16n8k8, f32_f32)}}};
+  case NVPTX::BI__asm_mma_m16n8k16_f32_f16_f16_f32_layout:
   case NVPTX::BI__asm_mma_m16n8k16_f32_f16_f16_f32:
     return {4, 2, 4, 4, {{MMA_VARIANTS_1(m16n8k16, f32_f32)}}};
 
   // BF16 mma.sync (D=f32, A=bf16, B=bf16, C=f32)
+  case NVPTX::BI__asm_mma_m16n8k8_f32_bf16_bf16_f32_layout:
   case NVPTX::BI__asm_mma_m16n8k8_f32_bf16_bf16_f32:
     return {2, 1, 4, 4, {{MMA_VARIANTS_1(m16n8k8, bf16)}}};
+  case NVPTX::BI__asm_mma_m16n8k16_f32_bf16_bf16_f32_layout:
   case NVPTX::BI__asm_mma_m16n8k16_f32_bf16_bf16_f32:
     return {4, 2, 4, 4, {{MMA_VARIANTS_1(m16n8k16, bf16)}}};
 
   // TF32 mma.sync (D=f32, A=tf32, B=tf32, C=f32)
+  case NVPTX::BI__asm_mma_m16n8k4_f32_tf32_tf32_f32_layout:
   case NVPTX::BI__asm_mma_m16n8k4_f32_tf32_tf32_f32:
     return {2, 1, 4, 4, {{MMA_VARIANTS_1(m16n8k4, tf32)}}};
+  case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32_layout:
   case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32:
     return {4, 2, 4, 4, {{MMA_VARIANTS_1(m16n8k8, tf32)}}};
 
   // FP64 mma.sync (D=f64, A=f64, B=f64, C=f64)
+  case NVPTX::BI__asm_mma_m8n8k4_f64_f64_f64_f64_layout:
   case NVPTX::BI__asm_mma_m8n8k4_f64_f64_f64_f64:
     return {1, 1, 2, 2, {{MMA_VARIANTS_1(m8n8k4, f64)}}};
+  case NVPTX::BI__asm_mma_m16n8k4_f64_f64_f64_f64_layout:
   case NVPTX::BI__asm_mma_m16n8k4_f64_f64_f64_f64:
     return {2, 1, 4, 4, {{MMA_VARIANTS_1(m16n8k4, f64)}}};
+  case NVPTX::BI__asm_mma_m16n8k8_f64_f64_f64_f64_layout:
   case NVPTX::BI__asm_mma_m16n8k8_f64_f64_f64_f64:
     return {4, 2, 4, 4, {{MMA_VARIANTS_1(m16n8k8, f64)}}};
+  case NVPTX::BI__asm_mma_m16n8k16_f64_f64_f64_f64_layout:
   case NVPTX::BI__asm_mma_m16n8k16_f64_f64_f64_f64:
     return {8, 4, 4, 4, {{MMA_VARIANTS_1(m16n8k16, f64)}}};
 
@@ -364,6 +367,7 @@ static NVPTXMmaInfo getNVPTXMmaInfo(unsigned BuiltinID) {
   }
 
 #undef MMA_VARIANTS
+#undef MMA_VARIANTS_1
 #undef MMA_SATF_VARIANTS
 #undef MMA_VARIANTS_I4
 #undef MMA_VARIANTS_B1_AND
@@ -421,21 +425,21 @@ static Value *MakeCpAsync(unsigned IntrinsicID, unsigned IntrinsicIDS,
   return result;
 }
 
-static Value *MakeCpAsyncBulkTensorG2S3D(unsigned IntrinsicID,
-                                         CodeGenFunction &CGF,
-                                         const CallExpr *E, bool HasMC) {
+static Value *MakeCpAsyncBulkTensorG2S(unsigned IntrinsicID, unsigned Dim,
+                                       CodeGenFunction &CGF,
+                                       const CallExpr *E, bool HasMC) {
   llvm::Function *F = CGF.CGM.getIntrinsic(IntrinsicID);
   llvm::FunctionType *FTy = F->getFunctionType();
-  SmallVector<Value *, 10> Args;
-  Args.reserve(10);
+  SmallVector<Value *, 16> Args;
+  Args.reserve(3 + Dim + 4);
 
-  // Common arguments: dst, mbarrier, tensormap, d0, d1, d2.
-  for (unsigned I = 0; I < 6; ++I)
+  // Common arguments: dst, mbarrier, tensormap, d0..d{Dim-1}.
+  for (unsigned I = 0; I < 3 + Dim; ++I)
     Args.push_back(CGF.EmitScalarExpr(E->getArg(I)));
 
   // Optional args in intrinsic signature:
   //   i16 cta_mask, i64 cache_hint, i1 has_cta_mask, i1 has_cache_hint.
-  Value *CTA = HasMC ? CGF.EmitScalarExpr(E->getArg(6))
+  Value *CTA = HasMC ? CGF.EmitScalarExpr(E->getArg(3 + Dim))
                      : ConstantInt::get(CGF.Builder.getInt16Ty(), 0);
   Args.push_back(CTA);
   Args.push_back(ConstantInt::get(CGF.Builder.getInt64Ty(), 0));
@@ -505,6 +509,7 @@ static std::pair<unsigned, unsigned> getWgmmaInfo(unsigned BuiltinID) {
   case NVPTX::BI__asm_wgmma_m64n24k16_f32_bf16_bf16:
     return {Intrinsic::nvvm_wgmma_m64n24k16_f32_bf16_bf16_1_1_1_0_0, 12};
   case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16_u64:
     return {Intrinsic::nvvm_wgmma_m64n32k16_f32_bf16_bf16_1_1_1_0_0, 16};
   case NVPTX::BI__asm_wgmma_m64n40k16_f32_bf16_bf16:
     return {Intrinsic::nvvm_wgmma_m64n40k16_f32_bf16_bf16_1_1_1_0_0, 20};
@@ -547,6 +552,7 @@ static std::pair<unsigned, unsigned> getWgmmaInfo(unsigned BuiltinID) {
   case NVPTX::BI__asm_wgmma_m64n184k16_f32_bf16_bf16:
     return {Intrinsic::nvvm_wgmma_m64n184k16_f32_bf16_bf16_1_1_1_0_0, 92};
   case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16_u64:
     return {Intrinsic::nvvm_wgmma_m64n192k16_f32_bf16_bf16_1_1_1_0_0, 96};
   case NVPTX::BI__asm_wgmma_m64n200k16_f32_bf16_bf16:
     return {Intrinsic::nvvm_wgmma_m64n200k16_f32_bf16_bf16_1_1_1_0_0, 100};
@@ -563,9 +569,11 @@ static std::pair<unsigned, unsigned> getWgmmaInfo(unsigned BuiltinID) {
   case NVPTX::BI__asm_wgmma_m64n248k16_f32_bf16_bf16:
     return {Intrinsic::nvvm_wgmma_m64n248k16_f32_bf16_bf16_1_1_1_0_0, 124};
   case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16_u64:
     return {Intrinsic::nvvm_wgmma_m64n256k16_f32_bf16_bf16_1_1_1_0_0, 128};
   // ---- bf16, scale_d = 0 variants ----
   case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16_scale_d0:
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16_scale_d0_u64:
     return {Intrinsic::nvvm_wgmma_m64n32k16_f32_bf16_bf16_0_1_1_0_0, 16};
   case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16_scale_d0:
   case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16_scale_d0_u64:
@@ -574,8 +582,10 @@ static std::pair<unsigned, unsigned> getWgmmaInfo(unsigned BuiltinID) {
   case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16_scale_d0_u64:
     return {Intrinsic::nvvm_wgmma_m64n128k16_f32_bf16_bf16_0_1_1_0_0, 64};
   case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16_scale_d0:
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16_scale_d0_u64:
     return {Intrinsic::nvvm_wgmma_m64n192k16_f32_bf16_bf16_0_1_1_0_0, 96};
   case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16_scale_d0:
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16_scale_d0_u64:
     return {Intrinsic::nvvm_wgmma_m64n256k16_f32_bf16_bf16_0_1_1_0_0, 128};
   // ---- fp16, m64nNk16 ----
   case NVPTX::BI__asm_wgmma_m64n8k16_f32_f16_f16:
@@ -656,13 +666,227 @@ static std::pair<unsigned, unsigned> getWgmmaInfo(unsigned BuiltinID) {
   }
 }
 
+struct NVPTXWgmmaFlagInfo {
+  unsigned NumEltsD;
+  bool SupportsTranspose;
+  std::array<unsigned, 32> Variants;
+
+  unsigned getWGMMAIntrinsic(int ScaleD, int ScaleA, int ScaleB, int TransA,
+                             int TransB) const {
+    if (ScaleD < 0 || ScaleD > 1 || ScaleA < 0 || ScaleA > 1 ||
+        ScaleB < 0 || ScaleB > 1 || TransA < 0 || TransA > 1 ||
+        TransB < 0 || TransB > 1)
+      return 0;
+    if (!SupportsTranspose && (TransA != 0 || TransB != 0))
+      return 0;
+    unsigned Index = SupportsTranspose
+                         ? ((ScaleD << 4) | (ScaleA << 3) |
+                            (ScaleB << 2) | (TransA << 1) | TransB)
+                         : ((ScaleD << 2) | (ScaleA << 1) | ScaleB);
+    return Variants[Index];
+  }
+};
+
+static NVPTXWgmmaFlagInfo getNVPTXWgmmaFlagInfo(unsigned BuiltinID) {
+
+#define WGMMA_TRANS_FLAG_SWITCH(GEOM, TYPE, NUM)                          \
+  return {NUM, true,                                                      \
+          {{Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_0_0_0_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_0_0_0_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_0_0_1_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_0_0_1_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_0_1_0_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_0_1_0_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_0_1_1_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_0_1_1_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_1_0_0_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_1_0_0_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_1_0_1_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_1_0_1_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_1_1_0_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_1_1_0_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_1_1_1_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_0_1_1_1_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_0_0_0_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_0_0_0_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_0_0_1_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_0_0_1_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_0_1_0_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_0_1_0_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_0_1_1_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_0_1_1_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_1_0_0_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_1_0_0_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_1_0_1_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_1_0_1_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_1_1_0_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_1_1_0_1,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_1_1_1_0,\
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_##TYPE##_##TYPE##_1_1_1_1_1}}}
+
+#define WGMMA_TF32_FLAG_SWITCH(GEOM, NUM)                                  \
+  return {NUM, false,                                                       \
+          {{Intrinsic::nvvm_wgmma_##GEOM##_f32_tf32_tf32_0_0_0,             \
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_tf32_tf32_0_0_1,             \
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_tf32_tf32_0_1_0,             \
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_tf32_tf32_0_1_1,             \
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_tf32_tf32_1_0_0,             \
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_tf32_tf32_1_0_1,             \
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_tf32_tf32_1_1_0,             \
+            Intrinsic::nvvm_wgmma_##GEOM##_f32_tf32_tf32_1_1_1}}}
+
+  switch (BuiltinID) {
+  case NVPTX::BI__asm_wgmma_m64n8k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n8k16, bf16, 4);
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n16k16, bf16, 8);
+  case NVPTX::BI__asm_wgmma_m64n24k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n24k16, bf16, 12);
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n32k16, bf16, 16);
+  case NVPTX::BI__asm_wgmma_m64n40k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n40k16, bf16, 20);
+  case NVPTX::BI__asm_wgmma_m64n48k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n48k16, bf16, 24);
+  case NVPTX::BI__asm_wgmma_m64n56k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n56k16, bf16, 28);
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n64k16, bf16, 32);
+  case NVPTX::BI__asm_wgmma_m64n72k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n72k16, bf16, 36);
+  case NVPTX::BI__asm_wgmma_m64n80k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n80k16, bf16, 40);
+  case NVPTX::BI__asm_wgmma_m64n88k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n88k16, bf16, 44);
+  case NVPTX::BI__asm_wgmma_m64n96k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n96k16, bf16, 48);
+  case NVPTX::BI__asm_wgmma_m64n104k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n104k16, bf16, 52);
+  case NVPTX::BI__asm_wgmma_m64n112k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n112k16, bf16, 56);
+  case NVPTX::BI__asm_wgmma_m64n120k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n120k16, bf16, 60);
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n128k16, bf16, 64);
+  case NVPTX::BI__asm_wgmma_m64n136k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n136k16, bf16, 68);
+  case NVPTX::BI__asm_wgmma_m64n144k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n144k16, bf16, 72);
+  case NVPTX::BI__asm_wgmma_m64n152k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n152k16, bf16, 76);
+  case NVPTX::BI__asm_wgmma_m64n160k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n160k16, bf16, 80);
+  case NVPTX::BI__asm_wgmma_m64n168k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n168k16, bf16, 84);
+  case NVPTX::BI__asm_wgmma_m64n176k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n176k16, bf16, 88);
+  case NVPTX::BI__asm_wgmma_m64n184k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n184k16, bf16, 92);
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n192k16, bf16, 96);
+  case NVPTX::BI__asm_wgmma_m64n200k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n200k16, bf16, 100);
+  case NVPTX::BI__asm_wgmma_m64n208k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n208k16, bf16, 104);
+  case NVPTX::BI__asm_wgmma_m64n216k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n216k16, bf16, 108);
+  case NVPTX::BI__asm_wgmma_m64n224k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n224k16, bf16, 112);
+  case NVPTX::BI__asm_wgmma_m64n232k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n232k16, bf16, 116);
+  case NVPTX::BI__asm_wgmma_m64n240k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n240k16, bf16, 120);
+  case NVPTX::BI__asm_wgmma_m64n248k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n248k16, bf16, 124);
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n256k16, bf16, 128);
+  case NVPTX::BI__asm_wgmma_m64n8k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n8k16, f16, 4);
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n16k16, f16, 8);
+  case NVPTX::BI__asm_wgmma_m64n24k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n24k16, f16, 12);
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n32k16, f16, 16);
+  case NVPTX::BI__asm_wgmma_m64n40k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n40k16, f16, 20);
+  case NVPTX::BI__asm_wgmma_m64n48k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n48k16, f16, 24);
+  case NVPTX::BI__asm_wgmma_m64n56k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n56k16, f16, 28);
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n64k16, f16, 32);
+  case NVPTX::BI__asm_wgmma_m64n72k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n72k16, f16, 36);
+  case NVPTX::BI__asm_wgmma_m64n80k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n80k16, f16, 40);
+  case NVPTX::BI__asm_wgmma_m64n88k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n88k16, f16, 44);
+  case NVPTX::BI__asm_wgmma_m64n96k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n96k16, f16, 48);
+  case NVPTX::BI__asm_wgmma_m64n104k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n104k16, f16, 52);
+  case NVPTX::BI__asm_wgmma_m64n112k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n112k16, f16, 56);
+  case NVPTX::BI__asm_wgmma_m64n120k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n120k16, f16, 60);
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n128k16, f16, 64);
+  case NVPTX::BI__asm_wgmma_m64n136k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n136k16, f16, 68);
+  case NVPTX::BI__asm_wgmma_m64n144k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n144k16, f16, 72);
+  case NVPTX::BI__asm_wgmma_m64n152k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n152k16, f16, 76);
+  case NVPTX::BI__asm_wgmma_m64n160k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n160k16, f16, 80);
+  case NVPTX::BI__asm_wgmma_m64n168k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n168k16, f16, 84);
+  case NVPTX::BI__asm_wgmma_m64n176k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n176k16, f16, 88);
+  case NVPTX::BI__asm_wgmma_m64n184k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n184k16, f16, 92);
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n192k16, f16, 96);
+  case NVPTX::BI__asm_wgmma_m64n200k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n200k16, f16, 100);
+  case NVPTX::BI__asm_wgmma_m64n208k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n208k16, f16, 104);
+  case NVPTX::BI__asm_wgmma_m64n216k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n216k16, f16, 108);
+  case NVPTX::BI__asm_wgmma_m64n224k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n224k16, f16, 112);
+  case NVPTX::BI__asm_wgmma_m64n232k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n232k16, f16, 116);
+  case NVPTX::BI__asm_wgmma_m64n240k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n240k16, f16, 120);
+  case NVPTX::BI__asm_wgmma_m64n248k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n248k16, f16, 124);
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16_flags:
+    WGMMA_TRANS_FLAG_SWITCH(m64n256k16, f16, 128);
+  case NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32_flags:
+    WGMMA_TF32_FLAG_SWITCH(m64n8k8, 4);
+  case NVPTX::BI__asm_wgmma_m64n16k8_f32_tf32_tf32_flags:
+    WGMMA_TF32_FLAG_SWITCH(m64n16k8, 8);
+  case NVPTX::BI__asm_wgmma_m64n24k8_f32_tf32_tf32_flags:
+    WGMMA_TF32_FLAG_SWITCH(m64n24k8, 12);
+  case NVPTX::BI__asm_wgmma_m64n32k8_f32_tf32_tf32_flags:
+    WGMMA_TF32_FLAG_SWITCH(m64n32k8, 16);
+  default:
+    llvm_unreachable("Unknown wgmma flags builtin");
+  }
+
+#undef WGMMA_TRANS_FLAG_SWITCH
+#undef WGMMA_TF32_FLAG_SWITCH
+}
+
 // EmitWgmma: common codegen for all wgmma builtins.
-// Builtin signature: void(float * D, void AS3 * desc_a, void AS3 * desc_b)
+// Builtin signature: void(float * D, unsigned long long desc_a, unsigned long long desc_b)
 // Intrinsic signature: {f32 x NumEltsD} (ptr AS3, ptr AS3)
 static Value *EmitWgmma(unsigned IntrinsicID, unsigned NumEltsD,
                         CodeGenFunction &CGF, const CallExpr *E) {
   Address Dst = CGF.EmitPointerWithAlignment(E->getArg(0));
-  // Arg1/2 are AS3 pointers (void address_space<3> *); emit as pointer values
+  // Arg1/2 are descriptor operands; u64 path is canonical and pointer path is kept as fallback compatibility
   // and cast to ptr addrspace(3) for the intrinsic.
   Value *RawA = CGF.EmitScalarExpr(E->getArg(1));
   Value *RawB = CGF.EmitScalarExpr(E->getArg(2));
@@ -3763,12 +3987,36 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
     return MakeCpAsync(Intrinsic::nvvm_cp_async_ca_shared_global_16,
                        Intrinsic::nvvm_cp_async_ca_shared_global_16_s, *this, E,
                        16);
+  case NVPTX::BI__nvvm_cp_async_bulk_tensor_g2s_tile_1d:
+    return MakeCpAsyncBulkTensorG2S(
+        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_1d, 1, *this, E, false);
+  case NVPTX::BI__nvvm_cp_async_bulk_tensor_g2s_tile_1d_multicast:
+    return MakeCpAsyncBulkTensorG2S(
+        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_1d, 1, *this, E, true);
+  case NVPTX::BI__nvvm_cp_async_bulk_tensor_g2s_tile_2d:
+    return MakeCpAsyncBulkTensorG2S(
+        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_2d, 2, *this, E, false);
+  case NVPTX::BI__nvvm_cp_async_bulk_tensor_g2s_tile_2d_multicast:
+    return MakeCpAsyncBulkTensorG2S(
+        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_2d, 2, *this, E, true);
   case NVPTX::BI__nvvm_cp_async_bulk_tensor_g2s_tile_3d:
-    return MakeCpAsyncBulkTensorG2S3D(
-        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_3d, *this, E, false);
+    return MakeCpAsyncBulkTensorG2S(
+        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_3d, 3, *this, E, false);
   case NVPTX::BI__nvvm_cp_async_bulk_tensor_g2s_tile_3d_multicast:
-    return MakeCpAsyncBulkTensorG2S3D(
-        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_3d, *this, E, true);
+    return MakeCpAsyncBulkTensorG2S(
+        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_3d, 3, *this, E, true);
+  case NVPTX::BI__nvvm_cp_async_bulk_tensor_g2s_tile_4d:
+    return MakeCpAsyncBulkTensorG2S(
+        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_4d, 4, *this, E, false);
+  case NVPTX::BI__nvvm_cp_async_bulk_tensor_g2s_tile_4d_multicast:
+    return MakeCpAsyncBulkTensorG2S(
+        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_4d, 4, *this, E, true);
+  case NVPTX::BI__nvvm_cp_async_bulk_tensor_g2s_tile_5d:
+    return MakeCpAsyncBulkTensorG2S(
+        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_5d, 5, *this, E, false);
+  case NVPTX::BI__nvvm_cp_async_bulk_tensor_g2s_tile_5d_multicast:
+    return MakeCpAsyncBulkTensorG2S(
+        Intrinsic::nvvm_cp_async_bulk_tensor_g2s_tile_5d, 5, *this, E, true);
   case NVPTX::BI__nvvm_mbarrier_init_shared:
     return Builder.CreateCall(
         CGM.getIntrinsic(Intrinsic::nvvm_mbarrier_init_shared),
@@ -3934,19 +4182,44 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   // Scheme A: unified mma.sync codegen for FP16/BF16/TF32/FP64
   // All A/B/C as scalar Value*, D as individual output pointers (Value*)
   // Param order: D0*..Dn*, A0..An, B0..Bn, C0..Cn
+  case NVPTX::BI__asm_mma_m8n8k4_f32_f16_f16_f32_layout:
   case NVPTX::BI__asm_mma_m8n8k4_f32_f16_f16_f32:
+  case NVPTX::BI__asm_mma_m16n8k8_f32_f16_f16_f32_layout:
   case NVPTX::BI__asm_mma_m16n8k8_f32_f16_f16_f32:
+  case NVPTX::BI__asm_mma_m16n8k16_f32_f16_f16_f32_layout:
   case NVPTX::BI__asm_mma_m16n8k16_f32_f16_f16_f32:
+  case NVPTX::BI__asm_mma_m16n8k8_f32_bf16_bf16_f32_layout:
   case NVPTX::BI__asm_mma_m16n8k8_f32_bf16_bf16_f32:
+  case NVPTX::BI__asm_mma_m16n8k16_f32_bf16_bf16_f32_layout:
   case NVPTX::BI__asm_mma_m16n8k16_f32_bf16_bf16_f32:
+  case NVPTX::BI__asm_mma_m16n8k4_f32_tf32_tf32_f32_layout:
   case NVPTX::BI__asm_mma_m16n8k4_f32_tf32_tf32_f32:
+  case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32_layout:
   case NVPTX::BI__asm_mma_m16n8k8_f32_tf32_tf32_f32:
+  case NVPTX::BI__asm_mma_m8n8k4_f64_f64_f64_f64_layout:
   case NVPTX::BI__asm_mma_m8n8k4_f64_f64_f64_f64:
+  case NVPTX::BI__asm_mma_m16n8k4_f64_f64_f64_f64_layout:
   case NVPTX::BI__asm_mma_m16n8k4_f64_f64_f64_f64:
+  case NVPTX::BI__asm_mma_m16n8k8_f64_f64_f64_f64_layout:
   case NVPTX::BI__asm_mma_m16n8k8_f64_f64_f64_f64:
+  case NVPTX::BI__asm_mma_m16n8k16_f64_f64_f64_f64_layout:
   case NVPTX::BI__asm_mma_m16n8k16_f64_f64_f64_f64: {
     NVPTXMmaInfo MI = getNVPTXMmaInfo(BuiltinID);
-    unsigned IID = MI.getMMAIntrinsic(0, 0);
+    unsigned Layout = 1; // Default legacy spelling maps to row,col.
+    unsigned NumValueArgs = MI.NumEltsD + MI.NumEltsA + MI.NumEltsB + MI.NumEltsC;
+    if (E->getNumArgs() == NumValueArgs + 1) {
+      std::optional<llvm::APSInt> LayoutArg =
+          E->getArg(NumValueArgs)->getIntegerConstantExpr(getContext());
+      if (!LayoutArg)
+        return nullptr;
+      int64_t LayoutValue = LayoutArg->getSExtValue();
+      if (LayoutValue < 0 || LayoutValue > 3)
+        return nullptr;
+      Layout = static_cast<unsigned>(LayoutValue);
+    }
+    unsigned IID = MI.getMMAIntrinsic(Layout, 0);
+    if (IID == 0)
+      return nullptr;
     Function *Intrinsic = CGM.getIntrinsic(IID);
 
     // D output pointers
@@ -3970,15 +4243,110 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
           Builder.CreateExtractValue(Result, i), DstPtrs[i]);
     return Result;
   }
+  // wgmma builtins with explicit compile-time scale/transpose flags.
+  case NVPTX::BI__asm_wgmma_m64n8k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n24k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n40k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n48k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n56k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n72k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n80k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n88k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n96k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n104k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n112k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n120k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n136k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n144k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n152k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n160k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n168k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n176k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n184k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n200k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n208k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n216k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n224k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n232k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n240k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n248k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16_flags:
+  case NVPTX::BI__asm_wgmma_m64n8k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n24k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n40k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n48k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n56k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n64k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n72k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n80k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n88k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n96k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n104k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n112k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n120k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n128k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n136k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n144k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n152k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n160k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n168k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n176k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n184k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n200k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n208k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n216k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n224k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n232k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n240k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n248k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_f16_f16_flags:
+  case NVPTX::BI__asm_wgmma_m64n8k8_f32_tf32_tf32_flags:
+  case NVPTX::BI__asm_wgmma_m64n16k8_f32_tf32_tf32_flags:
+  case NVPTX::BI__asm_wgmma_m64n24k8_f32_tf32_tf32_flags:
+  case NVPTX::BI__asm_wgmma_m64n32k8_f32_tf32_tf32_flags:
+  {
+    auto GetWgmmaFlag = [&](unsigned ArgNo) -> std::optional<int> {
+      std::optional<llvm::APSInt> Flag =
+          E->getArg(ArgNo)->getIntegerConstantExpr(getContext());
+      if (!Flag)
+        return std::nullopt;
+      int64_t Value = Flag->getSExtValue();
+      if (Value < 0 || Value > 1)
+        return std::nullopt;
+      return static_cast<int>(Value);
+    };
+    std::optional<int> ScaleD = GetWgmmaFlag(3);
+    std::optional<int> ScaleA = GetWgmmaFlag(4);
+    std::optional<int> ScaleB = GetWgmmaFlag(5);
+    std::optional<int> TransA = GetWgmmaFlag(6);
+    std::optional<int> TransB = GetWgmmaFlag(7);
+    if (!ScaleD || !ScaleA || !ScaleB || !TransA || !TransB)
+      return nullptr;
+    NVPTXWgmmaFlagInfo WI = getNVPTXWgmmaFlagInfo(BuiltinID);
+    unsigned IID = WI.getWGMMAIntrinsic(*ScaleD, *ScaleA, *ScaleB, *TransA,
+                                        *TransB);
+    if (IID == 0)
+      return nullptr;
+    return EmitWgmma(IID, WI.NumEltsD, *this, E);
+  }
   // =========================================================
-  // wgmma builtins — bf16/fp16 (m64nNk16) and tf32 (m64nNk8)
+  // wgmma builtins �?bf16/fp16 (m64nNk16) and tf32 (m64nNk8)
   // All share the same CodeGen via getWgmmaInfo + EmitWgmma.
-  // Builtin signature: void(float * D, void AS3 * desc_a, void AS3 * desc_b)
+  // Builtin signature: void(float * D, unsigned long long desc_a, unsigned long long desc_b)
   // =========================================================
   case NVPTX::BI__asm_wgmma_m64n8k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n16k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n24k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16_u64:
   case NVPTX::BI__asm_wgmma_m64n40k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n48k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n56k16_f32_bf16_bf16:
@@ -4001,6 +4369,7 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__asm_wgmma_m64n176k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n184k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16_u64:
   case NVPTX::BI__asm_wgmma_m64n200k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n208k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n216k16_f32_bf16_bf16:
@@ -4009,13 +4378,17 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   case NVPTX::BI__asm_wgmma_m64n240k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n248k16_f32_bf16_bf16:
   case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16:
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16_u64:
   case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16_scale_d0:
+  case NVPTX::BI__asm_wgmma_m64n32k16_f32_bf16_bf16_scale_d0_u64:
   case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16_scale_d0:
   case NVPTX::BI__asm_wgmma_m64n64k16_f32_bf16_bf16_scale_d0_u64:
   case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16_scale_d0:
   case NVPTX::BI__asm_wgmma_m64n128k16_f32_bf16_bf16_scale_d0_u64:
   case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16_scale_d0:
+  case NVPTX::BI__asm_wgmma_m64n192k16_f32_bf16_bf16_scale_d0_u64:
   case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16_scale_d0:
+  case NVPTX::BI__asm_wgmma_m64n256k16_f32_bf16_bf16_scale_d0_u64:
   case NVPTX::BI__asm_wgmma_m64n8k16_f32_f16_f16:
   case NVPTX::BI__asm_wgmma_m64n16k16_f32_f16_f16:
   case NVPTX::BI__asm_wgmma_m64n24k16_f32_f16_f16:
@@ -4057,7 +4430,7 @@ Value *CodeGenFunction::EmitNVPTXBuiltinExpr(unsigned BuiltinID,
   }
 
   // =========================================================
-  // ldmatrix builtins — lower to llvm.nvvm.ldmatrix.sync.aligned.*
+  // ldmatrix builtins �?lower to llvm.nvvm.ldmatrix.sync.aligned.*
   // =========================================================
 
   // --- m8n8 b16 (SM75+, PTX65+) ---

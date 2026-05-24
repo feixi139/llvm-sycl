@@ -636,7 +636,40 @@ foreach dim = [1, 2, 3, 4, 5] in {
   }
 }
 
-// Explicitly bind 3D tile G2S intrinsics used by wgmma path.
+// Explicitly bind tile G2S intrinsics (1D~5D) used by the Clang builtin path.
+def INT_CP_ASYNC_BULK_TENSOR_G2S_TILE_1D : NVPTXInst<(outs),
+  (ins ADDR:$dst, ADDR:$mbar, ADDR:$tmap, Int32Regs:$d0),
+  "cp.async.bulk.tensor.1d.shared::cluster.global.tile.mbarrier::complete_tx::bytes "
+  "[$dst], [$tmap, {{$d0}}], [$mbar];",
+  [(int_nvvm_cp_async_bulk_tensor_g2s_tile_1d
+      addr:$dst, addr:$mbar, addr:$tmap, i32:$d0, 0, 0, 0, 0)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
+def INT_CP_ASYNC_BULK_TENSOR_G2S_TILE_1D_MC : NVPTXInst<(outs),
+  (ins ADDR:$dst, ADDR:$mbar, ADDR:$tmap, Int32Regs:$d0, Int16Regs:$mc),
+  "cp.async.bulk.tensor.1d.shared::cluster.global.tile.mbarrier::complete_tx::bytes.multicast::cluster "
+  "[$dst], [$tmap, {{$d0}}], [$mbar], $mc;",
+  [(int_nvvm_cp_async_bulk_tensor_g2s_tile_1d
+      addr:$dst, addr:$mbar, addr:$tmap, i32:$d0, i16:$mc, 0, 1, 0)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
+def INT_CP_ASYNC_BULK_TENSOR_G2S_TILE_2D : NVPTXInst<(outs),
+  (ins ADDR:$dst, ADDR:$mbar, ADDR:$tmap, Int32Regs:$d0, Int32Regs:$d1),
+  "cp.async.bulk.tensor.2d.shared::cluster.global.tile.mbarrier::complete_tx::bytes "
+  "[$dst], [$tmap, {{$d0, $d1}}], [$mbar];",
+  [(int_nvvm_cp_async_bulk_tensor_g2s_tile_2d
+      addr:$dst, addr:$mbar, addr:$tmap, i32:$d0, i32:$d1, 0, 0, 0, 0)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
+def INT_CP_ASYNC_BULK_TENSOR_G2S_TILE_2D_MC : NVPTXInst<(outs),
+  (ins ADDR:$dst, ADDR:$mbar, ADDR:$tmap, Int32Regs:$d0, Int32Regs:$d1,
+       Int16Regs:$mc),
+  "cp.async.bulk.tensor.2d.shared::cluster.global.tile.mbarrier::complete_tx::bytes.multicast::cluster "
+  "[$dst], [$tmap, {{$d0, $d1}}], [$mbar], $mc;",
+  [(int_nvvm_cp_async_bulk_tensor_g2s_tile_2d
+      addr:$dst, addr:$mbar, addr:$tmap, i32:$d0, i32:$d1, i16:$mc, 0, 1, 0)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
 def INT_CP_ASYNC_BULK_TENSOR_G2S_TILE_3D : NVPTXInst<(outs),
   (ins ADDR:$dst, ADDR:$mbar, ADDR:$tmap, Int32Regs:$d0, Int32Regs:$d1,
        Int32Regs:$d2),
@@ -654,6 +687,48 @@ def INT_CP_ASYNC_BULK_TENSOR_G2S_TILE_3D_MC : NVPTXInst<(outs),
   "[$dst], [$tmap, {{$d0, $d1, $d2}}], [$mbar], $mc;",
   [(int_nvvm_cp_async_bulk_tensor_g2s_tile_3d
       addr:$dst, addr:$mbar, addr:$tmap, i32:$d0, i32:$d1, i32:$d2,
+      i16:$mc, 0, 1, 0)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
+def INT_CP_ASYNC_BULK_TENSOR_G2S_TILE_4D : NVPTXInst<(outs),
+  (ins ADDR:$dst, ADDR:$mbar, ADDR:$tmap, Int32Regs:$d0, Int32Regs:$d1,
+       Int32Regs:$d2, Int32Regs:$d3),
+  "cp.async.bulk.tensor.4d.shared::cluster.global.tile.mbarrier::complete_tx::bytes "
+  "[$dst], [$tmap, {{$d0, $d1, $d2, $d3}}], [$mbar];",
+  [(int_nvvm_cp_async_bulk_tensor_g2s_tile_4d
+      addr:$dst, addr:$mbar, addr:$tmap, i32:$d0, i32:$d1, i32:$d2, i32:$d3,
+      0, 0, 0, 0)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
+def INT_CP_ASYNC_BULK_TENSOR_G2S_TILE_4D_MC : NVPTXInst<(outs),
+  (ins ADDR:$dst, ADDR:$mbar, ADDR:$tmap, Int32Regs:$d0, Int32Regs:$d1,
+       Int32Regs:$d2, Int32Regs:$d3, Int16Regs:$mc),
+  "cp.async.bulk.tensor.4d.shared::cluster.global.tile.mbarrier::complete_tx::bytes.multicast::cluster "
+  "[$dst], [$tmap, {{$d0, $d1, $d2, $d3}}], [$mbar], $mc;",
+  [(int_nvvm_cp_async_bulk_tensor_g2s_tile_4d
+      addr:$dst, addr:$mbar, addr:$tmap, i32:$d0, i32:$d1, i32:$d2, i32:$d3,
+      i16:$mc, 0, 1, 0)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
+def INT_CP_ASYNC_BULK_TENSOR_G2S_TILE_5D : NVPTXInst<(outs),
+  (ins ADDR:$dst, ADDR:$mbar, ADDR:$tmap, Int32Regs:$d0, Int32Regs:$d1,
+       Int32Regs:$d2, Int32Regs:$d3, Int32Regs:$d4),
+  "cp.async.bulk.tensor.5d.shared::cluster.global.tile.mbarrier::complete_tx::bytes "
+  "[$dst], [$tmap, {{$d0, $d1, $d2, $d3, $d4}}], [$mbar];",
+  [(int_nvvm_cp_async_bulk_tensor_g2s_tile_5d
+      addr:$dst, addr:$mbar, addr:$tmap,
+      i32:$d0, i32:$d1, i32:$d2, i32:$d3, i32:$d4,
+      0, 0, 0, 0)]>,
+  Requires<[hasPTX<80>, hasSM<90>]>;
+
+def INT_CP_ASYNC_BULK_TENSOR_G2S_TILE_5D_MC : NVPTXInst<(outs),
+  (ins ADDR:$dst, ADDR:$mbar, ADDR:$tmap, Int32Regs:$d0, Int32Regs:$d1,
+       Int32Regs:$d2, Int32Regs:$d3, Int32Regs:$d4, Int16Regs:$mc),
+  "cp.async.bulk.tensor.5d.shared::cluster.global.tile.mbarrier::complete_tx::bytes.multicast::cluster "
+  "[$dst], [$tmap, {{$d0, $d1, $d2, $d3, $d4}}], [$mbar], $mc;",
+  [(int_nvvm_cp_async_bulk_tensor_g2s_tile_5d
+      addr:$dst, addr:$mbar, addr:$tmap,
+      i32:$d0, i32:$d1, i32:$d2, i32:$d3, i32:$d4,
       i16:$mc, 0, 1, 0)]>,
   Requires<[hasPTX<80>, hasSM<90>]>;
 
